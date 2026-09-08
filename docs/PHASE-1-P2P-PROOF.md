@@ -138,7 +138,7 @@ Do not interpret a zero P2P result as a library failure until we inspect:
 
 A result is **runtime-proven** when a browser reports actual P2P segment/byte traffic from the P2P Media Loader event path.
 
-### STRONG INFERRERENCE
+### STRONG INFERENCE
 
 A connected WebRTC peer without P2P media bytes proves peer connectivity, but not media transfer.
 

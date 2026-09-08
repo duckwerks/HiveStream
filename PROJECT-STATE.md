@@ -1,7 +1,7 @@
 # PROJECT STATE
 
-**Last updated:** 2026-09-08
-**Status:** Architectural baseline / pre-MVP implementation
+**Last updated:** 2026-09-08  
+**Status:** Phase 1 runtime experiment ready
 
 ## Mission
 
@@ -55,7 +55,19 @@ HTMLMediaElement
 
 **Phase 1 — P2P proof.**
 
-The immediate objective is the smallest standalone two-browser experiment capable of demonstrating real P2P media traffic.
+The standalone runtime experiment is now implemented at:
+
+```text
+experiments/phase-1-p2p-proof.html
+```
+
+Procedure and interpretation are documented at:
+
+```text
+docs/PHASE-1-P2P-PROOF.md
+```
+
+The experiment uses the current P2P Media Loader Hls.js integration and measures actual P2P/HTTP byte and segment events rather than treating peer discovery as proof of media transfer.
 
 ### Required measurements
 
@@ -67,13 +79,15 @@ The immediate objective is the smallest standalone two-browser experiment capabl
 - playback state
 - later: persistent inventory
 
-The proof must distinguish actual P2P segment traffic from ordinary HTTP loading.
+### Phase 1 exit condition
+
+Phase 1 is complete only after a reproducible two-browser run demonstrates actual media segments/bytes moving through the P2P path.
 
 ## Evidence boundary
 
-Research in `cytube-knowledge` establishes that p2p-media-loader has the mechanisms needed for segment storage, stored-segment inventory, announcements, requests, and uploads. The remaining engineering work is to prove the complete path in the target browsers and then build HiveStream-owned persistence/reuse behavior around it.
+Research in `cytube-knowledge` establishes that p2p-media-loader has the mechanisms needed for segment storage, stored-segment inventory, announcements, requests, and uploads. The current experiment now provides the runtime instrument needed to prove the browser-to-browser media path.
 
-One explicit open boundary is the lifecycle of prepopulated persistent segments: when an active P2P loader starts, exactly when and how stored segments become visible to peers must be runtime-proven rather than assumed.
+One explicit open boundary remains the lifecycle of prepopulated persistent segments: when an active P2P loader starts, exactly when and how stored segments become visible to peers must be runtime-proven rather than assumed. That belongs to the persistence phase after Phase 1.
 
 ## Scope guardrail
 

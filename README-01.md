@@ -1,3 +1,0 @@
-# HiveStream
-
-Initial repository commit.

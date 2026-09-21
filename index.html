@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HiveStream Phase 1B — Natural Swarm Diagnostic v8.1</title>
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v9</title>
 
 <!--
 ===============================================================================
@@ -63,6 +63,48 @@ with its source marked.  Absence of that value is itself useful evidence.
 
 EXPERIMENTAL INTEGRITY
 ----------------------
+v9 P2P-FIRST SCHEDULER EXPERIMENT
+----------------------------------
+v9 keeps the v8.1 natural-swarm experiment and its existing WebRTC, tracker,
+peer, stream-identity, transfer, JSON-export, and privacy instrumentation.
+
+The new P2P-first behavior is implemented through p2p-media-loader v4's actual
+Core configuration and scheduler behavior rather than through an external
+stopwatch or an invented "P2P timer".
+
+SOURCE-REVIEWED LIBRARY MECHANISM
+---------------------------------
+This diagnostic was prepared against the reviewed p2p-media-loader source
+commit 527105b420c15dfdb0e8ed4b6f0a261f48411192.
+
+The library's HybridLoader uses:
+- httpDownloadInitialTimeoutMs to delay HTTP during the initial startup period.
+- simultaneousHttpDownloads to cap concurrent HTTP requests.
+- simultaneousP2PDownloads to cap concurrent P2P requests.
+- highDemandTimeWindow, httpDownloadTimeWindow, and p2pDownloadTimeWindow as
+  playback-time windows used by getSegmentPlaybackStatuses().
+- regular queued segments are attempted through P2P when they are
+  P2P-downloadable; background random HTTP loading is separate.
+- high-demand segments can use HTTP first once the initial HTTP wait has ended,
+  so v9 does NOT claim that the entire loader has been globally changed to
+  "P2P only".
+
+For this experiment, v9 sets a short library-native initial HTTP delay and
+records the resulting scheduler configuration. The purpose is to give a
+connected peer an opportunity to satisfy the requested segment before HTTP
+startup is allowed, while retaining the library's normal HTTP fallback after
+that initial window.
+
+The diagnostic additionally subscribes to the library's documented
+onSegmentStart, onSegmentLoaded, onSegmentAbort, onSegmentError,
+onPeerConnect, onPeerClose, onPeerConnectError, onTrackerWarning,
+onTrackerError, onChunkDownloaded, and onChunkUploaded events.
+
+IMPORTANT:
+Instrumentation tells us what the library actually did. It does not force a
+P2P result, fabricate peer availability, or treat a tracker sighting as media
+proof.
+
 - Natural mode deliberately omits the swarmId property.
 - Custom mode remains available for controlled comparison.
 - The controlled rendition remains 848x480 / 836280.
@@ -203,7 +245,7 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v8.1</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v9</h1>
   <div class="small">
     William von Meister + GPT-5.6 Luna · passive WebRTC / p2p-media-loader instrumentation
   </div>
@@ -261,6 +303,7 @@ video {
     <div class="card"><h2>Manifest / Swarm</h2><pre id="manifest"></pre></div>
     <div class="card"><h2>Trackers / Peers</h2><pre id="peers"></pre></div>
     <div class="card"><h2>WebRTC Connectivity</h2><pre id="webrtc"></pre></div>
+    <div class="card"><h2>P2P Scheduler / Decision Evidence</h2><pre id="scheduler"></pre></div>
     <div class="card"><h2>Transfer / Proof</h2><pre id="transfer"></pre></div>
     <div class="card"><h2>Event Log</h2><pre id="log"></pre></div>
   </section>
@@ -296,6 +339,41 @@ video {
     height: 480,
     bitrate: 836280
   };
+
+  /*
+   * P2P-FIRST EXPERIMENT SETTINGS
+   * ------------------------------
+   * These are real p2p-media-loader Core options, not HiveStream inventions.
+   *
+   * httpDownloadInitialTimeoutMs:
+   *   HybridLoader explicitly checks this value before starting HTTP. A positive
+   *   value therefore creates a genuine library-native startup period during
+   *   which HTTP is held back. This is the main v9 "P2P-first" lever.
+   *
+   * simultaneousHttpDownloads:
+   *   Limits HTTP concurrency. We leave one HTTP slot available after the
+   *   initial wait so the experiment still has an HTTP fallback.
+   *
+   * simultaneousP2PDownloads:
+   *   Leaves the library's normal three P2P request slots available.
+   *
+   * IMPORTANT:
+   *   We deliberately do NOT set isP2PDisabled, isP2PUploadDisabled, or a
+   *   second tracker. We are testing the existing natural swarm, not creating
+   *   a different transport experiment.
+   */
+  var P2P_FOCUS = {
+    // Five seconds is deliberately a startup delay, not a proof timer.
+    httpDownloadInitialTimeoutMs: 5000,
+    simultaneousHttpDownloads: 1,
+    simultaneousP2PDownloads: 3,
+    highDemandTimeWindow: 15,
+    httpDownloadTimeWindow: 3000,
+    p2pDownloadTimeWindow: 6000,
+    isP2PDisabled: false,
+    isP2PUploadDisabled: false
+  };
+
 
   var video = document.getElementById("video");
   var streamUrlInput = document.getElementById("streamUrl");
@@ -443,7 +521,7 @@ video {
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-      version: "8.1",
+      version: "9.0",
       startedAt: null,
       elapsedMs: 0,
       authorship: "William von Meister (Project Owner) + GPT-5.6 Luna (Research & Technical Analysis Assistant)"
@@ -476,6 +554,20 @@ video {
       variantMode: "480",
       targetVariant: CONTROLLED,
       announceTrackers: TRACKER_HINTS.slice()
+    },
+    scheduler: {
+      requested: cloneJson(P2P_FOCUS),
+      observedCoreConfig: null,
+      actualConfigSource: null,
+      events: [],
+      counts: {
+        segmentStartP2P: 0,
+        segmentStartHTTP: 0,
+        segmentLoadedP2P: 0,
+        segmentLoadedHTTP: 0,
+        segmentAbort: 0,
+        segmentError: 0
+      }
     },
 
     manifest: {
@@ -1083,6 +1175,34 @@ video {
      */
     var engine = hlsInstance.p2pEngine;
 
+    /*
+     * Capture the authoritative runtime Core configuration. This is important:
+     * the report must tell us what p2p-media-loader actually accepted, not only
+     * what HiveStream attempted to pass into the constructor.
+     */
+    try {
+      var coreForConfig = engine.core || (hlsInstance.p2pEngine && hlsInstance.p2pEngine.core);
+      if (coreForConfig && typeof coreForConfig.getConfig === "function") {
+        var observedConfig = coreForConfig.getConfig();
+        R.scheduler.observedCoreConfig = cloneJson(observedConfig);
+        R.scheduler.actualConfigSource = "p2pEngine.core.getConfig()";
+        log("scheduler:core-config-observed", {
+          mainStream: observedConfig && observedConfig.mainStream
+            ? cloneJson(observedConfig.mainStream)
+            : null,
+          secondaryStream: observedConfig && observedConfig.secondaryStream
+            ? cloneJson(observedConfig.secondaryStream)
+            : null
+        });
+      } else {
+        R.scheduler.actualConfigSource = "core.getConfig() unavailable";
+        log("scheduler:core-config-unavailable");
+      }
+    } catch (e) {
+      R.scheduler.actualConfigSource = "core.getConfig() threw";
+      log("scheduler:core-config-error", { message: safeString(e) });
+    }
+
     function on(name, fn) {
       try {
         engine.addEventListener(name, fn);
@@ -1162,6 +1282,67 @@ video {
         t.lastEventAt = now();
       }
       log("tracker:warning", cloneJson(d));
+    });
+
+    /*
+     * P2P-FIRST SCHEDULER INSTRUMENTATION
+     * -----------------------------------
+     * onSegmentStart is the best public lifecycle signal for the source the
+     * library actually selected for a segment request. It is paired with
+     * onChunkDownloaded and onSegmentLoaded, which provide byte-level proof.
+     *
+     * We intentionally do not use a wall-clock timer to decide that P2P "won".
+     * The library's own downloadSource is the observed fact. The five-second
+     * initial HTTP delay is a library setting, not our verdict mechanism.
+     */
+    on("onSegmentStart", function (d) {
+      var source = d && d.downloadSource ? safeString(d.downloadSource).toLowerCase() : null;
+      var item = {
+        at: now(),
+        elapsedMs: Math.round(mono() - (R._monoStart || mono())),
+        source: source,
+        peerId: d && d.peerId ? d.peerId : null,
+        infoHash: d && d.infoHash ? d.infoHash : null,
+        streamType: d && d.streamType ? d.streamType : null,
+        segment: d && d.segment ? cloneJson(d.segment) : null,
+        playbackPosition: Number(video.currentTime) || 0,
+        initialHttpWaitMs: P2P_FOCUS.httpDownloadInitialTimeoutMs
+      };
+
+      R.scheduler.events.push({ type: "segment-start", detail: item });
+      if (source === "p2p") R.scheduler.counts.segmentStartP2P += 1;
+      if (source === "http") R.scheduler.counts.segmentStartHTTP += 1;
+      log("scheduler:segment-start", item);
+    });
+
+    on("onSegmentAbort", function (d) {
+      var item = {
+        at: now(),
+        source: d && d.downloadSource ? d.downloadSource : null,
+        peerId: d && d.peerId ? d.peerId : null,
+        infoHash: d && d.infoHash ? d.infoHash : null,
+        streamType: d && d.streamType ? d.streamType : null,
+        segment: d && d.segment ? cloneJson(d.segment) : null
+      };
+      R.scheduler.events.push({ type: "segment-abort", detail: item });
+      R.scheduler.counts.segmentAbort += 1;
+      log("scheduler:segment-abort", item);
+    });
+
+    on("onSegmentError", function (d) {
+      var item = {
+        at: now(),
+        source: d && d.downloadSource ? d.downloadSource : null,
+        peerId: d && d.peerId ? d.peerId : null,
+        infoHash: d && d.infoHash ? d.infoHash : null,
+        streamType: d && d.streamType ? d.streamType : null,
+        errorType: d && d.error && d.error.type ? d.error.type : null,
+        errorMessage: d && d.error && d.error.message ? d.error.message : null,
+        segment: d && d.segment ? cloneJson(d.segment) : null
+      };
+      R.scheduler.events.push({ type: "segment-error", detail: item });
+      R.scheduler.counts.segmentError += 1;
+      log("scheduler:segment-error", item);
     });
 
     /*
@@ -1267,7 +1448,19 @@ video {
       core.swarmId = v;
     }
 
+    /*
+     * Apply only the source-reviewed scheduler controls relevant to this
+     * experiment. Natural/custom swarm identity remains unchanged.
+     */
     core.announceTrackers = TRACKER_HINTS.slice();
+    core.httpDownloadInitialTimeoutMs = P2P_FOCUS.httpDownloadInitialTimeoutMs;
+    core.simultaneousHttpDownloads = P2P_FOCUS.simultaneousHttpDownloads;
+    core.simultaneousP2PDownloads = P2P_FOCUS.simultaneousP2PDownloads;
+    core.highDemandTimeWindow = P2P_FOCUS.highDemandTimeWindow;
+    core.httpDownloadTimeWindow = P2P_FOCUS.httpDownloadTimeWindow;
+    core.p2pDownloadTimeWindow = P2P_FOCUS.p2pDownloadTimeWindow;
+    core.isP2PDisabled = false;
+    core.isP2PUploadDisabled = false;
 
     return {
       mode: mode,
@@ -1441,7 +1634,7 @@ video {
     R = {
       test: {
         name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-        version: "8.1",
+        version: "9.0",
         startedAt: now(),
         elapsedMs: 0,
         authorship: "William von Meister (Project Owner) + GPT-5.6 Luna (Research & Technical Analysis Assistant)"
@@ -1470,6 +1663,20 @@ video {
         variantMode: variantValue(),
         targetVariant: CONTROLLED,
         announceTrackers: TRACKER_HINTS.slice()
+      },
+      scheduler: {
+        requested: cloneJson(P2P_FOCUS),
+        observedCoreConfig: null,
+        actualConfigSource: null,
+        events: [],
+        counts: {
+          segmentStartP2P: 0,
+          segmentStartHTTP: 0,
+          segmentLoadedP2P: 0,
+          segmentLoadedHTTP: 0,
+          segmentAbort: 0,
+          segmentError: 0
+        }
       },
       manifest: {
         url: "",
@@ -1680,11 +1887,13 @@ video {
       export: {
         savedAt: now(),
         format: "HiveStream Phase 1B diagnostic JSON",
-        exporterVersion: "8.1",
+        exporterVersion: "9.0",
         privacy: "No public IP, cookies, local storage contents, browsing history, or precise location are exported."
       },
       dependencies: R.dependencies,
       configuration: R.configuration,
+      scheduler: schedulerSummary(),
+      schedulerEvents: R.scheduler.events,
       manifest: R.manifest,
       selectedVariant: R.selectedVariant,
       swarm: R.swarm,
@@ -1721,6 +1930,12 @@ video {
 
     document.getElementById("webrtc").textContent =
       JSON.stringify(compactWebRTC(), null, 2);
+
+    document.getElementById("scheduler").textContent =
+      JSON.stringify({
+        focus: schedulerSummary(),
+        events: R.scheduler.events.slice(-200)
+      }, null, 2);
 
     document.getElementById("transfer").textContent =
       JSON.stringify({
@@ -1799,7 +2014,7 @@ video {
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "browser";
 
-    var filename = "HiveStream-Phase1B-v8.1-" + label + "-" + stamp + ".json";
+    var filename = "HiveStream-Phase1B-v9-" + label + "-" + stamp + ".json";
 
     try {
       var blob = new Blob([jsonText], {

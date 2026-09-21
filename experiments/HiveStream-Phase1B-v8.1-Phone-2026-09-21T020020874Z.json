@@ -1,0 +1,5205 @@
+{
+  "test": {
+    "name": "HiveStream Phase 1B — Natural Swarm Diagnostic",
+    "version": "8.1",
+    "startedAt": "2026-09-21T02:00:20.874Z",
+    "elapsedMs": 311380,
+    "authorship": "William von Meister (Project Owner) + GPT-5.6 Luna (Research & Technical Analysis Assistant)"
+  },
+  "identity": {
+    "browserInstanceId": "74917571-4544-4daa-a98c-662e6ecac820",
+    "deviceLabel": "Phone",
+    "browserIdentityPersistence": "localStorage",
+    "runId": "30b4cbbd-3612-4a3d-af97-08a9f94bfc95",
+    "actualP2PIdentity": {
+      "peerId": "-PM0400-CUJtTbdtCRKb",
+      "source": "hlsInstance.p2pEngine.core.peerId",
+      "verified": true
+    }
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Android 16; Mobile; rv:156.0) Gecko/156.0 Firefox/156.0",
+    "browserFamily": "Firefox",
+    "browserVersion": "156.0",
+    "platform": "Linux armv81",
+    "deviceClass": "mobile",
+    "language": "en-US",
+    "languages": [
+      "en-US"
+    ],
+    "screen": {
+      "width": 819,
+      "height": 378,
+      "availWidth": 819,
+      "availHeight": 378,
+      "colorDepth": 24,
+      "pixelDepth": 24
+    },
+    "devicePixelRatio": 2.857142857142857,
+    "viewport": {
+      "width": 743,
+      "height": 349
+    },
+    "online": true,
+    "hardwareConcurrency": 8,
+    "maxTouchPoints": 5,
+    "webRtcSupported": true,
+    "hlsSupported": true,
+    "p2pGlobal": true,
+    "p2pEngineExport": true,
+    "crossOriginIsolated": false
+  },
+  "network": {
+    "candidateTypes": {
+      "host": 0,
+      "srflx": 0,
+      "relay": 0,
+      "prflx": 0,
+      "other": 0
+    },
+    "ipv4": false,
+    "ipv6": false,
+    "udp": false,
+    "tcp": false,
+    "turnRelay": false
+  },
+  "export": {
+    "savedAt": "2026-09-21T02:05:32.256Z",
+    "format": "HiveStream Phase 1B diagnostic JSON",
+    "exporterVersion": "8.1",
+    "privacy": "No public IP, cookies, local storage contents, browsing history, or precise location are exported."
+  },
+  "dependencies": {
+    "hlsJs": "1.7.0",
+    "p2pMediaLoaderHlsJs": "4.0.0"
+  },
+  "configuration": {
+    "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "swarmMode": "natural",
+    "customSwarmId": null,
+    "variantMode": "480",
+    "targetVariant": {
+      "width": 848,
+      "height": 480,
+      "bitrate": 836280
+    },
+    "announceTrackers": [
+      "wss://tracker.openwebtorrent.com"
+    ]
+  },
+  "manifest": {
+    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "loaded": true,
+    "renditions": [
+      {
+        "index": 0,
+        "width": 1280,
+        "height": 720,
+        "bitrate": 2149280,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8"
+      },
+      {
+        "index": 1,
+        "width": 320,
+        "height": 184,
+        "bitrate": 246440,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"
+      },
+      {
+        "index": 2,
+        "width": 512,
+        "height": 288,
+        "bitrate": 460560,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8"
+      },
+      {
+        "index": 3,
+        "width": 848,
+        "height": 480,
+        "bitrate": 836280,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+      },
+      {
+        "index": 4,
+        "width": 1920,
+        "height": 1080,
+        "bitrate": 6221600,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8"
+      }
+    ],
+    "activeLevelIndex": 3,
+    "duration": null
+  },
+  "selectedVariant": {
+    "found": true,
+    "levelIndex": 3,
+    "properties": {
+      "index": 3,
+      "width": 848,
+      "height": 480,
+      "bitrate": 836280,
+      "codecs": null,
+      "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+    },
+    "reason": "Exact controlled rendition matched manifest."
+  },
+  "swarm": {
+    "resolvedSwarmId": null,
+    "controlledInfoHash": null,
+    "streams": [
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    ]
+  },
+  "trackers": {},
+  "peers": [],
+  "transfer": {
+    "bytes": {
+      "http": 130081900,
+      "p2pDown": 0,
+      "p2pUp": 0
+    },
+    "segments": [
+      {
+        "at": "2026-09-21T02:00:20.998Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:00:21.014Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:00:33.467Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:00:43.694Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:00:53.069Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:01:03.610Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:01:12.936Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:01:24.405Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:01:33.625Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:01:42.759Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:01:52.819Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:02:04.033Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:02:12.939Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:02:23.798Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:02:32.843Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:02:43.272Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:02:53.694Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:03:02.963Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:03:14.187Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:03:23.908Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:03:33.730Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:03:44.135Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:03:58.187Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:02.730Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:04.661Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:04.693Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:08.431Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:13.852Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:46.577Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:46.606Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:48.712Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:48.839Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:48.897Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:51.251Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:51.282Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:51.386Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:54.149Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:56.336Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:56.346Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:57.589Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:57.637Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:04:57.778Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:05:00.069Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:05:00.409Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:05:07.032Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:05:09.055Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      },
+      {
+        "at": "2026-09-21T02:05:09.153Z",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "source": "http",
+        "peerId": null,
+        "segmentId": null
+      }
+    ]
+  },
+  "connectivity": {
+    "trackerPeerDiscovered": false,
+    "localPeerIdKnown": true,
+    "remotePeerKnown": false,
+    "iceCandidatesGathered": false,
+    "candidatePairSucceeded": false,
+    "dataChannelOpened": false,
+    "p2pPeerConnected": false,
+    "p2pBytesReceived": 0
+  },
+  "webrtc": {
+    "connectivity": {
+      "trackerPeerDiscovered": false,
+      "localPeerIdKnown": true,
+      "remotePeerKnown": false,
+      "iceCandidatesGathered": false,
+      "candidatePairSucceeded": false,
+      "dataChannelOpened": false,
+      "p2pPeerConnected": false,
+      "p2pBytesReceived": 0
+    },
+    "iceCandidateCounts": {
+      "host": 0,
+      "srflx": 0,
+      "relay": 0,
+      "prflx": 0,
+      "other": 0
+    },
+    "peerConnections": [
+      {
+        "index": 0,
+        "createdAt": "2026-09-21T02:00:22.399Z",
+        "states": {
+          "signaling": "closed",
+          "iceGathering": "new",
+          "ice": "closed",
+          "connection": "closed"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 1,
+        "createdAt": "2026-09-21T02:00:22.409Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 2,
+        "createdAt": "2026-09-21T02:00:22.416Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 3,
+        "createdAt": "2026-09-21T02:00:22.421Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 4,
+        "createdAt": "2026-09-21T02:00:22.426Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 5,
+        "createdAt": "2026-09-21T02:00:22.431Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 6,
+        "createdAt": "2026-09-21T02:02:22.595Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 7,
+        "createdAt": "2026-09-21T02:02:22.614Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 8,
+        "createdAt": "2026-09-21T02:02:22.623Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 9,
+        "createdAt": "2026-09-21T02:02:22.632Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 10,
+        "createdAt": "2026-09-21T02:02:22.639Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 11,
+        "createdAt": "2026-09-21T02:04:22.794Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 12,
+        "createdAt": "2026-09-21T02:04:22.816Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 13,
+        "createdAt": "2026-09-21T02:04:22.841Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 14,
+        "createdAt": "2026-09-21T02:04:22.860Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 15,
+        "createdAt": "2026-09-21T02:04:22.877Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      }
+    ],
+    "candidatePairRecords": [],
+    "dataChannels": []
+  },
+  "verdict": {
+    "streamIdentityObserved": true,
+    "controlledVariantFound": false,
+    "peerConnected": false,
+    "p2pChunkBytesReceived": false,
+    "p2pSegmentLoaded": false,
+    "p2pSegmentMatchedSelectedVariant": false,
+    "proof": false
+  },
+  "events": [
+    {
+      "at": "2026-09-21T02:00:20.885Z",
+      "elapsedMs": 11,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-CUJtTbdtCRKb",
+        "source": "hlsInstance.p2pEngine.core.peerId",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.890Z",
+      "elapsedMs": 15,
+      "type": "hls:manifest-loading",
+      "data": {
+        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.892Z",
+      "elapsedMs": 18,
+      "type": "hls:manifest-loading",
+      "data": {
+        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.895Z",
+      "elapsedMs": 21,
+      "type": "player:created",
+      "data": {
+        "loaderGlobal": "window.p2pml.hlsjs.HlsJsP2PEngine",
+        "swarmMode": "natural",
+        "swarmIdPropertyPresent": false,
+        "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.921Z",
+      "elapsedMs": 47,
+      "type": "hls:manifest-loaded",
+      "data": {
+        "levels": 5,
+        "selectedVariant": {
+          "found": true,
+          "levelIndex": 3,
+          "properties": {
+            "index": 3,
+            "width": 848,
+            "height": 480,
+            "bitrate": 836280,
+            "codecs": null,
+            "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+          },
+          "reason": "Exact controlled rendition matched manifest."
+        }
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.925Z",
+      "elapsedMs": 49,
+      "type": "hls:manifest-loaded",
+      "data": {
+        "levels": 5,
+        "selectedVariant": {
+          "found": true,
+          "levelIndex": 3,
+          "properties": {
+            "index": 3,
+            "width": 848,
+            "height": 480,
+            "bitrate": 836280,
+            "codecs": null,
+            "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+          },
+          "reason": "Exact controlled rendition matched manifest."
+        }
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.927Z",
+      "elapsedMs": 52,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.930Z",
+      "elapsedMs": 55,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.933Z",
+      "elapsedMs": 58,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.936Z",
+      "elapsedMs": 61,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.938Z",
+      "elapsedMs": 63,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.963Z",
+      "elapsedMs": 89,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 40960,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.968Z",
+      "elapsedMs": 93,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 876544,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.982Z",
+      "elapsedMs": 107,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 997652,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.987Z",
+      "elapsedMs": 113,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4182812,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:20.998Z",
+      "elapsedMs": 123,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:21.014Z",
+      "elapsedMs": 139,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:21.229Z",
+      "elapsedMs": 354,
+      "type": "hls:level-switched",
+      "data": {
+        "level": 3
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:21.233Z",
+      "elapsedMs": 358,
+      "type": "hls:level-switched",
+      "data": {
+        "level": 3
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:22.400Z",
+      "elapsedMs": 1525,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 0,
+        "signaling": "closed",
+        "iceGathering": "new",
+        "ice": "closed",
+        "connection": "closed"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:22.410Z",
+      "elapsedMs": 1535,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 1,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:22.416Z",
+      "elapsedMs": 1541,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 2,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:22.421Z",
+      "elapsedMs": 1546,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 3,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:22.426Z",
+      "elapsedMs": 1551,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 4,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:22.431Z",
+      "elapsedMs": 1556,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 5,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:27.658Z",
+      "elapsedMs": 6783,
+      "type": "hls:error",
+      "data": {
+        "type": "mediaError",
+        "details": "bufferSeekOverHole",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:27.668Z",
+      "elapsedMs": 6793,
+      "type": "hls:error",
+      "data": {
+        "type": "mediaError",
+        "details": "bufferSeekOverHole",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:33.446Z",
+      "elapsedMs": 12571,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:33.458Z",
+      "elapsedMs": 12583,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2278148,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:33.467Z",
+      "elapsedMs": 12592,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:43.663Z",
+      "elapsedMs": 22787,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 20480,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:43.683Z",
+      "elapsedMs": 22808,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3125248,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:43.689Z",
+      "elapsedMs": 22815,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1448240,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:43.694Z",
+      "elapsedMs": 22819,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:53.043Z",
+      "elapsedMs": 32169,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:53.058Z",
+      "elapsedMs": 32184,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2182832,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:00:53.069Z",
+      "elapsedMs": 32194,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:03.580Z",
+      "elapsedMs": 42705,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:03.599Z",
+      "elapsedMs": 42725,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2822972,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:03.610Z",
+      "elapsedMs": 42736,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:12.915Z",
+      "elapsedMs": 52040,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:12.928Z",
+      "elapsedMs": 52053,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1325740,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:12.936Z",
+      "elapsedMs": 52060,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:24.373Z",
+      "elapsedMs": 63499,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:24.398Z",
+      "elapsedMs": 63522,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2149932,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:24.405Z",
+      "elapsedMs": 63530,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:33.589Z",
+      "elapsedMs": 72715,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:33.612Z",
+      "elapsedMs": 72737,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3314404,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:33.625Z",
+      "elapsedMs": 72750,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:42.733Z",
+      "elapsedMs": 81859,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 90112,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:42.748Z",
+      "elapsedMs": 81873,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1223256,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:42.759Z",
+      "elapsedMs": 81885,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:52.801Z",
+      "elapsedMs": 91926,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 73728,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:52.811Z",
+      "elapsedMs": 91936,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1525400,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:01:52.819Z",
+      "elapsedMs": 91945,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:04.005Z",
+      "elapsedMs": 103131,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 262144,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:04.022Z",
+      "elapsedMs": 103147,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1746072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:04.033Z",
+      "elapsedMs": 103158,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:12.910Z",
+      "elapsedMs": 112036,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 262144,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:12.932Z",
+      "elapsedMs": 112057,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2601472,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:12.939Z",
+      "elapsedMs": 112065,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:22.595Z",
+      "elapsedMs": 121720,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 6,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:22.614Z",
+      "elapsedMs": 121740,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 7,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:22.623Z",
+      "elapsedMs": 121748,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 8,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:22.632Z",
+      "elapsedMs": 121757,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 9,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:22.639Z",
+      "elapsedMs": 121764,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 10,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:23.770Z",
+      "elapsedMs": 122896,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 393216,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:23.788Z",
+      "elapsedMs": 122913,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1724416,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:23.798Z",
+      "elapsedMs": 122923,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:32.819Z",
+      "elapsedMs": 131943,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:32.833Z",
+      "elapsedMs": 131958,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2282660,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:32.843Z",
+      "elapsedMs": 131968,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:43.254Z",
+      "elapsedMs": 142379,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:43.264Z",
+      "elapsedMs": 142390,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2162340,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:43.272Z",
+      "elapsedMs": 142398,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:53.665Z",
+      "elapsedMs": 152790,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:53.682Z",
+      "elapsedMs": 152807,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1838416,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:02:53.694Z",
+      "elapsedMs": 152819,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:02.928Z",
+      "elapsedMs": 162054,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:02.950Z",
+      "elapsedMs": 162075,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1587060,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:02.963Z",
+      "elapsedMs": 162088,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:14.162Z",
+      "elapsedMs": 173287,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 786432,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:14.176Z",
+      "elapsedMs": 173301,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2384752,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:14.188Z",
+      "elapsedMs": 173313,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:23.879Z",
+      "elapsedMs": 183005,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:23.898Z",
+      "elapsedMs": 183023,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2870348,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:23.908Z",
+      "elapsedMs": 183033,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:33.702Z",
+      "elapsedMs": 192827,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 20480,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:33.719Z",
+      "elapsedMs": 192845,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2157312,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:33.730Z",
+      "elapsedMs": 192854,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:44.065Z",
+      "elapsedMs": 203190,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:44.115Z",
+      "elapsedMs": 203241,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3578356,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:44.135Z",
+      "elapsedMs": 203261,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.668Z",
+      "elapsedMs": 212793,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 36423,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.692Z",
+      "elapsedMs": 212817,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2700,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.715Z",
+      "elapsedMs": 212841,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 5391,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.732Z",
+      "elapsedMs": 212857,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 13464,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.738Z",
+      "elapsedMs": 212863,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 5400,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.755Z",
+      "elapsedMs": 212880,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 11599,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.760Z",
+      "elapsedMs": 212884,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 5400,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.767Z",
+      "elapsedMs": 212893,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 5391,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.780Z",
+      "elapsedMs": 212905,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 10791,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.789Z",
+      "elapsedMs": 212914,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 5400,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.799Z",
+      "elapsedMs": 212924,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2700,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.810Z",
+      "elapsedMs": 212935,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4096,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.820Z",
+      "elapsedMs": 212946,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12279,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.830Z",
+      "elapsedMs": 212955,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 10038,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.842Z",
+      "elapsedMs": 212966,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8192,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.851Z",
+      "elapsedMs": 212977,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8183,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.862Z",
+      "elapsedMs": 212988,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 9,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.872Z",
+      "elapsedMs": 212998,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16366,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.882Z",
+      "elapsedMs": 213007,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.899Z",
+      "elapsedMs": 213024,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.919Z",
+      "elapsedMs": 213044,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.936Z",
+      "elapsedMs": 213061,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.952Z",
+      "elapsedMs": 213078,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.959Z",
+      "elapsedMs": 213083,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.973Z",
+      "elapsedMs": 213098,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.978Z",
+      "elapsedMs": 213103,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:53.998Z",
+      "elapsedMs": 213124,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.004Z",
+      "elapsedMs": 213130,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.021Z",
+      "elapsedMs": 213147,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.043Z",
+      "elapsedMs": 213168,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 18,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.065Z",
+      "elapsedMs": 213190,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 32768,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.081Z",
+      "elapsedMs": 213206,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.094Z",
+      "elapsedMs": 213219,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.105Z",
+      "elapsedMs": 213230,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.116Z",
+      "elapsedMs": 213241,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.132Z",
+      "elapsedMs": 213257,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 27,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.137Z",
+      "elapsedMs": 213263,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16384,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.153Z",
+      "elapsedMs": 213277,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.172Z",
+      "elapsedMs": 213297,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 9,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.180Z",
+      "elapsedMs": 213305,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16366,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.223Z",
+      "elapsedMs": 213348,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 32786,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.230Z",
+      "elapsedMs": 213356,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.250Z",
+      "elapsedMs": 213375,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 9,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.260Z",
+      "elapsedMs": 213386,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16366,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.272Z",
+      "elapsedMs": 213397,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.290Z",
+      "elapsedMs": 213415,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.308Z",
+      "elapsedMs": 213434,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.324Z",
+      "elapsedMs": 213449,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.344Z",
+      "elapsedMs": 213469,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.358Z",
+      "elapsedMs": 213483,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.370Z",
+      "elapsedMs": 213496,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.387Z",
+      "elapsedMs": 213513,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4096,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.404Z",
+      "elapsedMs": 213528,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12279,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.417Z",
+      "elapsedMs": 213542,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.428Z",
+      "elapsedMs": 213554,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.446Z",
+      "elapsedMs": 213570,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 27,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.465Z",
+      "elapsedMs": 213590,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16384,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.481Z",
+      "elapsedMs": 213606,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.486Z",
+      "elapsedMs": 213611,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.505Z",
+      "elapsedMs": 213629,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.509Z",
+      "elapsedMs": 213634,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.527Z",
+      "elapsedMs": 213652,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 27,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.539Z",
+      "elapsedMs": 213664,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16384,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.550Z",
+      "elapsedMs": 213676,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.566Z",
+      "elapsedMs": 213692,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 9,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.579Z",
+      "elapsedMs": 213704,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16366,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.596Z",
+      "elapsedMs": 213721,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.615Z",
+      "elapsedMs": 213741,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.911Z",
+      "elapsedMs": 214037,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.940Z",
+      "elapsedMs": 214065,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 32786,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.953Z",
+      "elapsedMs": 214079,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:54.980Z",
+      "elapsedMs": 214106,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.003Z",
+      "elapsedMs": 214128,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.161Z",
+      "elapsedMs": 214287,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.230Z",
+      "elapsedMs": 214355,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.249Z",
+      "elapsedMs": 214373,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.275Z",
+      "elapsedMs": 214400,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.302Z",
+      "elapsedMs": 214426,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.334Z",
+      "elapsedMs": 214459,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.500Z",
+      "elapsedMs": 214625,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.531Z",
+      "elapsedMs": 214656,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 32750,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.550Z",
+      "elapsedMs": 214674,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.599Z",
+      "elapsedMs": 214725,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.643Z",
+      "elapsedMs": 214768,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.694Z",
+      "elapsedMs": 214820,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.736Z",
+      "elapsedMs": 214861,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.778Z",
+      "elapsedMs": 214903,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 27,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.808Z",
+      "elapsedMs": 214933,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16384,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.828Z",
+      "elapsedMs": 214953,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.893Z",
+      "elapsedMs": 215018,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:55.941Z",
+      "elapsedMs": 215067,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.140Z",
+      "elapsedMs": 215266,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.194Z",
+      "elapsedMs": 215319,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.243Z",
+      "elapsedMs": 215368,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.281Z",
+      "elapsedMs": 215407,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 18,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.316Z",
+      "elapsedMs": 215441,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16357,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.335Z",
+      "elapsedMs": 215459,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.364Z",
+      "elapsedMs": 215489,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.401Z",
+      "elapsedMs": 215525,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 9,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.424Z",
+      "elapsedMs": 215550,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16366,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.442Z",
+      "elapsedMs": 215568,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.471Z",
+      "elapsedMs": 215596,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.513Z",
+      "elapsedMs": 215638,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 36,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.536Z",
+      "elapsedMs": 215662,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.556Z",
+      "elapsedMs": 215681,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.589Z",
+      "elapsedMs": 215714,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.627Z",
+      "elapsedMs": 215752,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.666Z",
+      "elapsedMs": 215791,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.703Z",
+      "elapsedMs": 215827,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.730Z",
+      "elapsedMs": 215856,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.750Z",
+      "elapsedMs": 215875,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.782Z",
+      "elapsedMs": 215907,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.820Z",
+      "elapsedMs": 215946,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.860Z",
+      "elapsedMs": 215984,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.904Z",
+      "elapsedMs": 216029,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4096,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.933Z",
+      "elapsedMs": 216058,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12279,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.952Z",
+      "elapsedMs": 216076,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:56.987Z",
+      "elapsedMs": 216112,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.026Z",
+      "elapsedMs": 216152,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8192,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.058Z",
+      "elapsedMs": 216182,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8183,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.078Z",
+      "elapsedMs": 216203,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.100Z",
+      "elapsedMs": 216224,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.119Z",
+      "elapsedMs": 216244,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4123,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.138Z",
+      "elapsedMs": 216263,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.184Z",
+      "elapsedMs": 216309,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.220Z",
+      "elapsedMs": 216346,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.260Z",
+      "elapsedMs": 216385,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.289Z",
+      "elapsedMs": 216414,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.328Z",
+      "elapsedMs": 216453,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.364Z",
+      "elapsedMs": 216489,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.384Z",
+      "elapsedMs": 216509,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.403Z",
+      "elapsedMs": 216528,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8192,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.420Z",
+      "elapsedMs": 216545,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8219,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.440Z",
+      "elapsedMs": 216565,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4096,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.446Z",
+      "elapsedMs": 216571,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12279,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.484Z",
+      "elapsedMs": 216609,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.521Z",
+      "elapsedMs": 216646,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4096,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.548Z",
+      "elapsedMs": 216673,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12279,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.566Z",
+      "elapsedMs": 216691,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.594Z",
+      "elapsedMs": 216719,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.617Z",
+      "elapsedMs": 216742,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.634Z",
+      "elapsedMs": 216759,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 12288,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.649Z",
+      "elapsedMs": 216774,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4087,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.668Z",
+      "elapsedMs": 216794,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 18,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.686Z",
+      "elapsedMs": 216812,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16357,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.706Z",
+      "elapsedMs": 216832,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 27,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.715Z",
+      "elapsedMs": 216840,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16384,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.750Z",
+      "elapsedMs": 216875,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.788Z",
+      "elapsedMs": 216913,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.826Z",
+      "elapsedMs": 216950,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.860Z",
+      "elapsedMs": 216986,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16411,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.895Z",
+      "elapsedMs": 217019,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.932Z",
+      "elapsedMs": 217058,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:57.974Z",
+      "elapsedMs": 217099,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.006Z",
+      "elapsedMs": 217131,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8192,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.018Z",
+      "elapsedMs": 217144,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8219,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.048Z",
+      "elapsedMs": 217173,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8192,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.063Z",
+      "elapsedMs": 217189,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 8183,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.085Z",
+      "elapsedMs": 217209,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 16375,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.134Z",
+      "elapsedMs": 217259,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 18,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.167Z",
+      "elapsedMs": 217293,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 19144,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:03:58.187Z",
+      "elapsedMs": 217313,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:02.678Z",
+      "elapsedMs": 221804,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:02.707Z",
+      "elapsedMs": 221832,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2246376,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:02.730Z",
+      "elapsedMs": 221855,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:04.562Z",
+      "elapsedMs": 223687,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:04.572Z",
+      "elapsedMs": 223697,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:04.611Z",
+      "elapsedMs": 223736,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 28672,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:04.641Z",
+      "elapsedMs": 223767,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3632816,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:04.661Z",
+      "elapsedMs": 223787,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:04.684Z",
+      "elapsedMs": 223809,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3235668,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:04.693Z",
+      "elapsedMs": 223819,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:08.372Z",
+      "elapsedMs": 227497,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:08.411Z",
+      "elapsedMs": 227537,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2631400,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:08.431Z",
+      "elapsedMs": 227557,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:13.726Z",
+      "elapsedMs": 232852,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:13.739Z",
+      "elapsedMs": 232864,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:13.812Z",
+      "elapsedMs": 232937,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:13.841Z",
+      "elapsedMs": 232967,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4255532,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:13.852Z",
+      "elapsedMs": 232977,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:22.794Z",
+      "elapsedMs": 241919,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 11,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:22.816Z",
+      "elapsedMs": 241941,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 12,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:22.841Z",
+      "elapsedMs": 241966,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 13,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:22.860Z",
+      "elapsedMs": 241987,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 14,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:22.877Z",
+      "elapsedMs": 242003,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 15,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:46.502Z",
+      "elapsedMs": 265628,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:46.545Z",
+      "elapsedMs": 265670,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2314432,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:46.569Z",
+      "elapsedMs": 265694,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3915100,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:46.577Z",
+      "elapsedMs": 265702,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:46.606Z",
+      "elapsedMs": 265731,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.611Z",
+      "elapsedMs": 267736,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.625Z",
+      "elapsedMs": 267750,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.678Z",
+      "elapsedMs": 267802,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.703Z",
+      "elapsedMs": 267828,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2723520,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.712Z",
+      "elapsedMs": 267837,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.754Z",
+      "elapsedMs": 267879,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 94208,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.808Z",
+      "elapsedMs": 267934,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4018104,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.839Z",
+      "elapsedMs": 267964,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.853Z",
+      "elapsedMs": 267978,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 557056,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.882Z",
+      "elapsedMs": 268006,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3805672,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:48.897Z",
+      "elapsedMs": 268022,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.063Z",
+      "elapsedMs": 270188,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.082Z",
+      "elapsedMs": 270207,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.187Z",
+      "elapsedMs": 270313,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.223Z",
+      "elapsedMs": 270348,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3111176,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.242Z",
+      "elapsedMs": 270367,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1934520,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.251Z",
+      "elapsedMs": 270376,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.282Z",
+      "elapsedMs": 270407,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.338Z",
+      "elapsedMs": 270462,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 28672,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.362Z",
+      "elapsedMs": 270488,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1814856,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:51.386Z",
+      "elapsedMs": 270512,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:54.092Z",
+      "elapsedMs": 273217,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 49152,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:54.127Z",
+      "elapsedMs": 273252,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 4347040,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:54.149Z",
+      "elapsedMs": 273274,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:55.598Z",
+      "elapsedMs": 274723,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:55.607Z",
+      "elapsedMs": 274731,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:56.248Z",
+      "elapsedMs": 275374,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:56.280Z",
+      "elapsedMs": 275406,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3881036,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:56.307Z",
+      "elapsedMs": 275432,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3926568,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:56.336Z",
+      "elapsedMs": 275460,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:56.346Z",
+      "elapsedMs": 275472,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.423Z",
+      "elapsedMs": 276547,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.433Z",
+      "elapsedMs": 276558,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.472Z",
+      "elapsedMs": 276598,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.481Z",
+      "elapsedMs": 276606,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.538Z",
+      "elapsedMs": 276663,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.568Z",
+      "elapsedMs": 276693,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3052896,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.589Z",
+      "elapsedMs": 276714,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.598Z",
+      "elapsedMs": 276723,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.627Z",
+      "elapsedMs": 276753,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 3265148,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.637Z",
+      "elapsedMs": 276762,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.733Z",
+      "elapsedMs": 276858,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.757Z",
+      "elapsedMs": 276882,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1747800,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:57.778Z",
+      "elapsedMs": 276903,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:59.937Z",
+      "elapsedMs": 279062,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:04:59.952Z",
+      "elapsedMs": 279077,
+      "type": "hls:error",
+      "data": {
+        "type": "networkError",
+        "details": "aborted",
+        "fatal": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:00.016Z",
+      "elapsedMs": 279141,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 20480,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:00.044Z",
+      "elapsedMs": 279170,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 401768,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:00.069Z",
+      "elapsedMs": 279195,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:00.365Z",
+      "elapsedMs": 279490,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 675840,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:00.377Z",
+      "elapsedMs": 279503,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2079112,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:00.409Z",
+      "elapsedMs": 279534,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:06.965Z",
+      "elapsedMs": 286090,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 73728,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:07.000Z",
+      "elapsedMs": 286125,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 1104280,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:07.032Z",
+      "elapsedMs": 286157,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:09.011Z",
+      "elapsedMs": 288136,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 131072,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:09.042Z",
+      "elapsedMs": 288167,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2888396,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:09.055Z",
+      "elapsedMs": 288181,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:09.107Z",
+      "elapsedMs": 288233,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 180224,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:09.122Z",
+      "elapsedMs": 288247,
+      "type": "transfer:chunk-downloaded",
+      "data": {
+        "bytes": 2671924,
+        "downloadSource": "http",
+        "peerId": null,
+        "streamType": "main",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "p2p": false
+      }
+    },
+    {
+      "at": "2026-09-21T02:05:09.153Z",
+      "elapsedMs": 288278,
+      "type": "transfer:segment-loaded",
+      "data": {
+        "source": "http",
+        "peerId": null,
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "controlledInfoHash": null,
+        "controlledMatch": false
+      }
+    }
+  ]
+}

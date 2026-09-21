@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HiveStream Phase 1B — Natural Swarm Diagnostic v8</title>
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v8.1</title>
 
 <!--
 ===============================================================================
@@ -21,7 +21,7 @@ This page is a diagnostic instrument for HiveStream Phase 1B.  It intentionally
 does NOT redesign the HiveStream architecture and it does NOT add TURN merely
 because the previous experiment failed.
 
-v7 keeps the v6 experiment structure and makes the WebRTC boundary observable
+v8.1 keeps the v6/v8 experiment structure and makes the WebRTC boundary observable
 in much greater detail.  The goal is to answer a narrow question:
 
     When two browsers discover one another through the WebTorrent-compatible
@@ -75,6 +75,24 @@ EXPERIMENTAL INTEGRITY
 This file is an experiment/diagnostic artifact, not the production HiveStream
 core.  Findings from it should be treated as evidence for the architecture,
 not as an automatic reason to change architecture.
+===============================================================================
+
+v8.1 EXPORT / IDENTITY ADDITIONS
+--------------------------------
+This revision adds a durable browser identity, a per-run identity, an optional
+human-readable device label, and a complete "Save JSON" export path. The
+exported report also records non-sensitive browser/device characteristics and a
+normalized network-capability summary so separate runs can be distinguished
+without collecting a public IP address, precise location, cookies, browsing
+history, or other unrelated personal data.
+
+browserInstanceId identifies an ordinary browser storage context when
+localStorage is available. runId identifies one specific test execution. The
+actual p2p-media-loader peer ID remains a separate third identity and is
+recorded only when observed.
+
+Copy JSON and Save JSON serialize the same publicReport() object. The exporter
+does not create a second or reduced diagnostic dataset.
 ===============================================================================
 -->
 
@@ -183,13 +201,17 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v8</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v8.1</h1>
   <div class="small">
     William von Meister + GPT-5.6 Luna · passive WebRTC / p2p-media-loader instrumentation
   </div>
 
   <section class="card" style="margin-top:12px">
     <div class="controls">
+      <div>
+        <label for="deviceLabel">Device label (optional)</label>
+        <input id="deviceLabel" value="" placeholder="Phone, Laptop, Desktop, etc.">
+      </div>
       <div>
         <label for="streamUrl">HLS master URL</label>
         <input id="streamUrl" value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
@@ -243,7 +265,16 @@ video {
 
   <section class="card" style="margin-top:12px">
     <h2>Full JSON</h2>
-    <button id="copyBtn">Copy JSON</button>
+    <div class="controls" style="margin-bottom:8px">
+      <button id="copyBtn">Copy JSON</button>
+      <button id="saveBtn">Save JSON to File</button>
+    </div>
+    <div class="small">
+      Save JSON downloads the complete diagnostic report with browser, device,
+      run, P2P identity, and network-capability identifiers. It does not export
+      public IP, cookies, local storage contents, browsing history, or precise
+      location.
+    </div>
     <pre id="json" style="margin-top:8px"></pre>
   </section>
 </main>
@@ -272,6 +303,8 @@ video {
   var startBtn = document.getElementById("startBtn");
   var stopBtn = document.getElementById("stopBtn");
   var copyBtn = document.getElementById("copyBtn");
+  var saveBtn = document.getElementById("saveBtn");
+  var deviceLabelInput = document.getElementById("deviceLabel");
 
   var hlsInstance = null;
   var hlsDestroying = false;
@@ -296,6 +329,107 @@ video {
     });
   }
 
+  /*
+   * Browser identity is an application-generated identifier, NOT a hardware
+   * fingerprint. localStorage lets ordinary repeated runs from the same
+   * browser profile be correlated. Private browsing, cleared storage, or
+   * privacy restrictions may prevent persistence; the report explicitly says
+   * session-only in that case instead of pretending this is hardware identity.
+   */
+  function getBrowserInstanceId() {
+    var key = "hivestream.phase1b.browserInstanceId.v1";
+    try {
+      var existing = window.localStorage.getItem(key);
+      if (existing && /^[0-9a-f-]{36}$/i.test(existing)) return existing;
+      var created = uuid();
+      window.localStorage.setItem(key, created);
+      return created;
+    } catch (e) {
+      return uuid();
+    }
+  }
+
+  function browserIdentityPersistence() {
+    try {
+      var key = "hivestream.phase1b.browserInstanceId.v1";
+      return window.localStorage && window.localStorage.getItem(key)
+        ? "localStorage"
+        : "session-only";
+    } catch (e) {
+      return "session-only";
+    }
+  }
+
+  /*
+   * Friendly browser fields make reports easier to compare while preserving
+   * navigator.userAgent as the authoritative raw browser identification.
+   * Parsing is intentionally conservative because UA strings vary by browser.
+   */
+  function detectBrowserFamily() {
+    var ua = navigator.userAgent || "";
+    if (/Firefox//i.test(ua)) return "Firefox";
+    if (/Edg//i.test(ua)) return "Edge";
+    if (/OPR//i.test(ua)) return "Opera";
+    if (/Chrome//i.test(ua)) return "Chrome";
+    if (/Safari//i.test(ua) && !/Chrome//i.test(ua)) return "Safari";
+    return "Unknown";
+  }
+
+  function detectBrowserVersion() {
+    var ua = navigator.userAgent || "";
+    var patterns = [
+      /Firefox/([0-9.]+)/i,
+      /Edg/([0-9.]+)/i,
+      /OPR/([0-9.]+)/i,
+      /Chrome/([0-9.]+)/i,
+      /Version/([0-9.]+)/i
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      var m = patterns[i].exec(ua);
+      if (m) return m[1];
+    }
+    return null;
+  }
+
+  function detectDeviceClass() {
+    var ua = navigator.userAgent || "";
+    if (/Mobi|Android|iPhone|iPad|Tablet/i.test(ua)) return "mobile";
+    return "desktop";
+  }
+
+  function currentEnvironment() {
+    return {
+      userAgent: navigator.userAgent,
+      browserFamily: detectBrowserFamily(),
+      browserVersion: detectBrowserVersion(),
+      platform: navigator.platform,
+      deviceClass: detectDeviceClass(),
+      language: navigator.language || null,
+      languages: navigator.languages ? Array.prototype.slice.call(navigator.languages) : [],
+      screen: {
+        width: window.screen && Number(window.screen.width) || null,
+        height: window.screen && Number(window.screen.height) || null,
+        availWidth: window.screen && Number(window.screen.availWidth) || null,
+        availHeight: window.screen && Number(window.screen.availHeight) || null,
+        colorDepth: window.screen && Number(window.screen.colorDepth) || null,
+        pixelDepth: window.screen && Number(window.screen.pixelDepth) || null
+      },
+      devicePixelRatio: Number(window.devicePixelRatio) || null,
+      viewport: {
+        width: Number(window.innerWidth) || null,
+        height: Number(window.innerHeight) || null
+      },
+      online: navigator.onLine,
+      hardwareConcurrency: Number(navigator.hardwareConcurrency) || null,
+      maxTouchPoints: Number(navigator.maxTouchPoints) || 0,
+      webRtcSupported: !!window.RTCPeerConnection,
+      hlsSupported: !!(window.Hls && Hls.isSupported && Hls.isSupported()),
+      p2pGlobal: !!(window.p2pml && window.p2pml.hlsjs),
+      p2pEngineExport: !!(window.p2pml && window.p2pml.hlsjs && window.p2pml.hlsjs.HlsJsP2PEngine),
+      crossOriginIsolated: !!window.crossOriginIsolated
+    };
+  }
+
   function safeString(v) {
     try { return String(v); } catch (e) { return "[unprintable]"; }
   }
@@ -307,15 +441,17 @@ video {
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-      version: 8,
+      version: "8.1",
       startedAt: null,
       elapsedMs: 0,
       authorship: "William von Meister (Project Owner) + GPT-5.6 Luna (Research & Technical Analysis Assistant)"
     },
 
     identity: {
-      browserInstanceId: uuid(),
-      runId: null,
+      browserInstanceId: getBrowserInstanceId(),
+      runId: uuid(),
+      deviceLabel: deviceLabelInput.value.trim(),
+      browserIdentityPersistence: browserIdentityPersistence(),
       actualP2PIdentity: {
         peerId: null,
         source: null,
@@ -324,17 +460,7 @@ video {
       }
     },
 
-    environment: {
-      userAgent: navigator.userAgent,
-      platform: navigator.platform,
-      language: navigator.language || null,
-      online: navigator.onLine,
-      webRtcSupported: !!window.RTCPeerConnection,
-      hlsSupported: !!(window.Hls && Hls.isSupported && Hls.isSupported()),
-      p2pGlobal: !!(window.p2pml && window.p2pml.hlsjs),
-      p2pEngineExport: !!(window.p2pml && window.p2pml.hlsjs && window.p2pml.hlsjs.HlsJsP2PEngine),
-      crossOriginIsolated: !!window.crossOriginIsolated
-    },
+    environment: currentEnvironment(),
 
     dependencies: {
       hlsJs: HLS_VERSION,
@@ -1308,13 +1434,15 @@ video {
     R = {
       test: {
         name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-        version: 8,
+        version: "8.1",
         startedAt: now(),
         elapsedMs: 0,
         authorship: "William von Meister (Project Owner) + GPT-5.6 Luna (Research & Technical Analysis Assistant)"
       },
       identity: {
         browserInstanceId: keepId,
+        deviceLabel: deviceLabelInput.value.trim(),
+        browserIdentityPersistence: browserIdentityPersistence(),
         runId: uuid(),
         actualP2PIdentity: {
           peerId: null,
@@ -1323,15 +1451,7 @@ video {
           note: "No separate HiveStream peer ID is generated. p2p-media-loader's public local peer-ID getter was not assumed."
         }
       },
-      environment: {
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        language: navigator.language || null,
-        online: navigator.onLine,
-        webRtcSupported: !!window.RTCPeerConnection,
-        hlsSupported: !!(window.Hls && Hls.isSupported && Hls.isSupported()),
-        crossOriginIsolated: !!window.crossOriginIsolated
-      },
+      environment: currentEnvironment(),
       dependencies: {
         hlsJs: HLS_VERSION,
         p2pMediaLoaderHlsJs: P2PML_VERSION
@@ -1473,13 +1593,61 @@ video {
     };
   }
 
+
+  /*
+   * This compact network summary is derived only from ICE candidates already
+   * captured by the diagnostic. It deliberately omits public-IP lookup and
+   * other external fingerprinting. Raw candidate records remain available for
+   * detailed WebRTC analysis.
+   */
+  function networkSummary() {
+    var records = R.webrtc.candidateRecords || [];
+    var summary = {
+      candidateTypes: {
+        host: R.webrtc.ice.host || 0,
+        srflx: R.webrtc.ice.srflx || 0,
+        relay: R.webrtc.ice.relay || 0,
+        prflx: R.webrtc.ice.prflx || 0,
+        other: R.webrtc.ice.other || 0
+      },
+      ipv4: false,
+      ipv6: false,
+      udp: false,
+      tcp: false,
+      turnRelay: false
+    };
+
+    records.forEach(function (c) {
+      if (c.addressFamily === "IPv4") summary.ipv4 = true;
+      if (c.addressFamily === "IPv6") summary.ipv6 = true;
+      if (c.protocol === "udp") summary.udp = true;
+      if (c.protocol === "tcp") summary.tcp = true;
+      if (c.type === "relay") summary.turnRelay = true;
+    });
+
+    return summary;
+  }
+
   function publicReport() {
     updateVerdict();
+
+    /* Copy and Save both call this same report builder. The export timestamp
+       describes the actual report request, not the beginning of the run. */
+    R.identity.deviceLabel = deviceLabelInput.value.trim();
+    R.identity.browserIdentityPersistence = browserIdentityPersistence();
+    R.environment = currentEnvironment();
 
     return {
       test: R.test,
       identity: R.identity,
       environment: R.environment,
+      network: networkSummary(),
+      export: {
+        savedAt: now(),
+        format: "HiveStream Phase 1B diagnostic JSON",
+        exporterVersion: "8.1",
+        privacy: "No public IP, cookies, local storage contents, browsing history, or precise location are exported."
+      },
       dependencies: R.dependencies,
       configuration: R.configuration,
       manifest: R.manifest,
@@ -1561,6 +1729,8 @@ video {
     draw();
   });
 
+  saveBtn.addEventListener("click", saveJsonToFile);
+
   copyBtn.addEventListener("click", function () {
     var textValue = JSON.stringify(publicReport(), null, 2);
 
@@ -1574,6 +1744,56 @@ video {
       fallbackCopy(textValue);
     }
   });
+
+
+  /*
+   * Save JSON is entirely client-side. A Blob and object URL let the browser
+   * download the same complete report produced by Copy JSON without sending
+   * diagnostic data to a server. The filename contains the device label when
+   * supplied, plus the UTC test start time, so multiple files remain sortable.
+   */
+  function saveJsonToFile() {
+    var report = publicReport();
+    var jsonText = JSON.stringify(report, null, 2);
+    var started = report.test.startedAt || now();
+    var stamp = started.replace(/[:.]/g, "").replace(/Z$/, "Z");
+    var label = (report.identity.deviceLabel ||
+      (report.environment.browserFamily + "-" + report.environment.deviceClass) ||
+      "browser")
+      .replace(/[^a-z0-9_-]+/gi, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40) || "browser";
+
+    var filename = "HiveStream-Phase1B-v8.1-" + label + "-" + stamp + ".json";
+
+    try {
+      var blob = new Blob([jsonText], {
+        type: "application/json;charset=utf-8"
+      });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
+      log("json:saved", {
+        filename: filename,
+        bytes: jsonText.length
+      });
+    } catch (e) {
+      log("json:save-failed", {
+        filename: filename,
+        message: safeString(e)
+      });
+    }
+  }
 
   function fallbackCopy(value) {
     var ta = document.createElement("textarea");

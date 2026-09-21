@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HiveStream Phase 1B — Natural Swarm Diagnostic v7</title>
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v8</title>
 
 <!--
 ===============================================================================
-HIVESTREAM PHASE 1B — NATURAL SWARM DIAGNOSTIC v7
+HIVESTREAM PHASE 1B — NATURAL SWARM DIAGNOSTIC v8
 ===============================================================================
 
 AUTHORS
@@ -90,7 +90,7 @@ not as an automatic reason to change architecture.
 (function installPeerConnectionCapture() {
   var Native = window.RTCPeerConnection;
   var pcs = [];
-  window.__HS_V7_PEER_CONNECTIONS = pcs;
+  window.__HS_V8_PEER_CONNECTIONS = pcs;
 
   if (!Native) return;
 
@@ -113,7 +113,7 @@ not as an automatic reason to change architecture.
 })();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/p2p-media-loader-hlsjs@4.0.0/dist/p2p-media-loader-hlsjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p2p-media-loader-hlsjs@4.0.0/dist/p2p-media-loader-hlsjs.iife.min.js"></script>
 
 <style>
 :root {
@@ -183,7 +183,7 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v7</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v8</h1>
   <div class="small">
     William von Meister + GPT-5.6 Luna · passive WebRTC / p2p-media-loader instrumentation
   </div>
@@ -307,7 +307,7 @@ video {
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-      version: 7,
+      version: 8,
       startedAt: null,
       elapsedMs: 0,
       authorship: "William von Meister (Project Owner) + GPT-5.6 Luna (Research & Technical Analysis Assistant)"
@@ -331,6 +331,8 @@ video {
       online: navigator.onLine,
       webRtcSupported: !!window.RTCPeerConnection,
       hlsSupported: !!(window.Hls && Hls.isSupported && Hls.isSupported()),
+      p2pGlobal: !!(window.p2pml && window.p2pml.hlsjs),
+      p2pEngineExport: !!(window.p2pml && window.p2pml.hlsjs && window.p2pml.hlsjs.HlsJsP2PEngine),
       crossOriginIsolated: !!window.crossOriginIsolated
     },
 
@@ -460,7 +462,7 @@ video {
    * ICE candidate strings have changed slightly between browser versions.
    * The previous v6 parser searched for the literal substring " typ ".  That
    * can work with ordinary SDP candidate strings, but it is unnecessarily
-   * brittle.  v7 first uses the standards-facing RTCIceCandidate fields and
+   * brittle.  v8 first uses the standards-facing RTCIceCandidate fields and
    * only falls back to a tolerant token parser.
    */
   function parseCandidate(candidate) {
@@ -711,7 +713,7 @@ video {
   }
 
   function pollStats() {
-    var pcs = window.__HS_V7_PEER_CONNECTIONS || [];
+    var pcs = window.__HS_V8_PEER_CONNECTIONS || [];
 
     while (R.webrtc.peerConnections.length < pcs.length) {
       attachPC(pcs[R.webrtc.peerConnections.length], R.webrtc.peerConnections.length);
@@ -941,26 +943,26 @@ video {
   }
 
   function wireCoreEvents() {
-    if (!hlsInstance) return;
-
-    var core = null;
-    try {
-      core = hlsInstance.p2pEngine && hlsInstance.p2pEngine.core;
-    } catch (e) {}
+    if (!hlsInstance || !hlsInstance.p2pEngine) {
+      log("fatal:p2p-engine-missing");
+      return;
+    }
 
     /*
-     * v6 already demonstrated that the HLS-with-P2P object emits these events.
-     * We continue to wire them defensively so a missing optional event cannot
-     * prevent the rest of the diagnostic from running.
+     * p2p-media-loader v4 documents P2P event subscription through
+     * hls.p2pEngine.addEventListener().  Do not assume the engine itself
+     * exposes an EventEmitter-style .on() API.
      */
-    var source = core || hlsInstance;
+    var engine = hlsInstance.p2pEngine;
 
     function on(name, fn) {
       try {
-        if (source && typeof source.on === "function") source.on(name, fn);
-        else if (source && typeof source.addEventListener === "function") source.addEventListener(name, fn);
+        engine.addEventListener(name, fn);
       } catch (e) {
-        log("core:event-listener-error", { event: name, message: safeString(e) });
+        log("p2p:event-listener-error", {
+          event: name,
+          message: safeString(e)
+        });
       }
     }
 
@@ -1034,10 +1036,15 @@ video {
       log("tracker:warning", cloneJson(d));
     });
 
-    on("onChunkDownloaded", function (d) {
-      var bytes = Number(d && (d.bytes || d.byteLength || d.length)) || 0;
-      var type = d && (d.type || d.source || d.downloadType);
-      var isP2P = type === "p2p" || type === "P2P";
+    /*
+     * v3/v4 changed the high-frequency chunk events to positional arguments:
+     * onChunkDownloaded(bytesLength, downloadSource, peerId, streamType, infoHash)
+     * onChunkUploaded(bytesLength, peerId, streamType, infoHash)
+     */
+    on("onChunkDownloaded", function (bytesLength, downloadSource, peerId, streamType, infoHash) {
+      var bytes = Number(bytesLength) || 0;
+      var source = safeString(downloadSource || "").toLowerCase();
+      var isP2P = !!peerId || source === "p2p";
 
       if (isP2P) {
         R.transfer.bytes.p2pDown += bytes;
@@ -1047,44 +1054,63 @@ video {
         R.transfer.bytes.http += bytes;
       }
 
+      if (peerId) {
+        R.connectivity.remotePeerKnown = true;
+      }
+
       log("transfer:chunk-downloaded", {
         bytes: bytes,
-        source: isP2P ? "p2p" : "http",
-        infoHash: d && d.infoHash ? d.infoHash : null
+        downloadSource: downloadSource || null,
+        peerId: peerId || null,
+        streamType: streamType || null,
+        infoHash: infoHash || null,
+        p2p: isP2P
       });
     });
 
-    on("onChunkUploaded", function (d) {
-      var bytes = Number(d && (d.bytes || d.byteLength || d.length)) || 0;
+    on("onChunkUploaded", function (bytesLength, peerId, streamType, infoHash) {
+      var bytes = Number(bytesLength) || 0;
       R.transfer.bytes.p2pUp += bytes;
-      log("transfer:chunk-uploaded", { bytes: bytes });
+
+      log("transfer:chunk-uploaded", {
+        bytes: bytes,
+        peerId: peerId || null,
+        streamType: streamType || null,
+        infoHash: infoHash || null
+      });
     });
 
     on("onSegmentLoaded", function (d) {
+      var source = d && (d.downloadSource || d.source || d.type || d.downloadType);
+      var peerId = d && d.peerId ? d.peerId : null;
+      var isP2P = safeString(source || "").toLowerCase() === "p2p" || !!peerId;
+
       var seg = {
         at: now(),
         infoHash: d && d.infoHash ? d.infoHash : null,
-        source: d && (d.type || d.source || d.downloadType) ? (d.type || d.source || d.downloadType) : null,
-        segmentId: d && (d.segmentId || d.id || d.index) != null ? (d.segmentId || d.id || d.index) : null
+        source: source || null,
+        peerId: peerId,
+        segmentId: d && (d.segmentId || d.id || d.index) != null
+          ? (d.segmentId || d.id || d.index)
+          : null
       };
 
       R.transfer.segments.push(seg);
 
-      var isP2P = seg.source === "p2p" || seg.source === "P2P";
-      var controlledMatch =
-        !!R.swarm.controlledInfoHash &&
-        seg.infoHash === R.swarm.controlledInfoHash;
-
-      if (isP2P) R.verdict.p2pSegmentLoaded = true;
-      if (isP2P && controlledMatch) {
-        R.verdict.p2pSegmentMatchedSelectedVariant = true;
+      if (isP2P) {
+        R.verdict.p2pSegmentLoaded = true;
+        if (R.swarm.controlledInfoHash &&
+            seg.infoHash === R.swarm.controlledInfoHash) {
+          R.verdict.p2pSegmentMatchedSelectedVariant = true;
+        }
       }
 
       log("transfer:segment-loaded", {
         source: seg.source,
+        peerId: seg.peerId,
         infoHash: seg.infoHash,
         controlledInfoHash: R.swarm.controlledInfoHash,
-        controlledMatch: controlledMatch
+        controlledMatch: isP2P && seg.infoHash === R.swarm.controlledInfoHash
       });
     });
   }
@@ -1094,7 +1120,7 @@ video {
     var core = {};
 
     /*
-     * CRITICAL v6/v7 RULE:
+     * CRITICAL v6/v7/v8 RULE:
      * Natural mode does not set swarmId at all.  The property is omitted rather
      * than assigned null/undefined.  This lets p2p-media-loader exercise its
      * documented/default swarm identity behavior.
@@ -1107,6 +1133,8 @@ video {
       }
       core.swarmId = v;
     }
+
+    core.announceTrackers = TRACKER_HINTS.slice();
 
     return {
       mode: mode,
@@ -1201,7 +1229,6 @@ video {
     var options = {
       p2p: {
         core: cfg.core,
-        announceTrackers: TRACKER_HINTS.slice(),
         onHlsJsCreated: function (h) {
           hlsInstance = h;
           wireCoreEvents();
@@ -1212,12 +1239,25 @@ video {
     };
 
     try {
-      var HlsWithP2P = window.HlsWithP2P;
-      if (!HlsWithP2P) {
-        log("fatal:HlsWithP2P-missing", {
+      var p2pNamespace = window.p2pml && window.p2pml.hlsjs;
+      var HlsJsP2PEngine = p2pNamespace && p2pNamespace.HlsJsP2PEngine;
+
+      if (!HlsJsP2PEngine) {
+        log("fatal:p2pml-global-missing", {
+          p2pml: !!window.p2pml,
+          hlsjs: !!p2pNamespace,
+          HlsJsP2PEngine: false,
           availableGlobals: Object.keys(window).filter(function (k) {
             return /p2p|hls/i.test(k);
           }).slice(0, 40)
+        });
+        return false;
+      }
+
+      var HlsWithP2P = HlsJsP2PEngine.injectMixin(window.Hls);
+      if (typeof HlsWithP2P !== "function") {
+        log("fatal:injectMixin-invalid", {
+          returnedType: typeof HlsWithP2P
         });
         return false;
       }
@@ -1229,6 +1269,7 @@ video {
       hlsInstance.attachMedia(video);
 
       log("player:created", {
+        loaderGlobal: "window.p2pml.hlsjs.HlsJsP2PEngine",
         swarmMode: R.configuration.swarmMode,
         swarmIdPropertyPresent: Object.prototype.hasOwnProperty.call(cfg.core, "swarmId"),
         streamUrl: R.configuration.streamUrl
@@ -1267,7 +1308,7 @@ video {
     R = {
       test: {
         name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-        version: 7,
+        version: 8,
         startedAt: now(),
         elapsedMs: 0,
         authorship: "William von Meister (Project Owner) + GPT-5.6 Luna (Research & Technical Analysis Assistant)"

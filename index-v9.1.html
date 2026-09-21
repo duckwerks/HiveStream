@@ -592,6 +592,14 @@ video {
       targetVariant: CONTROLLED,
       announceTrackers: TRACKER_HINTS.slice()
     },
+    instrumentation: {
+      engineEventBindings: [],
+      receivedP2PEvents: {},
+      engineSurface: null,
+      coreSurface: null,
+      peerIdDiscoveryAttempts: 0,
+      peerIdDiscoverySuccesses: 0
+    },
     scheduler: {
       requested: cloneJson(P2P_FOCUS),
       observedCoreConfig: null,

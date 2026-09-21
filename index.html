@@ -21,7 +21,7 @@ This page is a diagnostic instrument for HiveStream Phase 1B.  It intentionally
 does NOT redesign the HiveStream architecture and it does NOT add TURN merely
 because the previous experiment failed.
 
-v8.1 keeps the v6/v8 experiment structure and makes the WebRTC boundary observable
+v9 keeps the v6/v8 experiment structure and makes the WebRTC boundary observable
 in much greater detail.  The goal is to answer a narrow question:
 
     When two browsers discover one another through the WebTorrent-compatible
@@ -68,8 +68,10 @@ EXPERIMENTAL INTEGRITY
 - The controlled rendition remains 848x480 / 836280.
 - HTTP fallback remains enabled.
 - No TURN server is added by this diagnostic.
-- Instrumentation is passive: it observes browser WebRTC objects and loader
-  events but does not modify ICE policy or force a transport.
+- WebRTC instrumentation is passive. The P2P-first scheduler settings are an
+  intentional, source-reviewed p2p-media-loader configuration for this test.
+  The diagnostic does not force a peer, fabricate a segment, or modify ICE
+  policy.
 - The Mux test stream remains the default fixture used by v6.
 
 This file is an experiment/diagnostic artifact, not the production HiveStream
@@ -77,7 +79,7 @@ core.  Findings from it should be treated as evidence for the architecture,
 not as an automatic reason to change architecture.
 ===============================================================================
 
-v8.1 EXPORT / IDENTITY ADDITIONS
+v9 EXPORT / IDENTITY ADDITIONS
 --------------------------------
 This revision adds a durable browser identity, a per-run identity, an optional
 human-readable device label, and a complete "Save JSON" export path. The
@@ -1223,6 +1225,11 @@ video {
 
       R.transfer.segments.push(seg);
 
+      if (isP2P) R.scheduler.counts.segmentLoadedP2P += 1;
+      else if (safeString(source || "").toLowerCase() === "http") {
+        R.scheduler.counts.segmentLoadedHTTP += 1;
+      }
+
       if (isP2P) {
         R.verdict.p2pSegmentLoaded = true;
         if (R.swarm.controlledInfoHash &&
@@ -1626,6 +1633,34 @@ video {
     });
 
     return summary;
+  }
+
+  function schedulerSummary() {
+    var starts = R.scheduler.events.filter(function (e) {
+      return e.type === "segment-start";
+    });
+
+    var first = starts.length ? starts[0].detail : null;
+
+    return {
+      interpretation: "Observed library segment lifecycle; not an independent proof verdict.",
+      requested: cloneJson(P2P_FOCUS),
+      observedCoreConfig: cloneJson(R.scheduler.observedCoreConfig),
+      actualConfigSource: R.scheduler.actualConfigSource,
+      counts: cloneJson(R.scheduler.counts),
+      firstSegmentStart: first
+        ? {
+            source: first.source,
+            peerId: first.peerId,
+            infoHash: first.infoHash,
+            elapsedMs: first.elapsedMs
+          }
+        : null,
+      p2pSegmentStartObserved: R.scheduler.counts.segmentStartP2P > 0,
+      httpSegmentStartObserved: R.scheduler.counts.segmentStartHTTP > 0,
+      p2pLoadedSegmentObserved: R.scheduler.counts.segmentLoadedP2P > 0,
+      httpFallbackObserved: R.scheduler.counts.segmentLoadedHTTP > 0
+    };
   }
 
   function publicReport() {

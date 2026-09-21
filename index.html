@@ -367,22 +367,22 @@ video {
    */
   function detectBrowserFamily() {
     var ua = navigator.userAgent || "";
-    if (/Firefox//i.test(ua)) return "Firefox";
-    if (/Edg//i.test(ua)) return "Edge";
-    if (/OPR//i.test(ua)) return "Opera";
-    if (/Chrome//i.test(ua)) return "Chrome";
-    if (/Safari//i.test(ua) && !/Chrome//i.test(ua)) return "Safari";
+    if (/Firefox\//i.test(ua)) return "Firefox";
+    if (/Edg\//i.test(ua)) return "Edge";
+    if (/OPR\//i.test(ua)) return "Opera";
+    if (/Chrome\//i.test(ua)) return "Chrome";
+    if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) return "Safari";
     return "Unknown";
   }
 
   function detectBrowserVersion() {
     var ua = navigator.userAgent || "";
     var patterns = [
-      /Firefox/([0-9.]+)/i,
-      /Edg/([0-9.]+)/i,
-      /OPR/([0-9.]+)/i,
-      /Chrome/([0-9.]+)/i,
-      /Version/([0-9.]+)/i
+      /Firefox\/([0-9.]+)/i,
+      /Edg\/([0-9.]+)/i,
+      /OPR\/([0-9.]+)/i,
+      /Chrome\/([0-9.]+)/i,
+      /Version\/([0-9.]+)/i
     ];
     for (var i = 0; i < patterns.length; i++) {
       var m = patterns[i].exec(ua);

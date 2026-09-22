@@ -7,7 +7,7 @@
 
 <!--
 ===============================================================================
-HIVESTREAM PHASE 1B — NATURAL SWARM DIAGNOSTIC v11
+HIVESTREAM PHASE 1B — NATURAL SWARM DIAGNOSTIC v12.1
 ===============================================================================
 
 AUTHORS
@@ -532,6 +532,22 @@ v12 CHANGE 6 - "P2P-ONLY" TERMINOLOGY (source-review item #10, UI text
   underlying config value or internal field name, to avoid a larger,
   higher-risk rename across the codebase for a wording-only concern.
 
+v12.1 — SOURCE-LEVEL INSTRUMENTATION CORRECTIONS
+===============================================================================
+1. networkSummary() now reads the nested parsed candidate object stored in
+   candidateRecords, preventing false-negative IPv4/IPv6/UDP/TCP/relay flags.
+2. Successful addIceCandidate() calls are recorded as explicit remote ICE
+   evidence; normal WebTorrent negotiation does not require trickle ICE.
+3. The first controlled infoHash/codecs registration is locked for the run.
+   Later registrations remain evidence and can report identity/codec mismatch.
+4. Segment transport classification now requires downloadSource/source == p2p.
+   peerId remains correlation evidence and is not transport proof by itself.
+5. Peer-ID/RTCPeerConnection attribution exports confidence and candidate-pool
+   size directly in the compact browser protocol report.
+6. Existing stall rescue is documented as zero-P2P-evidence rescue; behavior
+   is unchanged.
+
+===============================================================================
 WHAT v12 DELIBERATELY DOES NOT DO
 ------------------------------------
 Per the project owner's own explicit request to review before coding
@@ -700,6 +716,7 @@ Both remain open, tracked here for the next revision.
         gatheringState: safeCall(function(){ return pc.iceGatheringState; }, null),
         connectionState: safeCall(function(){ return pc.iceConnectionState; }, null),
         candidates: [],
+        remoteCandidates: [],
         candidateErrors: [],
         stateHistory: []
       },
@@ -923,9 +940,15 @@ Both remain open, tracked here for the next revision.
     };
     pc.addIceCandidate = function(candidate) {
       var self = this;
+      var summary = candidateSummary(candidate);
       ctx.record.signaling.addIceCandidateCalls++;
-      ctx.event("signaling:addIceCandidate", candidateSummary(candidate));
-      return originalAddIceCandidate.call(self, candidate);
+      ctx.event("signaling:addIceCandidate", summary);
+      return originalAddIceCandidate.call(self, candidate).then(function(result) {
+        /* Successful API delivery is explicit remote ICE evidence. */
+        if (summary) ctx.record.ice.remoteCandidates.push(summary);
+        ctx.event("signaling:addIceCandidate-success", summary);
+        return result;
+      });
     };
     pc.createDataChannel = function(label, options) {
       var dc = originalCreateDataChannel.call(this, label, options);
@@ -2357,7 +2380,25 @@ video {
        * uses, so both places now agree on when a controlled match counts.
        */
       if (variantValue() === "480" && matchesControlled(s && s.properties)) {
-        R.swarm.controlledInfoHash = s.infoHash || null;
+        var observedInfoHash = s && s.infoHash ? s.infoHash : null;
+        var observedCodecs = s && s.properties ? s.properties.codecs : null;
+
+        /* Lock the first controlled stream identity for this run. */
+        if (!R.swarm.controlledInfoHash && observedInfoHash) {
+          R.swarm.controlledInfoHash = observedInfoHash;
+          R.swarm.controlledCodecs = observedCodecs;
+        } else if (observedInfoHash &&
+                   observedInfoHash !== R.swarm.controlledInfoHash) {
+          log("swarm:controlled-identity-mismatch", {
+            lockedInfoHash: R.swarm.controlledInfoHash,
+            observedInfoHash: observedInfoHash,
+            lockedCodecs: R.swarm.controlledCodecs,
+            observedCodecs: observedCodecs,
+            note: "Later controlled registration differs from the run-locked " +
+              "controlled infoHash; the locked identity remains the proof target."
+          });
+        }
+
         R.selectedVariant.found = true;
         R.selectedVariant.properties = cloneJson(s.properties);
         R.verdict.controlledVariantFound = true;
@@ -2375,20 +2416,19 @@ video {
          * width/height/bitrate-only, unchanged from v11, to avoid
          * regressing verdict.proof's detection behavior).
          */
-        var newCodecs = s && s.properties ? s.properties.codecs : null;
+        var newCodecs = observedCodecs;
         var priorCodecs = R.swarm.controlledCodecs;
         if (priorCodecs != null && newCodecs != null && priorCodecs !== newCodecs) {
           log("scheduler:codec-mismatch-observed", {
             priorCodecs: priorCodecs,
             newCodecs: newCodecs,
-            note: "Two stream registrations matched width/height/bitrate " +
-              "for the controlled variant but reported different codecs. " +
-              "Per stream-identity.ts, codecs feed into the infoHash, so " +
-              "these may NOT be the same P2P swarm despite matching on the " +
-              "properties this diagnostic's matchesControlled() checks."
+            lockedInfoHash: R.swarm.controlledInfoHash,
+            observedInfoHash: observedInfoHash,
+            note: "Two controlled registrations report different codecs; " +
+              "codecs feed into the library's infoHash."
           });
         }
-        if (newCodecs != null) R.swarm.controlledCodecs = newCodecs;
+        /* Never overwrite the locked controlledCodecs here. */
       } else if (variantValue() !== "480" && matchesControlled(s && s.properties)) {
         /* Still log that AUTO mode happened to touch the controlled
            rendition's properties, for visibility - just don't let it
@@ -2549,12 +2589,17 @@ video {
     on("onSegmentLoaded", function (d) {
       var source = d && (d.downloadSource || d.source || d.type || d.downloadType);
       var peerId = d && d.peerId ? d.peerId : null;
-      var isP2P = safeString(source || "").toLowerCase() === "p2p" || !!peerId;
+      var normalizedSource = safeString(source || "").toLowerCase();
+      var isP2P = normalizedSource === "p2p";
+      var isHTTP = normalizedSource === "http";
+      var sourceClassification =
+        isP2P ? "p2p" : isHTTP ? "http" : "ambiguous";
 
       var seg = {
         at: now(),
         infoHash: d && d.infoHash ? d.infoHash : null,
         source: source || null,
+        sourceClassification: sourceClassification,
         peerId: peerId,
         segmentId: d && (d.segmentId || d.id || d.index) != null
           ? (d.segmentId || d.id || d.index)
@@ -2564,7 +2609,7 @@ video {
       boundedPush(R.transfer.segments, seg);
 
       if (isP2P) R.scheduler.counts.segmentLoadedP2P += 1;
-      else if (safeString(source || "").toLowerCase() === "http") {
+      else if (isHTTP) {
         R.scheduler.counts.segmentLoadedHTTP += 1;
       }
 
@@ -2578,6 +2623,7 @@ video {
 
       log("transfer:segment-loaded", {
         source: seg.source,
+        sourceClassification: seg.sourceClassification,
         peerId: seg.peerId,
         infoHash: seg.infoHash,
         controlledInfoHash: R.swarm.controlledInfoHash,
@@ -3084,7 +3130,9 @@ video {
         },
         candidateTypes: candidateTypes,
         localCandidates: local,
-        remoteCandidates: [],
+        remoteCandidates: (p.ice.remoteCandidates || []).slice(),
+        peerCorrelationConfidence: p.peerCorrelationConfidence || null,
+        peerCorrelationCandidatePoolSize: p.peerCorrelationCandidatePoolSize || null,
         selectedPair: p.stats.selectedCandidatePair,
         candidatePairHistory: p.stats.candidatePairs || [],
         stateHistory: p.ice.stateHistory || [],
@@ -3249,6 +3297,7 @@ video {
       pool[0].peerId = peerId;
       pool[0].remotePeerId = peerId;
       pool[0].peerCorrelationConfidence = confidence;
+      pool[0].peerCorrelationCandidatePoolSize = pool.length;
       pool[0].events.push({
         at:now(),
         elapsedMs:Math.round(mono()-(pool[0].createdMono||mono())),
@@ -3351,12 +3400,15 @@ video {
       turnRelay: false
     };
 
-    records.forEach(function (c) {
+    records.forEach(function (record) {
+      /* candidateRecords preserve the parsed candidate under .candidate. */
+      var c = record && record.candidate ? record.candidate : record;
+      if (!c) return;
       if (c.addressFamily === "IPv4") summary.ipv4 = true;
       if (c.addressFamily === "IPv6") summary.ipv6 = true;
-      if (c.protocol === "udp") summary.udp = true;
-      if (c.protocol === "tcp") summary.tcp = true;
-      if (c.type === "relay") summary.turnRelay = true;
+      if (safeString(c.protocol || "").toLowerCase() === "udp") summary.udp = true;
+      if (safeString(c.protocol || "").toLowerCase() === "tcp") summary.tcp = true;
+      if (normalizeCandidateType(c.candidateType) === "relay") summary.turnRelay = true;
     });
 
     return summary;

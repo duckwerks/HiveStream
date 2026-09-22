@@ -701,7 +701,7 @@ WHAT v11 DELIBERATELY DOES NOT CHANGE
     var args = Array.prototype.slice.call(arguments);
     var pc = new (Function.prototype.bind.apply(Native, [null].concat(args)))();
     var ctx = makeRecord(pc);
-    pcs.push(ctx.record);
+    pcs.push(pc);
 
     pc.createOffer = function() {
       var self = this;
@@ -1675,10 +1675,6 @@ video {
 
     var pcs = (window.__HS_V11_PEER_CONNECTIONS || []).filter(function(p){ return p && p.runId === R.identity.runId; });
 
-    while (R.webrtc.peerConnections.length < pcs.length) {
-      attachPC(pcs[R.webrtc.peerConnections.length], R.webrtc.peerConnections.length);
-    }
-
     pcs.forEach(function (pc, i) {
       var rec = R.webrtc.peerConnections[i];
       if (!pc || !rec || !pc.getStats) return;
@@ -1715,6 +1711,7 @@ video {
         if (browserRec) {
           browserRec.stats.lastAt = now();
           browserRec.stats.selectedCandidatePairId = selectedPairId;
+          browserRec.stats.selectedCandidatePair = null;
           browserRec.stats.transport = transportHit ? {
             id:transportHit.id || null,
             selectedCandidatePairId:transportHit.selectedCandidatePairId || null,
@@ -1754,7 +1751,10 @@ video {
           rec.selectedPair = summary;
           rec.candidatePairHistory.push(summary);
           R.webrtc.candidatePairRecords.push(summary);
-          if (browserRec) browserRec.stats.candidatePairs.push(summary);
+          if (browserRec) {
+            browserRec.stats.candidatePairs.push(summary);
+            browserRec.stats.selectedCandidatePair = summary;
+          }
           R.connectivity.candidatePairSucceeded = true;
 
           log("webrtc:candidate-pair-succeeded", {
@@ -2769,20 +2769,89 @@ video {
   function syncV11BrowserProtocol() {
     var all = window.__HS_V11_PEER_CONNECTIONS || [];
     var runId = R.identity && R.identity.runId;
-    var selected = all.filter(function(p){ return p && p.runId === runId; });
+    var selected = all.filter(function(pc){
+      return pc && pc.__hsV11 && pc.__hsV11.runId === runId;
+    });
 
     R.webrtc.browserProtocol.totalCaptured = all.length;
     R.webrtc.browserProtocol.currentRunCaptured = selected.length;
-    R.webrtc.browserProtocol.records = selected.map(function(p) {
+
+    /*
+     * The v10 compact peerConnections array remains as a report-compatible
+     * view, but v11 is now its authoritative source. We do not attach a
+     * second set of event listeners here; the browser-level wrapper already
+     * captured those events exactly once.
+     */
+    R.webrtc.peerConnections = selected.map(function(pc, index){
+      var p = pc.__hsV11;
+      var local = (p.ice.candidates || []).filter(function(c){ return c; });
+      var candidateTypes = {};
+      local.forEach(function(c){
+        var t = c.candidateType || "other";
+        candidateTypes[t] = (candidateTypes[t] || 0) + 1;
+      });
+
       return {
+        index: index,
         pcId: p.pcId,
-        runId: p.runId,
-        createdAt: p.createdAt,
         peerId: p.peerId || p.remotePeerId || null,
-        signaling: p.signaling,
-        ice: p.ice,
-        connection: p.connection,
+        createdAt: p.createdAt,
+        states: {
+          signaling: p.signaling.state,
+          iceGathering: p.ice.gatheringState,
+          ice: p.ice.connectionState,
+          connection: p.connection.state
+        },
+        candidateTypes: candidateTypes,
+        localCandidates: local,
+        remoteCandidates: [],
+        selectedPair: p.stats.selectedCandidatePair,
+        candidatePairHistory: p.stats.candidatePairs || [],
+        stateHistory: p.ice.stateHistory || [],
         dataChannels: p.dataChannels.map(function(d){
+          return {
+            label:d.label,id:d.id,ordered:d.ordered,protocol:d.protocol,
+            readyStateAtBind:d.readyStateAtBind,openAt:d.openAt,
+            closeAt:d.closeAt,errorCount:d.errorCount,messageCount:d.messageCount
+          };
+        }),
+        iceCandidateErrors: p.ice.candidateErrors || []
+      };
+    });
+
+    R.webrtc.candidateRecords = [];
+    R.webrtc.ice.host = 0;
+    R.webrtc.ice.srflx = 0;
+    R.webrtc.ice.relay = 0;
+    R.webrtc.ice.prflx = 0;
+    R.webrtc.ice.other = 0;
+
+    selected.forEach(function(pc, index){
+      var p = pc.__hsV11;
+      (p.ice.candidates || []).forEach(function(c){
+        var t = c.candidateType || "other";
+        if (R.webrtc.ice[t] === undefined) R.webrtc.ice.other++;
+        else R.webrtc.ice[t]++;
+        R.webrtc.candidateRecords.push({
+          at:p.createdAt,
+          pcIndex:index,
+          source:"local-event",
+          candidate:c
+        });
+      });
+    });
+
+    R.webrtc.browserProtocol.records = selected.map(function(pc){
+      var p = pc.__hsV11;
+      return {
+        pcId:p.pcId,
+        runId:p.runId,
+        createdAt:p.createdAt,
+        peerId:p.peerId || p.remotePeerId || null,
+        signaling:p.signaling,
+        ice:p.ice,
+        connection:p.connection,
+        dataChannels:p.dataChannels.map(function(d){
           return {
             origin:d.origin,label:d.label,id:d.id,ordered:d.ordered,
             protocol:d.protocol,readyStateAtBind:d.readyStateAtBind,
@@ -2790,10 +2859,10 @@ video {
             messageCount:d.messageCount
           };
         }),
-        events: p.events.slice(-200),
-        stats: p.stats,
-        closed: p.closed,
-        closeAt: p.closeAt
+        events:p.events.slice(-200),
+        stats:p.stats,
+        closed:p.closed,
+        closeAt:p.closeAt
       };
     });
   }

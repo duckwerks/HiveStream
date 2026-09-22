@@ -1,0 +1,4032 @@
+{
+  "test": {
+    "name": "HiveStream Phase 1B — Natural Swarm Diagnostic",
+    "version": "10.0",
+    "startedAt": "2026-09-22T00:34:52.509Z",
+    "elapsedMs": 220134,
+    "authorship": "William von Meister (Project Owner) + Claude Sonnet 5 (Anthropic, v10) + GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
+  },
+  "identity": {
+    "browserInstanceId": "a777a91f-2806-4ee9-8c86-1ce4d25f80e5",
+    "deviceLabel": "PhoneChromeP2PWifif",
+    "browserIdentityPersistence": "localStorage",
+    "runId": "ec48dbe8-6826-44ce-9721-a97f55bc385e",
+    "actualP2PIdentity": {
+      "peerId": "-PM0400-KuniGDhQdkhp",
+      "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+      "verified": true
+    }
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "browserFamily": "Chrome",
+    "browserVersion": "150.0.0.0",
+    "platform": "Linux armv81",
+    "deviceClass": "desktop",
+    "language": "en-US",
+    "languages": [
+      "en-US",
+      "en"
+    ],
+    "screen": {
+      "width": 832,
+      "height": 384,
+      "availWidth": 755,
+      "availHeight": 355,
+      "colorDepth": 24,
+      "pixelDepth": 24
+    },
+    "devicePixelRatio": 2.8125,
+    "viewport": {
+      "width": 980,
+      "height": 459
+    },
+    "online": true,
+    "hardwareConcurrency": 8,
+    "maxTouchPoints": 5,
+    "webRtcSupported": true,
+    "hlsSupported": true,
+    "p2pGlobal": true,
+    "p2pEngineExport": true,
+    "crossOriginIsolated": false
+  },
+  "network": {
+    "candidateTypes": {
+      "host": 0,
+      "srflx": 0,
+      "relay": 0,
+      "prflx": 0,
+      "other": 0
+    },
+    "ipv4": false,
+    "ipv6": false,
+    "udp": false,
+    "tcp": false,
+    "turnRelay": false
+  },
+  "export": {
+    "savedAt": "2026-09-22T00:38:32.644Z",
+    "format": "HiveStream Phase 1B diagnostic JSON",
+    "exporterVersion": "10.0",
+    "privacy": "No public IP, cookies, local storage contents, browsing history, or precise location are exported."
+  },
+  "dependencies": {
+    "hlsJs": "1.7.0",
+    "p2pMediaLoaderHlsJs": "4.0.0"
+  },
+  "configuration": {
+    "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "swarmMode": "natural",
+    "customSwarmId": null,
+    "variantMode": "480",
+    "targetVariant": {
+      "width": 848,
+      "height": 480,
+      "bitrate": 836280
+    },
+    "transportMode": "p2ponly",
+    "announceTrackers": [
+      "wss://tracker.novage.com.ua",
+      "wss://tracker.webtorrent.dev",
+      "wss://tracker.openwebtorrent.com"
+    ]
+  },
+  "instrumentation": {
+    "engineEventBindings": [
+      {
+        "event": "onStreamAdded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onStreamRegistrationError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onPeerConnect",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onPeerClose",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onPeerError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onPeerWarning",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onPeerConnectError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onTrackerError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onTrackerWarning",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onSegmentStart",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onSegmentAbort",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onSegmentError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onChunkDownloaded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onChunkUploaded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      },
+      {
+        "event": "onSegmentLoaded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:34:52.530Z"
+      }
+    ],
+    "receivedP2PEvents": {
+      "onStreamAdded": 5
+    },
+    "engineSurface": {
+      "label": "hlsInstance.p2pEngine",
+      "constructor": "Oa",
+      "ownKeys": [
+        "core",
+        "segmentManager",
+        "hlsInstanceGetter",
+        "currentHlsInstance",
+        "debug",
+        "updateMediaElementEventHandlers",
+        "handleManifestLoaded",
+        "handleLevelSwitching",
+        "handleLevelUpdated",
+        "handleMediaAttached",
+        "handleMediaDetached",
+        "handlePlaybackUpdate",
+        "destroyCore",
+        "destroy"
+      ],
+      "functionKeys": [
+        "hlsInstanceGetter",
+        "debug",
+        "updateMediaElementEventHandlers",
+        "handleManifestLoaded",
+        "handleLevelSwitching",
+        "handleLevelUpdated",
+        "handleMediaAttached",
+        "handleMediaDetached",
+        "handlePlaybackUpdate",
+        "destroyCore",
+        "destroy"
+      ]
+    },
+    "coreSurface": {
+      "label": "hlsInstance.p2pEngine.core",
+      "constructor": "e",
+      "ownKeys": [
+        "eventTarget",
+        "manifestResponseUrl",
+        "streams",
+        "mainStreamConfig",
+        "secondaryStreamConfig",
+        "commonCoreConfig",
+        "bandwidthCalculators",
+        "segmentStorage",
+        "webTorrentSocketPool",
+        "logger",
+        "socketPoolLogger",
+        "peerId",
+        "mainStreamLoader",
+        "secondaryStreamLoader",
+        "streamDetails",
+        "storageInitPromise"
+      ],
+      "functionKeys": [
+        "logger",
+        "socketPoolLogger"
+      ]
+    },
+    "peerIdDiscoveryAttempts": 146,
+    "peerIdDiscoverySuccesses": 1,
+    "peerIdDiscoveryMethod": "direct"
+  },
+  "scheduler": {
+    "interpretation": "Observed library segment lifecycle; not an independent proof verdict.",
+    "transportMode": "p2ponly",
+    "requestedStreamConfig": {
+      "label": "P2P-only (simultaneousHttpDownloads: 0)",
+      "httpDownloadInitialTimeoutMs": 5000,
+      "simultaneousHttpDownloads": 0,
+      "simultaneousP2PDownloads": 3,
+      "highDemandTimeWindow": 15,
+      "httpDownloadTimeWindow": 3000,
+      "p2pDownloadTimeWindow": 6000,
+      "isP2PDisabled": false,
+      "isP2PUploadDisabled": false
+    },
+    "observedCoreConfig": {
+      "trackerClientVersionPrefix": "-PM0400-",
+      "mainStream": {
+        "isP2PUploadDisabled": false,
+        "isP2PDisabled": false,
+        "simultaneousHttpDownloads": 0,
+        "simultaneousP2PDownloads": 3,
+        "highDemandTimeWindow": 15,
+        "httpDownloadInitialTimeoutMs": 5000,
+        "httpDownloadTimeWindow": 3000,
+        "p2pDownloadTimeWindow": 6000,
+        "webRtcMaxMessageSize": 65535,
+        "p2pNotReceivingBytesTimeoutMs": 2000,
+        "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+        "httpNotReceivingBytesTimeoutMs": 3000,
+        "httpErrorRetries": 3,
+        "p2pErrorRetries": 3,
+        "announceTrackers": [
+          "wss://tracker.novage.com.ua",
+          "wss://tracker.webtorrent.dev",
+          "wss://tracker.openwebtorrent.com"
+        ],
+        "rtcConfig": {
+          "iceServers": [
+            {
+              "urls": "stun:stun.l.google.com:19302"
+            },
+            {
+              "urls": "stun:global.stun.twilio.com:3478"
+            }
+          ]
+        },
+        "p2pMaxPeers": 50,
+        "p2pChurnMaxPeersMultiplier": 1.5,
+        "p2pChurnCleanupIntervalMs": 30000,
+        "p2pChurnGracePeriodMs": 15000,
+        "webRtcOffersCount": 5,
+        "webRtcOfferTimeoutMs": 50000,
+        "webRtcIceGatheringTimeoutMs": 5000,
+        "webRtcConnectionTimeoutMs": 15000
+      },
+      "secondaryStream": {
+        "isP2PUploadDisabled": false,
+        "isP2PDisabled": false,
+        "simultaneousHttpDownloads": 0,
+        "simultaneousP2PDownloads": 3,
+        "highDemandTimeWindow": 15,
+        "httpDownloadInitialTimeoutMs": 5000,
+        "httpDownloadTimeWindow": 3000,
+        "p2pDownloadTimeWindow": 6000,
+        "webRtcMaxMessageSize": 65535,
+        "p2pNotReceivingBytesTimeoutMs": 2000,
+        "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+        "httpNotReceivingBytesTimeoutMs": 3000,
+        "httpErrorRetries": 3,
+        "p2pErrorRetries": 3,
+        "announceTrackers": [
+          "wss://tracker.novage.com.ua",
+          "wss://tracker.webtorrent.dev",
+          "wss://tracker.openwebtorrent.com"
+        ],
+        "rtcConfig": {
+          "iceServers": [
+            {
+              "urls": "stun:stun.l.google.com:19302"
+            },
+            {
+              "urls": "stun:global.stun.twilio.com:3478"
+            }
+          ]
+        },
+        "p2pMaxPeers": 50,
+        "p2pChurnMaxPeersMultiplier": 1.5,
+        "p2pChurnCleanupIntervalMs": 30000,
+        "p2pChurnGracePeriodMs": 15000,
+        "webRtcOffersCount": 5,
+        "webRtcOfferTimeoutMs": 50000,
+        "webRtcIceGatheringTimeoutMs": 5000,
+        "webRtcConnectionTimeoutMs": 15000
+      }
+    },
+    "actualConfigSource": "p2pEngine.core.getConfig()",
+    "counts": {
+      "segmentStartP2P": 0,
+      "segmentStartHTTP": 0,
+      "segmentLoadedP2P": 0,
+      "segmentLoadedHTTP": 0,
+      "segmentAbort": 0,
+      "segmentError": 0
+    },
+    "firstSegmentStart": null,
+    "p2pSegmentStartObserved": false,
+    "httpSegmentStartObserved": false,
+    "p2pLoadedSegmentObserved": false,
+    "httpFallbackObserved": false
+  },
+  "schedulerEvents": [],
+  "transport": {
+    "mode": "p2ponly",
+    "requestedStreamConfig": {
+      "label": "P2P-only (simultaneousHttpDownloads: 0)",
+      "httpDownloadInitialTimeoutMs": 5000,
+      "simultaneousHttpDownloads": 0,
+      "simultaneousP2PDownloads": 3,
+      "highDemandTimeWindow": 15,
+      "httpDownloadTimeWindow": 3000,
+      "p2pDownloadTimeWindow": 6000,
+      "isP2PDisabled": false,
+      "isP2PUploadDisabled": false
+    },
+    "webrtcConnectionBudget": {
+      "webRtcOffersCount": 5,
+      "webRtcOfferTimeoutMs": 50000,
+      "webRtcIceGatheringTimeoutMs": 5000,
+      "webRtcConnectionTimeoutMs": 15000,
+      "note": "Library defaults, not overridden by this diagnostic. A single attempt can legitimately take up to roughly the sum of the ICE gathering and connection timeouts, plus however much of the offer wait it needs, before the library itself gives up."
+    },
+    "stallRescue": {
+      "enabled": true,
+      "timeoutMs": 90000,
+      "armedAt": "2026-09-22T00:34:52.511Z",
+      "triggeredAt": "2026-09-22T00:36:22.625Z",
+      "triggeredElapsedMs": 90114,
+      "reason": "zero P2P bytes received after 90000ms in P2P-only mode",
+      "action": "applyDynamicConfig({ core: { simultaneousHttpDownloads: 1 } })"
+    },
+    "hlsConfig": {
+      "requested": {
+        "fragLoadingTimeOut": 120000
+      }
+    },
+    "playerRecovery": {
+      "levelDriftCorrections": [],
+      "fatalErrorRecoveries": []
+    }
+  },
+  "manifest": {
+    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "loaded": true,
+    "renditions": [
+      {
+        "index": 0,
+        "width": 1280,
+        "height": 720,
+        "bitrate": 2149280,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8"
+      },
+      {
+        "index": 1,
+        "width": 320,
+        "height": 184,
+        "bitrate": 246440,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"
+      },
+      {
+        "index": 2,
+        "width": 512,
+        "height": 288,
+        "bitrate": 460560,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8"
+      },
+      {
+        "index": 3,
+        "width": 848,
+        "height": 480,
+        "bitrate": 836280,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+      },
+      {
+        "index": 4,
+        "width": 1920,
+        "height": 1080,
+        "bitrate": 6221600,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8"
+      }
+    ],
+    "activeLevelIndex": null,
+    "duration": null
+  },
+  "selectedVariant": {
+    "found": true,
+    "levelIndex": 3,
+    "properties": {
+      "index": 3,
+      "width": 848,
+      "height": 480,
+      "bitrate": 836280,
+      "codecs": null,
+      "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+    },
+    "reason": "Exact controlled rendition matched manifest."
+  },
+  "swarm": {
+    "resolvedSwarmId": null,
+    "controlledInfoHash": null,
+    "streams": [
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    ]
+  },
+  "trackers": {
+    "wss://tracker.novage.com.ua": {
+      "status": "configured",
+      "infoHashes": [],
+      "uniquePeers": 0,
+      "peerEvents": 0,
+      "lastEvent": null,
+      "lastEventAt": null
+    },
+    "wss://tracker.webtorrent.dev": {
+      "status": "configured",
+      "infoHashes": [],
+      "uniquePeers": 0,
+      "peerEvents": 0,
+      "lastEvent": null,
+      "lastEventAt": null
+    },
+    "wss://tracker.openwebtorrent.com": {
+      "status": "configured",
+      "infoHashes": [],
+      "uniquePeers": 0,
+      "peerEvents": 0,
+      "lastEvent": null,
+      "lastEventAt": null
+    }
+  },
+  "peers": [],
+  "transfer": {
+    "bytes": {
+      "http": 0,
+      "p2pDown": 0,
+      "p2pUp": 0
+    },
+    "segments": []
+  },
+  "connectivity": {
+    "trackerPeerDiscovered": false,
+    "localPeerIdKnown": true,
+    "remotePeerKnown": false,
+    "iceCandidatesGathered": false,
+    "candidatePairSucceeded": false,
+    "dataChannelOpened": false,
+    "p2pPeerConnected": false,
+    "p2pBytesReceived": 0
+  },
+  "webrtc": {
+    "connectivity": {
+      "trackerPeerDiscovered": false,
+      "localPeerIdKnown": true,
+      "remotePeerKnown": false,
+      "iceCandidatesGathered": false,
+      "candidatePairSucceeded": false,
+      "dataChannelOpened": false,
+      "p2pPeerConnected": false,
+      "p2pBytesReceived": 0
+    },
+    "iceCandidateCounts": {
+      "host": 0,
+      "srflx": 0,
+      "relay": 0,
+      "prflx": 0,
+      "other": 0
+    },
+    "peerConnections": [
+      {
+        "index": 0,
+        "createdAt": "2026-09-22T00:34:54.084Z",
+        "states": {
+          "signaling": "closed",
+          "iceGathering": "new",
+          "ice": "closed",
+          "connection": "closed"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 1,
+        "createdAt": "2026-09-22T00:34:54.106Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:33.953Z",
+            "elapsedMs": 41443,
+            "pcIndex": 1,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:33.849Z",
+            "pcIndex": 1,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 42295,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 2,
+        "createdAt": "2026-09-22T00:34:54.122Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:33.983Z",
+            "elapsedMs": 41472,
+            "pcIndex": 2,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:33.888Z",
+            "pcIndex": 2,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 36277,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 3,
+        "createdAt": "2026-09-22T00:34:54.137Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:33.990Z",
+            "elapsedMs": 41480,
+            "pcIndex": 3,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:33.896Z",
+            "pcIndex": 3,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 60551,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 4,
+        "createdAt": "2026-09-22T00:34:54.151Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:34.003Z",
+            "elapsedMs": 41493,
+            "pcIndex": 4,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:33.913Z",
+            "pcIndex": 4,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 35202,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 5,
+        "createdAt": "2026-09-22T00:34:54.164Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:34.016Z",
+            "elapsedMs": 41506,
+            "pcIndex": 5,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:33.937Z",
+            "pcIndex": 5,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 46306,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 6,
+        "createdAt": "2026-09-22T00:34:55.605Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:34.712Z",
+            "elapsedMs": 42201,
+            "pcIndex": 6,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:34.629Z",
+            "pcIndex": 6,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 39128,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 7,
+        "createdAt": "2026-09-22T00:34:55.619Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:34.718Z",
+            "elapsedMs": 42207,
+            "pcIndex": 7,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:34.645Z",
+            "pcIndex": 7,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 38679,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 8,
+        "createdAt": "2026-09-22T00:34:55.629Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:34.733Z",
+            "elapsedMs": 42222,
+            "pcIndex": 8,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:34.659Z",
+            "pcIndex": 8,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 40171,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 9,
+        "createdAt": "2026-09-22T00:34:55.639Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:34.752Z",
+            "elapsedMs": 42242,
+            "pcIndex": 9,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:34.672Z",
+            "pcIndex": 9,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 36727,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 10,
+        "createdAt": "2026-09-22T00:34:55.649Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:35:34.767Z",
+            "elapsedMs": 42256,
+            "pcIndex": 10,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:35:34.685Z",
+            "pcIndex": 10,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 43143,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 11,
+        "createdAt": "2026-09-22T00:36:54.085Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:33.984Z",
+            "elapsedMs": 161474,
+            "pcIndex": 11,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:33.849Z",
+            "pcIndex": 11,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 44161,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 12,
+        "createdAt": "2026-09-22T00:36:54.117Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.028Z",
+            "elapsedMs": 161518,
+            "pcIndex": 12,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:33.907Z",
+            "pcIndex": 12,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 42378,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 13,
+        "createdAt": "2026-09-22T00:36:54.149Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.039Z",
+            "elapsedMs": 161529,
+            "pcIndex": 13,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:33.917Z",
+            "pcIndex": 13,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 43217,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 14,
+        "createdAt": "2026-09-22T00:36:54.174Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.068Z",
+            "elapsedMs": 161558,
+            "pcIndex": 14,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:33.939Z",
+            "pcIndex": 14,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 34570,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 15,
+        "createdAt": "2026-09-22T00:36:54.192Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.091Z",
+            "elapsedMs": 161581,
+            "pcIndex": 15,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:33.960Z",
+            "pcIndex": 15,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 43116,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 16,
+        "createdAt": "2026-09-22T00:36:55.613Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.756Z",
+            "elapsedMs": 162246,
+            "pcIndex": 16,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:34.613Z",
+            "pcIndex": 16,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 41710,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 17,
+        "createdAt": "2026-09-22T00:36:55.642Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.766Z",
+            "elapsedMs": 162255,
+            "pcIndex": 17,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:34.635Z",
+            "pcIndex": 17,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 55271,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 18,
+        "createdAt": "2026-09-22T00:36:55.661Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.789Z",
+            "elapsedMs": 162278,
+            "pcIndex": 18,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:34.657Z",
+            "pcIndex": 18,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 47739,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 19,
+        "createdAt": "2026-09-22T00:36:55.679Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.812Z",
+            "elapsedMs": 162302,
+            "pcIndex": 19,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:34.679Z",
+            "pcIndex": 19,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 53670,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      },
+      {
+        "index": 20,
+        "createdAt": "2026-09-22T00:36:55.700Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:37:34.835Z",
+            "elapsedMs": 162325,
+            "pcIndex": 20,
+            "state": "iceGathering",
+            "value": "complete"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [
+          {
+            "at": "2026-09-22T00:37:34.701Z",
+            "pcIndex": 20,
+            "address": "[0:0:0:x:x:x:x:x]",
+            "port": 46798,
+            "url": "stun:stun.l.google.com:19302",
+            "errorCode": 701,
+            "errorText": "STUN binding request timed out."
+          }
+        ],
+        "dataChannels": []
+      }
+    ],
+    "candidatePairRecords": [],
+    "dataChannels": []
+  },
+  "verdict": {
+    "streamIdentityObserved": true,
+    "controlledVariantFound": false,
+    "peerConnected": false,
+    "p2pChunkBytesReceived": false,
+    "p2pSegmentLoaded": false,
+    "p2pSegmentMatchedSelectedVariant": false,
+    "proof": false
+  },
+  "events": [
+    {
+      "at": "2026-09-22T00:34:52.519Z",
+      "elapsedMs": 9,
+      "type": "p2p:runtime-surface",
+      "data": {
+        "engine": {
+          "label": "hlsInstance.p2pEngine",
+          "constructor": "Oa",
+          "ownKeys": [
+            "core",
+            "segmentManager",
+            "hlsInstanceGetter",
+            "currentHlsInstance",
+            "debug",
+            "updateMediaElementEventHandlers",
+            "handleManifestLoaded",
+            "handleLevelSwitching",
+            "handleLevelUpdated",
+            "handleMediaAttached",
+            "handleMediaDetached",
+            "handlePlaybackUpdate",
+            "destroyCore",
+            "destroy"
+          ],
+          "functionKeys": [
+            "hlsInstanceGetter",
+            "debug",
+            "updateMediaElementEventHandlers",
+            "handleManifestLoaded",
+            "handleLevelSwitching",
+            "handleLevelUpdated",
+            "handleMediaAttached",
+            "handleMediaDetached",
+            "handlePlaybackUpdate",
+            "destroyCore",
+            "destroy"
+          ]
+        },
+        "core": {
+          "label": "hlsInstance.p2pEngine.core",
+          "constructor": "e",
+          "ownKeys": [
+            "eventTarget",
+            "manifestResponseUrl",
+            "streams",
+            "mainStreamConfig",
+            "secondaryStreamConfig",
+            "commonCoreConfig",
+            "bandwidthCalculators",
+            "segmentStorage",
+            "webTorrentSocketPool",
+            "logger",
+            "socketPoolLogger",
+            "peerId",
+            "mainStreamLoader",
+            "secondaryStreamLoader",
+            "streamDetails",
+            "storageInitPromise"
+          ],
+          "functionKeys": [
+            "logger",
+            "socketPoolLogger"
+          ]
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:52.523Z",
+      "elapsedMs": 13,
+      "type": "scheduler:core-config-observed",
+      "data": {
+        "mainStream": {
+          "isP2PUploadDisabled": false,
+          "isP2PDisabled": false,
+          "simultaneousHttpDownloads": 0,
+          "simultaneousP2PDownloads": 3,
+          "highDemandTimeWindow": 15,
+          "httpDownloadInitialTimeoutMs": 5000,
+          "httpDownloadTimeWindow": 3000,
+          "p2pDownloadTimeWindow": 6000,
+          "webRtcMaxMessageSize": 65535,
+          "p2pNotReceivingBytesTimeoutMs": 2000,
+          "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+          "httpNotReceivingBytesTimeoutMs": 3000,
+          "httpErrorRetries": 3,
+          "p2pErrorRetries": 3,
+          "announceTrackers": [
+            "wss://tracker.novage.com.ua",
+            "wss://tracker.webtorrent.dev",
+            "wss://tracker.openwebtorrent.com"
+          ],
+          "rtcConfig": {
+            "iceServers": [
+              {
+                "urls": "stun:stun.l.google.com:19302"
+              },
+              {
+                "urls": "stun:global.stun.twilio.com:3478"
+              }
+            ]
+          },
+          "p2pMaxPeers": 50,
+          "p2pChurnMaxPeersMultiplier": 1.5,
+          "p2pChurnCleanupIntervalMs": 30000,
+          "p2pChurnGracePeriodMs": 15000,
+          "webRtcOffersCount": 5,
+          "webRtcOfferTimeoutMs": 50000,
+          "webRtcIceGatheringTimeoutMs": 5000,
+          "webRtcConnectionTimeoutMs": 15000
+        },
+        "secondaryStream": {
+          "isP2PUploadDisabled": false,
+          "isP2PDisabled": false,
+          "simultaneousHttpDownloads": 0,
+          "simultaneousP2PDownloads": 3,
+          "highDemandTimeWindow": 15,
+          "httpDownloadInitialTimeoutMs": 5000,
+          "httpDownloadTimeWindow": 3000,
+          "p2pDownloadTimeWindow": 6000,
+          "webRtcMaxMessageSize": 65535,
+          "p2pNotReceivingBytesTimeoutMs": 2000,
+          "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+          "httpNotReceivingBytesTimeoutMs": 3000,
+          "httpErrorRetries": 3,
+          "p2pErrorRetries": 3,
+          "announceTrackers": [
+            "wss://tracker.novage.com.ua",
+            "wss://tracker.webtorrent.dev",
+            "wss://tracker.openwebtorrent.com"
+          ],
+          "rtcConfig": {
+            "iceServers": [
+              {
+                "urls": "stun:stun.l.google.com:19302"
+              },
+              {
+                "urls": "stun:global.stun.twilio.com:3478"
+              }
+            ]
+          },
+          "p2pMaxPeers": 50,
+          "p2pChurnMaxPeersMultiplier": 1.5,
+          "p2pChurnCleanupIntervalMs": 30000,
+          "p2pChurnGracePeriodMs": 15000,
+          "webRtcOffersCount": 5,
+          "webRtcOfferTimeoutMs": 50000,
+          "webRtcIceGatheringTimeoutMs": 5000,
+          "webRtcConnectionTimeoutMs": 15000
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:52.530Z",
+      "elapsedMs": 19,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:52.539Z",
+      "elapsedMs": 29,
+      "type": "hls:manifest-loading",
+      "data": {
+        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:52.545Z",
+      "elapsedMs": 35,
+      "type": "hls:manifest-loading",
+      "data": {
+        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:52.556Z",
+      "elapsedMs": 45,
+      "type": "player:created",
+      "data": {
+        "loaderGlobal": "window.p2pml.hlsjs.HlsJsP2PEngine",
+        "swarmMode": "natural",
+        "transportMode": "p2ponly",
+        "stallRescueEnabled": true,
+        "stallRescueTimeoutMs": 90000,
+        "swarmIdPropertyPresent": false,
+        "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.063Z",
+      "elapsedMs": 553,
+      "type": "hls:manifest-loaded",
+      "data": {
+        "levels": 5,
+        "selectedVariant": {
+          "found": true,
+          "levelIndex": 3,
+          "properties": {
+            "index": 3,
+            "width": 848,
+            "height": 480,
+            "bitrate": 836280,
+            "codecs": null,
+            "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+          },
+          "reason": "Exact controlled rendition matched manifest."
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.071Z",
+      "elapsedMs": 560,
+      "type": "hls:manifest-loaded",
+      "data": {
+        "levels": 5,
+        "selectedVariant": {
+          "found": true,
+          "levelIndex": 3,
+          "properties": {
+            "index": 3,
+            "width": 848,
+            "height": 480,
+            "bitrate": 836280,
+            "codecs": null,
+            "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+          },
+          "reason": "Exact controlled rendition matched manifest."
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.083Z",
+      "elapsedMs": 572,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 1,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.093Z",
+      "elapsedMs": 582,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.100Z",
+      "elapsedMs": 590,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 2,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.108Z",
+      "elapsedMs": 597,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.117Z",
+      "elapsedMs": 606,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 3,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.125Z",
+      "elapsedMs": 615,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.135Z",
+      "elapsedMs": 624,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 4,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.144Z",
+      "elapsedMs": 633,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.153Z",
+      "elapsedMs": 643,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 5,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:53.164Z",
+      "elapsedMs": 653,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:54.063Z",
+      "elapsedMs": 1552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:54.084Z",
+      "elapsedMs": 1574,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 0,
+        "signaling": "closed",
+        "iceGathering": "new",
+        "ice": "closed",
+        "connection": "closed"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:54.106Z",
+      "elapsedMs": 1596,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 1,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:54.122Z",
+      "elapsedMs": 1612,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 2,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:54.137Z",
+      "elapsedMs": 1627,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 3,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:54.151Z",
+      "elapsedMs": 1641,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 4,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:54.164Z",
+      "elapsedMs": 1654,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 5,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:55.597Z",
+      "elapsedMs": 3086,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:55.605Z",
+      "elapsedMs": 3094,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 6,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:55.619Z",
+      "elapsedMs": 3109,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 7,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:55.629Z",
+      "elapsedMs": 3119,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 8,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:55.639Z",
+      "elapsedMs": 3128,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 9,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:55.649Z",
+      "elapsedMs": 3138,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 10,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:57.062Z",
+      "elapsedMs": 4552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:34:58.602Z",
+      "elapsedMs": 6092,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:00.062Z",
+      "elapsedMs": 7552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:01.611Z",
+      "elapsedMs": 9101,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:03.063Z",
+      "elapsedMs": 10552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:04.596Z",
+      "elapsedMs": 12086,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:06.062Z",
+      "elapsedMs": 13552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:07.611Z",
+      "elapsedMs": 15101,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:09.062Z",
+      "elapsedMs": 16552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:10.611Z",
+      "elapsedMs": 18101,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:12.062Z",
+      "elapsedMs": 19552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:13.612Z",
+      "elapsedMs": 21102,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:15.062Z",
+      "elapsedMs": 22552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:16.574Z",
+      "elapsedMs": 24063,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:18.062Z",
+      "elapsedMs": 25552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:19.605Z",
+      "elapsedMs": 27095,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:21.062Z",
+      "elapsedMs": 28552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:22.575Z",
+      "elapsedMs": 30064,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:24.062Z",
+      "elapsedMs": 31552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:25.575Z",
+      "elapsedMs": 33065,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:27.064Z",
+      "elapsedMs": 34554,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:28.575Z",
+      "elapsedMs": 36065,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:30.062Z",
+      "elapsedMs": 37552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:31.574Z",
+      "elapsedMs": 39064,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.062Z",
+      "elapsedMs": 40552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.849Z",
+      "elapsedMs": 41339,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:33.849Z",
+        "pcIndex": 1,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 42295,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.888Z",
+      "elapsedMs": 41378,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:33.888Z",
+        "pcIndex": 2,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 36277,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.896Z",
+      "elapsedMs": 41385,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:33.896Z",
+        "pcIndex": 3,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 60551,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.913Z",
+      "elapsedMs": 41402,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:33.913Z",
+        "pcIndex": 4,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 35202,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.937Z",
+      "elapsedMs": 41426,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:33.937Z",
+        "pcIndex": 5,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 46306,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.953Z",
+      "elapsedMs": 41443,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:33.953Z",
+        "elapsedMs": 41443,
+        "pcIndex": 1,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.983Z",
+      "elapsedMs": 41472,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:33.983Z",
+        "elapsedMs": 41472,
+        "pcIndex": 2,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:33.990Z",
+      "elapsedMs": 41480,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:33.990Z",
+        "elapsedMs": 41480,
+        "pcIndex": 3,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.003Z",
+      "elapsedMs": 41493,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:34.003Z",
+        "elapsedMs": 41493,
+        "pcIndex": 4,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.016Z",
+      "elapsedMs": 41506,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:34.016Z",
+        "elapsedMs": 41506,
+        "pcIndex": 5,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.620Z",
+      "elapsedMs": 42110,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.629Z",
+      "elapsedMs": 42118,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:34.629Z",
+        "pcIndex": 6,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 39128,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.645Z",
+      "elapsedMs": 42135,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:34.645Z",
+        "pcIndex": 7,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 38679,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.659Z",
+      "elapsedMs": 42148,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:34.659Z",
+        "pcIndex": 8,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 40171,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.672Z",
+      "elapsedMs": 42161,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:34.672Z",
+        "pcIndex": 9,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 36727,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.685Z",
+      "elapsedMs": 42174,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:35:34.685Z",
+        "pcIndex": 10,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 43143,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.712Z",
+      "elapsedMs": 42201,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:34.712Z",
+        "elapsedMs": 42201,
+        "pcIndex": 6,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.718Z",
+      "elapsedMs": 42207,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:34.718Z",
+        "elapsedMs": 42207,
+        "pcIndex": 7,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.733Z",
+      "elapsedMs": 42222,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:34.733Z",
+        "elapsedMs": 42222,
+        "pcIndex": 8,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.752Z",
+      "elapsedMs": 42242,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:34.752Z",
+        "elapsedMs": 42242,
+        "pcIndex": 9,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:34.767Z",
+      "elapsedMs": 42256,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:35:34.767Z",
+        "elapsedMs": 42256,
+        "pcIndex": 10,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:36.062Z",
+      "elapsedMs": 43552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:37.600Z",
+      "elapsedMs": 45090,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:39.062Z",
+      "elapsedMs": 46552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:40.577Z",
+      "elapsedMs": 48067,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:42.062Z",
+      "elapsedMs": 49552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:43.577Z",
+      "elapsedMs": 51067,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:45.063Z",
+      "elapsedMs": 52552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:46.612Z",
+      "elapsedMs": 54102,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:48.062Z",
+      "elapsedMs": 55552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:49.619Z",
+      "elapsedMs": 57109,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:51.062Z",
+      "elapsedMs": 58552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:52.581Z",
+      "elapsedMs": 60071,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:54.062Z",
+      "elapsedMs": 61552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:55.613Z",
+      "elapsedMs": 63103,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:57.062Z",
+      "elapsedMs": 64552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:35:58.609Z",
+      "elapsedMs": 66098,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:00.062Z",
+      "elapsedMs": 67552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:01.591Z",
+      "elapsedMs": 69081,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:03.062Z",
+      "elapsedMs": 70552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:04.590Z",
+      "elapsedMs": 72079,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:06.062Z",
+      "elapsedMs": 73552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:07.601Z",
+      "elapsedMs": 75091,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:09.062Z",
+      "elapsedMs": 76552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:10.578Z",
+      "elapsedMs": 78067,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:12.062Z",
+      "elapsedMs": 79552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:13.606Z",
+      "elapsedMs": 81096,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:15.062Z",
+      "elapsedMs": 82552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:16.579Z",
+      "elapsedMs": 84069,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:18.062Z",
+      "elapsedMs": 85552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:19.617Z",
+      "elapsedMs": 87107,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:21.062Z",
+      "elapsedMs": 88552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:22.614Z",
+      "elapsedMs": 90104,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:22.625Z",
+      "elapsedMs": 90115,
+      "type": "scheduler:stall-rescue-triggered",
+      "data": {
+        "reason": "zero P2P bytes received after 90000ms in P2P-only mode",
+        "elapsedMs": 90114,
+        "action": "applyDynamicConfig({ core: { simultaneousHttpDownloads: 1 } })"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:24.062Z",
+      "elapsedMs": 91552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:25.620Z",
+      "elapsedMs": 93109,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:27.062Z",
+      "elapsedMs": 94552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:28.576Z",
+      "elapsedMs": 96065,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:30.062Z",
+      "elapsedMs": 97552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:31.609Z",
+      "elapsedMs": 99099,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:33.062Z",
+      "elapsedMs": 100552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:34.586Z",
+      "elapsedMs": 102075,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:36.064Z",
+      "elapsedMs": 103553,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:37.630Z",
+      "elapsedMs": 105120,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:39.062Z",
+      "elapsedMs": 106552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:40.581Z",
+      "elapsedMs": 108071,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:42.062Z",
+      "elapsedMs": 109552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:43.611Z",
+      "elapsedMs": 111100,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:45.062Z",
+      "elapsedMs": 112552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:46.619Z",
+      "elapsedMs": 114108,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:48.062Z",
+      "elapsedMs": 115552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:49.621Z",
+      "elapsedMs": 117111,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:51.062Z",
+      "elapsedMs": 118552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:52.579Z",
+      "elapsedMs": 120068,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:54.062Z",
+      "elapsedMs": 121552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:54.085Z",
+      "elapsedMs": 121574,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 11,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:54.117Z",
+      "elapsedMs": 121606,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 12,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:54.149Z",
+      "elapsedMs": 121639,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 13,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:54.174Z",
+      "elapsedMs": 121663,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 14,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:54.192Z",
+      "elapsedMs": 121682,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 15,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:55.584Z",
+      "elapsedMs": 123074,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:55.613Z",
+      "elapsedMs": 123103,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 16,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:55.642Z",
+      "elapsedMs": 123131,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 17,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:55.661Z",
+      "elapsedMs": 123150,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 18,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:55.679Z",
+      "elapsedMs": 123169,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 19,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:55.700Z",
+      "elapsedMs": 123190,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 20,
+        "signaling": "have-local-offer",
+        "iceGathering": "gathering",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:57.062Z",
+      "elapsedMs": 124552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:36:58.620Z",
+      "elapsedMs": 126110,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:00.062Z",
+      "elapsedMs": 127552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:01.621Z",
+      "elapsedMs": 129110,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:03.064Z",
+      "elapsedMs": 130554,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:04.588Z",
+      "elapsedMs": 132077,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:06.062Z",
+      "elapsedMs": 133552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:07.615Z",
+      "elapsedMs": 135104,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:09.062Z",
+      "elapsedMs": 136552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:10.584Z",
+      "elapsedMs": 138073,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:12.062Z",
+      "elapsedMs": 139552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:13.636Z",
+      "elapsedMs": 141126,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:15.062Z",
+      "elapsedMs": 142552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:16.601Z",
+      "elapsedMs": 144091,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:18.066Z",
+      "elapsedMs": 145555,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:19.612Z",
+      "elapsedMs": 147102,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:21.062Z",
+      "elapsedMs": 148552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:22.635Z",
+      "elapsedMs": 150124,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:24.062Z",
+      "elapsedMs": 151552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:25.631Z",
+      "elapsedMs": 153121,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:27.062Z",
+      "elapsedMs": 154552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:28.584Z",
+      "elapsedMs": 156073,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:30.062Z",
+      "elapsedMs": 157552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:31.622Z",
+      "elapsedMs": 159111,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:33.062Z",
+      "elapsedMs": 160552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:33.849Z",
+      "elapsedMs": 161339,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:33.849Z",
+        "pcIndex": 11,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 44161,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:33.907Z",
+      "elapsedMs": 161396,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:33.907Z",
+        "pcIndex": 12,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 42378,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:33.917Z",
+      "elapsedMs": 161406,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:33.917Z",
+        "pcIndex": 13,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 43217,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:33.939Z",
+      "elapsedMs": 161429,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:33.939Z",
+        "pcIndex": 14,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 34570,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:33.960Z",
+      "elapsedMs": 161450,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:33.960Z",
+        "pcIndex": 15,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 43116,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:33.984Z",
+      "elapsedMs": 161474,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:33.984Z",
+        "elapsedMs": 161474,
+        "pcIndex": 11,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.029Z",
+      "elapsedMs": 161518,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.028Z",
+        "elapsedMs": 161518,
+        "pcIndex": 12,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.039Z",
+      "elapsedMs": 161529,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.039Z",
+        "elapsedMs": 161529,
+        "pcIndex": 13,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.068Z",
+      "elapsedMs": 161558,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.068Z",
+        "elapsedMs": 161558,
+        "pcIndex": 14,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.091Z",
+      "elapsedMs": 161581,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.091Z",
+        "elapsedMs": 161581,
+        "pcIndex": 15,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.604Z",
+      "elapsedMs": 162094,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.613Z",
+      "elapsedMs": 162103,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:34.613Z",
+        "pcIndex": 16,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 41710,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.635Z",
+      "elapsedMs": 162124,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:34.635Z",
+        "pcIndex": 17,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 55271,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.657Z",
+      "elapsedMs": 162146,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:34.657Z",
+        "pcIndex": 18,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 47739,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.679Z",
+      "elapsedMs": 162168,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:34.679Z",
+        "pcIndex": 19,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 53670,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.701Z",
+      "elapsedMs": 162191,
+      "type": "webrtc:icecandidateerror",
+      "data": {
+        "at": "2026-09-22T00:37:34.701Z",
+        "pcIndex": 20,
+        "address": "[0:0:0:x:x:x:x:x]",
+        "port": 46798,
+        "url": "stun:stun.l.google.com:19302",
+        "errorCode": 701,
+        "errorText": "STUN binding request timed out."
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.756Z",
+      "elapsedMs": 162246,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.756Z",
+        "elapsedMs": 162246,
+        "pcIndex": 16,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.766Z",
+      "elapsedMs": 162255,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.766Z",
+        "elapsedMs": 162255,
+        "pcIndex": 17,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.789Z",
+      "elapsedMs": 162278,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.789Z",
+        "elapsedMs": 162278,
+        "pcIndex": 18,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.812Z",
+      "elapsedMs": 162302,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.812Z",
+        "elapsedMs": 162302,
+        "pcIndex": 19,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:34.835Z",
+      "elapsedMs": 162325,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:37:34.835Z",
+        "elapsedMs": 162325,
+        "pcIndex": 20,
+        "state": "iceGathering",
+        "value": "complete"
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:36.062Z",
+      "elapsedMs": 163552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:37.608Z",
+      "elapsedMs": 165097,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:39.062Z",
+      "elapsedMs": 166552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:40.586Z",
+      "elapsedMs": 168076,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:42.062Z",
+      "elapsedMs": 169552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:43.587Z",
+      "elapsedMs": 171077,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:45.064Z",
+      "elapsedMs": 172554,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:46.624Z",
+      "elapsedMs": 174113,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:48.062Z",
+      "elapsedMs": 175552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:49.647Z",
+      "elapsedMs": 177136,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:51.064Z",
+      "elapsedMs": 178554,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:52.580Z",
+      "elapsedMs": 180070,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:54.062Z",
+      "elapsedMs": 181552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:55.612Z",
+      "elapsedMs": 183102,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:57.062Z",
+      "elapsedMs": 184552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:37:58.586Z",
+      "elapsedMs": 186075,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:00.062Z",
+      "elapsedMs": 187552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:01.623Z",
+      "elapsedMs": 189113,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:03.062Z",
+      "elapsedMs": 190552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:04.584Z",
+      "elapsedMs": 192073,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:06.066Z",
+      "elapsedMs": 193556,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:07.582Z",
+      "elapsedMs": 195071,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:09.062Z",
+      "elapsedMs": 196552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:10.621Z",
+      "elapsedMs": 198110,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:12.062Z",
+      "elapsedMs": 199552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:13.639Z",
+      "elapsedMs": 201128,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:15.062Z",
+      "elapsedMs": 202552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:16.589Z",
+      "elapsedMs": 204078,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:18.062Z",
+      "elapsedMs": 205552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:19.586Z",
+      "elapsedMs": 207076,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:21.062Z",
+      "elapsedMs": 208552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:22.589Z",
+      "elapsedMs": 210079,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:24.062Z",
+      "elapsedMs": 211552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:25.610Z",
+      "elapsedMs": 213100,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:27.062Z",
+      "elapsedMs": 214552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:28.588Z",
+      "elapsedMs": 216078,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:30.062Z",
+      "elapsedMs": 217552,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:38:31.637Z",
+      "elapsedMs": 219126,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-KuniGDhQdkhp",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    }
+  ]
+}

@@ -1347,6 +1347,7 @@ video {
 
     connectivity: {
       offerCreated: false,
+      answerCreated: false,
       localDescriptionSet: false,
       remoteDescriptionSet: false,
       iceGatheringCompleted: false,
@@ -1673,7 +1674,9 @@ video {
     R.instrumentation.peerIdDiscoveryAttempts += 1;
     discoverActualPeerId();
 
-    var pcs = (window.__HS_V11_PEER_CONNECTIONS || []).filter(function(p){ return p && p.runId === R.identity.runId; });
+    var pcs = (window.__HS_V11_PEER_CONNECTIONS || []).filter(function(p){
+      return p && p.__hsV11 && p.__hsV11.runId === R.identity.runId;
+    });
 
     pcs.forEach(function (pc, i) {
       var rec = R.webrtc.peerConnections[i];
@@ -2873,6 +2876,7 @@ video {
     var records = R.webrtc.browserProtocol.records || [];
     var m = {
       offerCreated:false,
+      answerCreated:false,
       localDescriptionSet:false,
       remoteDescriptionSet:false,
       iceGatheringCompleted:false,
@@ -2884,7 +2888,8 @@ video {
 
     records.forEach(function(p){
       (p.signaling.operations || []).forEach(function(op){
-        if(op.ok && (op.name === "createOffer" || op.name === "createAnswer")) m.offerCreated = true;
+        if(op.ok && op.name === "createOffer") m.offerCreated = true;
+        if(op.ok && op.name === "createAnswer") m.answerCreated = true;
       });
       if((p.signaling.localDescriptions || []).length) m.localDescriptionSet = true;
       if((p.signaling.remoteDescriptions || []).length) m.remoteDescriptionSet = true;

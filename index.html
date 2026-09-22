@@ -1,630 +1,24 @@
 <!doctype html>
+<!--
+HiveStream Phase 1B — Natural Swarm Diagnostic v12.2
+Author: Elwood Edwards (Project Owner / HiveStream Developer)
+Technical implementation and diagnostic revision: GPT-5.6 Luna (OpenAI)
+Fresh v12.2 source; historical revisions remain in Git history.
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.1</title>
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.2</title>
 
-<!--
-===============================================================================
-HIVESTREAM PHASE 1B — NATURAL SWARM DIAGNOSTIC v12.1
-===============================================================================
 
-AUTHORS
--------
-William von Meister — Project Owner / HiveStream Developer
-Claude Sonnet 5 (Anthropic) — v10 historical revision retained as baseline.
-GPT-5.6 Luna (OpenAI, GPT-5.6 Luna) — v11 research, source audit,
-  instrumentation redesign, and implementation.
-
-v11 is a forward revision of the v11 experiment. It preserves the natural-swarm
-experiment, public Mux fixture, tracker set, controlled rendition, transport
-modes, JSON export, and the existing evidence ladder while correcting the
-WebRTC instrumentation so it follows the actual p2p-media-loader v4.0.0
-WebTorrent client lifecycle observed directly in the pinned source commit.
-
-Per this project's own convention (see AI-COLLABORATION-AND-AUTHORSHIP.md,
-referenced in the v7 Drive docs): an author line identifies provenance of a
-given revision's changes, not technical authority over the file as a whole.
-v11 keeps essentially all of v9.1's instrumentation intact and adds to it;
-it does not re-litigate or discard the Luna-authored evidence chain.
-
-PURPOSE
--------
-This page is a diagnostic instrument for HiveStream Phase 1B. It intentionally
-does NOT redesign the HiveStream architecture.
-
-v11 keeps the v6-v9.1 experiment structure (natural/custom swarm identity,
-WebRTC boundary instrumentation, P2P event/runtime-surface audit, browser
-identity, JSON export) and adds four things, each grounded directly in the
-actual library source rather than guessed or inferred from behavior alone.
-The source used for all of this is a direct clone of github.com/Novage/
-p2p-media-loader at commit 527105b420c15dfdb0e8ed4b6f0a261f48411192 (the same
-commit v9/v9.1 cite) - confirmed byte-identical to the published v4.0.0 tag
-for every file this diagnostic depends on (hybrid-loader.ts, core.ts,
-utils/stream.ts, utils/queue.ts, types.ts) - plus the actual pinned
-hls.js@1.7.0 dist bundle loaded by this page's own script element, downloaded
-and grepped directly rather than assumed from memory.
-
-The evidence chain recorded by this version is unchanged from v9.1:
-
-    tracker
-      -> peer discovery
-      -> signaling / RTCPeerConnection creation
-      -> ICE gathering
-      -> ICE candidate exchange
-      -> ICE connectivity checking
-      -> selected candidate pair
-      -> DTLS / connection establishment
-      -> data channel
-      -> p2p-media-loader peer connection
-      -> P2P chunk
-      -> controlled media segment
-
-IMPORTANT INTERPRETATION RULE
------------------------------
-A tracker "peer-seen" event proves that the P2P layer observed a peer through
-the tracker. It does NOT prove that the two browsers established a WebRTC
-transport, nor that the peer supplied media bytes. ICE candidates being
-gathered does not prove that any candidate pair succeeded. Instrumentation
-tells us what the library actually did; it does not force a P2P result,
-fabricate peer availability, or treat a tracker sighting as media proof.
-This rule is unchanged from v3 onward and still governs every field below.
-
-LOCAL PEER ID NOTE
-------------------
-p2p-media-loader v4's own local peer ID IS reachable this time, via a
-source-verified direct property rather than only the v9.1 heuristic walk -
-see "v11 CHANGE 4" below.
-
-===============================================================================
-v11 CHANGE 1 — A REAL "AS CLOSE TO P2P-ONLY AS THE LIBRARY PROTOCOL ALLOWS"
-              TRANSPORT MODE, PLUS A CORRECTION ABOUT WHAT v9/v9.1 ACTUALLY
-              CONFIGURED
-===============================================================================
-v9/v9.1's "P2P-first scheduler" experiment set:
-    httpDownloadInitialTimeoutMs: 5000   (milliseconds)
-    simultaneousHttpDownloads:    1
-    httpDownloadTimeWindow:       3000   (SECONDS, not milliseconds)
-    p2pDownloadTimeWindow:        6000   (SECONDS, not milliseconds)
-
-Reading utils/stream.ts directly: highDemandTimeWindow, httpDownloadTimeWindow,
-and p2pDownloadTimeWindow are all playback-ahead windows measured in SECONDS
-(isSegmentInTimeWindow computes position + timeWindowLength * rate, where
-position/rate are playback seconds/rate - there is no unit conversion).
-3000 and 6000 are, byte-for-byte, this library's own DEFAULT_STREAM_CONFIG
-values (core.ts, DEFAULT_STREAM_CONFIG). So v9/v9.1 did not actually narrow
-either time window at all - both were left at the library default the whole
-time. The only field genuinely changed from default was httpDownloadInitialTimeoutMs
-(library default: 0ms) and a modest drop of simultaneousHttpDownloads from
-the default of 2 to 1. Flagging this because the project asked directly
-whether "the http timeout of 3000 (changed to 5000)" was long enough - those
-are actually two different, differently-scoped settings, and the 3000 one was
-never changed. See v11 CHANGE 2 for the real answer about the 5000ms figure.
-
-THE ACTUAL P2P-ONLY LEVER, READ DIRECTLY FROM hybrid-loader.ts
-----------------------------------------------------------------
-processQueue() and loadRandomThroughHttp() gate every HTTP-eligibility
-check in the scheduler behind the same comparison:
-this.requests.executingHttpCount < simultaneousHttpDownloads. This is true
-for all three scheduling tiers:
-  (a) the segment HLS.js is actively blocked on right now (canLoadThroughHttp
-      in the shouldStartLoadImmediatelyEngineRequest branch),
-  (b) "high-demand" segments (within highDemandTimeWindow of the playhead -
-      library default 15s - which can even cancel an in-progress P2P download
-      to switch to HTTP once an HTTP slot frees up), and
-  (c) the interval-driven background prefetcher loadRandomThroughHttp(),
-      which returns immediately if executingHttpCount >= simultaneousHttpDownloads.
-With simultaneousHttpDownloads: 0, "0 < 0" is always false and
-"0 >= 0" is always true - so all three tiers are permanently blocked from
-using HTTP, for the entire lifetime of the HybridLoader instance, not just a
-startup window. This is a first-class, documented Core option
-(types.ts: "The maximum number of simultaneous HTTP downloads allowed",
-default 2) - setting it to 0 is not a hack, timing race, or reinterpretation
-of the library; it is the library's own supported mechanism for exactly this
-question, which is why it is the right answer to "as close to a P2P-only test
-as the library protocol allows."
-
-Documented, expected, and intentional consequence: if simultaneousHttpDownloads: 0
-and no peer has a given segment, that segment never loads and playback stalls
-indefinitely. The project's own v7 research (Drive doc "P2P-Only Mode &
-Improvements") already reached this exact conclusion independently; v11 is
-the first revision to actually implement it as a selectable mode instead of
-only proposing it. See v11 CHANGE 3 for how this diagnostic keeps a real
-stall from meaning an unusable page during actual test sessions.
-
-v11 THEREFORE ADDS A "Transport mode" TOGGLE, ORTHOGONAL TO THE EXISTING
-"Swarm mode" (Natural/Custom) TOGGLE:
-  - Hybrid    — identical to v9.1's own settings (unchanged, so hybrid-mode
-                runs stay directly comparable to every prior v9/v9.1 run).
-  - P2P-only  — simultaneousHttpDownloads: 0, everything else unchanged.
-Nothing about swarm identity, the controlled-variant selector, tracker list,
-or the WebRTC/event instrumentation changes between the two transport modes.
-
-===============================================================================
-v11 CHANGE 2 — IS 5000ms "LONG ENOUGH"? A SOURCE-GROUNDED ANSWER
-===============================================================================
-Two independent problems with treating httpDownloadInitialTimeoutMs as the
-main P2P-favoring lever, both confirmed from source:
-
-1. It is a ONE-TIME window. HybridLoader.createdAt is set once, in the
-   constructor (performance.now()), and every check of isInitialHttpWait
-   compares against that same fixed timestamp for the life of the loader.
-   It does not reset on ABR level switches or on later segment requests.
-   It can only ever help the very first requested segment(s) at page load -
-   it structurally cannot help any segment requested later in the session,
-   no matter its value.
-
-2. Even for that first window, 5000ms is short relative to the library's own
-   documented WebRTC connection budget (types.ts, StreamConfig defaults):
-       webRtcIceGatheringTimeoutMs: 5000    (ms to gather ICE candidates
-                                              before sending an offer)
-       webRtcOfferTimeoutMs:        50000   (ms to keep a pending offer
-                                              alive waiting for an answer)
-       webRtcConnectionTimeoutMs:   15000   (ms to wait for the data channel
-                                              to actually open after
-                                              signaling completes)
-   A single legitimate connection attempt can legitimately still be
-   in-progress tens of seconds after the page loads under the library's own
-   defaults - the ICE-gathering step alone can legitimately take the full
-   5000ms before an offer is even sent. So a 5000ms "give P2P a head start"
-   window is, structurally, not reliably enough time for a cold WebRTC
-   handshake to complete - it can only help when a peer connection is
-   already warm (e.g. reconnecting mid-session), which the "first segment
-   only" framing above means basically never applies here anyway.
-
-v11's answer: don't rely on httpDownloadInitialTimeoutMs as the P2P-favoring
-mechanism at all. It is still set (5000ms, unchanged) in both transport modes
-purely for parity with v9/v9.1's own reporting and because it is genuinely
-redundant-but-harmless once simultaneousHttpDownloads: 0 already blocks
-HTTP outright in P2P-only mode. The real lever is CHANGE 1. The WebRTC
-budget numbers above are recorded verbatim in the exported report
-(transport.webrtcConnectionBudget) specifically so a connect-error's
-elapsed time can be checked directly against them during analysis, instead
-of guessed at.
-
-===============================================================================
-v11 CHANGE 3 — STALL-RESCUE WATCHDOG (library-native, not a hack)
-===============================================================================
-A genuine P2P-only run can legitimately hang forever if no peer ever shows
-up - that is the correct, informative outcome for the test, not a bug to
-paper over. But it also means a real multi-device test session can be left
-staring at a frozen video element with no way to tell "still trying" from
-"actually broken," and no way to let the page recover without a full reload
-(which would lose the whole event log).
-
-The library exposes a genuinely public, documented, runtime-safe way to
-change this without reconstructing the player: Core.applyDynamicConfig()
-(core.ts), surfaced through the hlsjs wrapper as
-HlsJsP2PEngine.applyDynamicConfig() (engine.ts). simultaneousHttpDownloads
-is explicitly listed in DynamicStreamProperties (types.ts) - i.e. it is
-one of the properties the library itself documents as safely changeable
-after construction, not something v11 is forcing through a private field.
-
-v11 adds a "Stall-rescue timeout" input (seconds, default 90, 0 = disabled).
-While running in P2P-only mode, if p2pBytesReceived is still exactly 0 once
-that many seconds have elapsed since the run started, v11 calls:
-
-    hlsInstance.p2pEngine.applyDynamicConfig({
-      core: { simultaneousHttpDownloads: 1 }
-    });
-
-- exactly once per run - opening a single HTTP slot so the page can recover
-and finish loading, while leaving every other P2P-only setting untouched.
-This is logged as a distinct, clearly-timestamped event
-(scheduler:stall-rescue-triggered) and recorded in the exported report
-under transport.stallRescue, so analysis can cleanly separate "the pure
-P2P-only phase" (before the rescue) from "the rescued phase" (after it) -
-a stall that gets rescued should never be silently read as a successful
-P2P-only run.
-
-The 90-second default is deliberately larger than a single full WebRTC
-connection attempt under the library's own default budget (ICE gathering
-5000ms + up to a 50000ms offer wait + up to a 15000ms data-channel wait,
-per CHANGE 2 above), so a rescue firing means real evidence that the
-attempt was actually stuck, not just still in progress.
-
-===============================================================================
-v11 CHANGE 4 — DIRECT PEER-ID LOOKUP, FATAL-ERROR RECOVERY, LEVEL RE-LOCK,
-              TRACKERS LISTED UPFRONT
-===============================================================================
-Four smaller fixes, each tracked as an open item in this project's own prior
-research (the v7 Drive doc's improvement list) and each now verified against
-source rather than left as a proposal:
-
-(a) Direct peer-ID lookup. core.ts declares "private readonly peerId: string"
-    on the Core class, and engine.ts declares "private readonly core: Core"
-    on HlsJsP2PEngine. TypeScript's `private` (not the true ES `#private`
-    syntax) compiles away entirely - it is a compile-time-only check, so at
-    runtime hlsInstance.p2pEngine.core.peerId is an ordinary, readable
-    property. v11 reads it directly first, and falls back to v9.1's own
-    generic recursive-walk heuristic only if the direct read is ever empty
-    (e.g. a future library version renames or relocates the field) - so
-    nothing from v9.1's approach is lost, it is just no longer the primary
-    path.
-
-(b) Fatal hls.js error recovery. hls.js 1.7.0's own defaults (read directly
-    from the pinned dist bundle) include fragLoadingTimeOut: 20000 -
-    meaningfully shorter than the WebRTC connection budget in CHANGE 2. This
-    is almost certainly what was firing the fragLoadError/levelLoadTimeOut
-    events that triggered the "CONTROLLED level doesn't stay locked" bug
-    found in the second real v6 run: hls.js was independently timing out and
-    reacting on its own schedule while p2p-media-loader was still legitimately
-    trying. v11 raises fragLoadingTimeOut to 120000ms (comfortably past the
-    WebRTC budget) and adds the standard hls.js fatal-error recovery pattern
-    that was simply missing before: hls.startLoad() on a fatal
-    Hls.ErrorTypes.NETWORK_ERROR, hls.recoverMediaError() on a fatal
-    Hls.ErrorTypes.MEDIA_ERROR. Every recovery attempt is logged with the
-    error type/details and which action was taken
-    (playerRecovery.fatalErrorRecoveries in the report).
-
-(c) Level re-lock on drift. When CONTROLLED variant mode is selected and
-    LEVEL_SWITCHED reports a level other than the one v11 originally
-    locked to, v11 now re-applies hls.currentLevel immediately and logs
-    the correction (playerRecovery.levelDriftCorrections). Previously the
-    level was only set once, at MANIFEST_PARSED, and hls.js's own ABR was
-    free to drift away from the controlled rendition afterward with nothing
-    recorded except the resulting mismatch. This directly targets the
-    finding in this project's own evidence: every real v8.1/v9/v9.1 run to
-    date has controlledVariantFound: false, even the runs with genuine
-    non-zero P2P byte transfer - meaning the strict proof verdict has been
-    failing specifically because of this drift, not because P2P doesn't
-    work.
-
-(d) Trackers listed upfront. The Trackers panel previously only ever showed
-    a tracker once it produced a peer-sighting or error/warning event, so a
-    tracker that was silently working (or silently doing nothing) looked
-    identical to one that was never configured at all. v11 pre-populates
-    R.trackers with all three configured trackers at status "configured"
-    before the run starts, so the panel and the exported report always show
-    all three, whether or not any of them ever produced an event.
-
-===============================================================================
-v11 SOURCE AUDIT — p2p-media-loader v4.0.0 WEBRTC PROTOCOL
-====================================================================
-
-The v11 browser instrumentation is derived from the pinned source commit
-527105b420c15dfdb0e8ed4b6f0a261f48411192, especially:
-
-  packages/p2p-media-loader-core/src/webtorrent/webtorrent-client/index.ts
-  packages/p2p-media-loader-core/src/types.ts
-  packages/p2p-media-loader-core/src/core.ts
-  packages/p2p-media-loader-core/src/p2p/peer-protocol.ts
-  packages/p2p-media-loader-core/src/p2p/loader.ts
-
-Source-level findings:
-
-1. OUTGOING NEGOTIATION
-   WebTorrentClient creates a PC, creates RTCDataChannel("webtorrent"),
-   createOffer(), setLocalDescription(), waits for ICE gathering, then sends
-   the offer and offer_id in a WebTorrent tracker announce.
-
-2. INCOMING NEGOTIATION
-   A tracker offer causes setRemoteDescription(offer), createAnswer(),
-   setLocalDescription(answer), ICE gathering, then an answer announce
-   containing to_peer_id and offer_id.
-
-3. ANSWER COMPLETION
-   An outgoing offer is not considered connected merely because an answer
-   exists at the tracker. The library calls setRemoteDescription(answer) and
-   then waits for the RTCDataChannel to open.
-
-4. CONNECTION SUCCESS
-   The library's waitForConnection() resolves on data-channel "open". Terminal
-   ICE states reject the connection. Therefore v11 treats "data channel open"
-   as a separate milestone from "ICE checking" and "candidate pair exists".
-
-5. ICE SIGNALING MODEL
-   The library waits for ICE gathering and sends the gathered SDP. This is not
-   the same as a trickle-ICE design. v11 records addIceCandidate() defensively,
-   but does not require it for success.
-
-6. PUBLIC P2P EVENT CONTRACT
-   p2p-media-loader v4 peer events carry peerId, infoHash, streamType, trackerUrl.
-   Chunk events are positional:
-     (bytesLength, downloadSource, peerId, streamType, infoHash)
-   v11 preserves this contract.
-
-7. STREAM IDENTITY
-   Core computes streamSwarmId/infoHash at registration. v11 keeps the existing
-   onStreamAdded/getStreams-based identity evidence and does not mutate swarm
-   identity dynamically.
-
-8. RUN ISOLATION
-   Every browser PC is tagged with the current HiveStream runId at construction.
-   Old PCs cannot silently become current-run evidence.
-
-9. STATS
-   Candidate-pair selection is read from transport.selectedCandidatePairId
-   first, with Firefox's non-standard candidate-pair.selected as fallback.
-   Candidate-pair state, nominated flag, RTT, packet/byte counts, and candidate
-   linkage remain distinct facts.
-
-10. HLS EVENT BINDING
-    v11 attached HLS events twice. v11 retains the onHlsJsCreated binding and
-    removes the second attachHlsEvents() call after new HlsWithP2P(options).
-
-WHAT v11 DELIBERATELY DOES NOT CHANGE
-===============================================================================
-- No TURN server is added by this diagnostic. This project's own v7
-  run-sequence decision doc reasoned that a no-TURN P2P-only run would
-  likely just reproduce an uninformative stall, given prior evidence
-  pointing at NAT/CGNAT reachability as the actual blocker - and the
-  duckwerks/HiveStream experiment evidence gathered since (2026-09-21,
-  v8.1 runs) is consistent with that: the only real P2P byte exchange seen
-  in any run so far was between two browsers on the SAME physical device,
-  never across genuinely separate devices/networks. v11's changes (a real
-  P2P-only mode, a stall-rescue watchdog, and a fix for the bug that was
-  silently preventing proof:true even when P2P worked) are offered as
-  this project's stated "correct and robust instrumentation" priority
-  before reaching for TURN - not as a replacement for eventually testing
-  it. Whether to add TURN in a v11 remains an open, separate decision.
-- Natural mode still deliberately omits the swarmId property; Custom mode
-  is unchanged; the CONTROLLED 848x480/836280 variant selector, AUTO mode,
-  and the underlying WebRTC/tracker/peer/P2P-event instrumentation from
-  v6-v9.1 are all unchanged.
-- The Mux test stream remains the default fixture used since v6.
-===============================================================================
-
-===============================================================================
-v12 — LIBRARY-PROTOCOL CONFORMANCE REVIEW + BUG FIXES
-===============================================================================
-AUTHOR OF THIS REVISION: Claude Sonnet 5 (Anthropic).
-DATE: 2026-09-21/22.
-REQUESTED BY: William von Meister (Project Owner).
-
-WHAT THIS REVIEW DID
----------------------
-Before changing anything, this revision re-verified v11's own source-audit
-claims against the actual library rather than trusting v11's code comments
-at face value. This was done by cloning github.com/Novage/p2p-media-loader
-at the exact pinned commit 527105b420c15dfdb0e8ed4b6f0a261f48411192 and
-diffing it against the published v4.0.0 tag, then separately pulling the
-real published npm package p2p-media-loader-hlsjs@4.0.0 (the same artifact
-loaded by this page's own <script> tag from jsdelivr) and grepping its
-built UMD bundle for the exact runtime symbols this diagnostic depends on.
-
-CONFORMANCE RESULT: CLEAN.
-- packages/p2p-media-loader-core/src is BYTE-IDENTICAL between the pinned
-  commit and the v4.0.0 tag, for every file, not just the five files v11's
-  header already named (hybrid-loader.ts, core.ts, utils/stream.ts,
-  utils/queue.ts, types.ts).
-- The only diff anywhere in the packages this diagnostic touches is a
-  type-only signature simplification in p2p-media-loader-hlsjs/src/engine.ts
-  (PartialHlsJsP2PEngineConfig) - zero behavioral effect on core.peerId,
-  applyDynamicConfig, or anything else this diagnostic reads.
-- npm confirms "4.0.0" is genuinely the current stable dist-tag ("latest":
-  "4.0.0"), with 5.0.0-alpha.x correctly isolated on a separate "alpha"
-  dist-tag - this diagnostic is not accidentally tracking a prerelease.
-- The published p2p-media-loader-hlsjs.iife.min.js CDN bundle (the exact
-  file this page loads) was unpacked and grepped directly: it contains
-  peerId, applyDynamicConfig, and simultaneousHttpDownloads - confirming
-  the symbols v11/v12 depend on at runtime are actually shipped in the
-  artifact the browser fetches, not just present in the repository source.
-- Every specific numeric/behavioral claim in v11's header was independently
-  re-derived from source and matches exactly: DEFAULT_STREAM_CONFIG
-  (simultaneousHttpDownloads:2, httpDownloadTimeWindow:3000,
-  p2pDownloadTimeWindow:6000, httpDownloadInitialTimeoutMs:0);
-  isSegmentInTimeWindow's lack of unit conversion (confirming the time
-  windows are SECONDS); the simultaneousHttpDownloads:0 gating logic across
-  all three hybrid-loader.ts scheduling tiers, INCLUDING the
-  abortLastHttpLoadingInQueueAfterItem() OR-bypass in the high-demand tier,
-  which was specifically checked and confirmed to be dead code under
-  simultaneousHttpDownloads:0 (it can only abort a request already in
-  status:"loading" with downloadSource:"http", and nothing can ever reach
-  that state when the count gate is 0 with no bypass in the other two
-  tiers); the WebRTC connection budget constants
-  (webRtcOffersCount:5, webRtcOfferTimeoutMs:50000,
-  webRtcIceGatheringTimeoutMs:5000, webRtcConnectionTimeoutMs:15000); the
-  `private readonly peerId: string` / `private readonly core: Core` field
-  declarations that make the direct-property-read trick legitimate; and
-  waitForConnection()'s exact resolve/reject semantics around data-channel
-  "open" and terminal ICE connection states. hls.js 1.7.0's own published
-  dist bundle was also pulled and grepped directly, confirming
-  fragLoadingTimeOut's default of 20000ms.
-
-ONE LIBRARY BEHAVIOR v11 DID NOT MENTION (informational, not a bug):
-packages/p2p-media-loader-core/src/utils/stream.ts's calculateTimeWindows()
-silently zeroes httpDownloadTimeWindow/p2pDownloadTimeWindow when available
-browser storage is <=5%, and collapses the P2P window down to the HTTP
-window when <=10%. Not relevant to this project's current test devices,
-but worth knowing if a run on a nearly-full phone ever behaves oddly.
-
-ONE LIBRARY BEHAVIOR THAT DIRECTLY MOTIVATES A v12 FIX:
-packages/p2p-media-loader-core/src/stream-identity.ts's
-computeStreamIdentityHash() was read in full. It confirms that stream
-identity (and therefore the infoHash announced to trackers) is a SHA-1 of
-NORMALIZED bitrate, codecs, width, height, language, channels, name,
-frameRate, and videoRange - codecs genuinely participates in whether two
-devices land in the same P2P swarm for "the same" rendition, exactly as
-the project's own docs/HiveStream-Phase1B-v10-Source-Level-Review-Baseline.md
-(review item #16) already suspected. This is why v12 CHANGE 3 below adds
-codec/frameRate/videoRange capture.
-
-BUGS FOUND IN v11's OWN CODE (not the library) AND FIXED IN v12
-------------------------------------------------------------------
-v12 CHANGE 1 - AUTO-MODE PROOF LEAK (real correctness bug, fixed)
-  v11's onStreamAdded handler called matchesControlled(s.properties) and,
-  on a match, set BOTH R.selectedVariant.found = true AND
-  R.verdict.controlledVariantFound = true - UNCONDITIONALLY, with no check
-  of the current variantMode. But v11's own MANIFEST_LOADED handler
-  explicitly documents (selectedVariant.reason) that in AUTO mode
-  "automatic level selection is not used as strict proof." Concretely:
-  if a run were started in AUTO mode and hls.js's own ABR algorithm
-  happened to land on exactly 848x480/836280 for some segment, v11 would
-  silently flip controlledVariantFound (and therefore verdict.proof, if the
-  other three conditions also held) to true - contradicting the
-  diagnostic's own stated intent that AUTO-mode matches are not strict
-  proof. v12 gates this exact check behind `variantValue() === "480"`, the
-  same guard MANIFEST_LOADED already uses, so onStreamAdded and
-  MANIFEST_LOADED now agree on when a controlled match counts.
-
-v12 CHANGE 2 - PEER-TO-PEERCONNECTION CORRELATION AMBIGUITY (real
-  attribution-quality bug, mitigated)
-  v11's correlatePeerIdToBrowserPc() attributed an incoming p2p-media-loader
-  peerId to "whichever captured RTCPeerConnection for this run is most
-  recently created and not yet closed" - a single best-guess heuristic with
-  no signal of when that guess might be wrong. Given this project's own
-  evidence (the v8.1 four-browser run, and v10's three-tracker natural-swarm
-  run) that multiple simultaneous negotiations are a realistic condition,
-  not a corner case, and given that precise peer/segment attribution is the
-  explicit point of this instrumentation (see the v8.1 findings doc's
-  entire "peer attribution" section), a silent single-best-guess is a real
-  quality gap. v12 does not have a stronger correlation signal available
-  from the library's public event contract (peerId only arrives on
-  onPeerConnect/onPeerConnectError, with no PC-level linkage exposed) - so
-  v12 instead makes the ambiguity OBSERVABLE rather than inventing a
-  fake-precise fix: when more than one open, not-yet-attributed PC exists
-  at correlation time, v12 logs a distinct
-  webrtc:peer-correlation-ambiguous event naming every candidate PC and
-  marks the eventual attribution's confidence as "ambiguous" in the PC's
-  own event record, instead of silently picking one with no trace. When
-  exactly one candidate exists (the common case per the v8.1/v10 evidence),
-  attribution proceeds exactly as v11 did, now recorded as confidence
-  "unambiguous".
-
-v12 CHANGE 3 - CODEC/FRAMERATE/VIDEORANGE CAPTURE (source-motivated
-  addition, additive/non-regressive)
-  Per the stream-identity.ts finding above, v12 now reads level.videoCodec /
-  level.audioCodec (hls.js 1.7.0's own level object fields - confirmed
-  present by grepping the pinned hls.js@1.7.0 dist bundle) alongside the
-  existing width/height/bitrate capture in MANIFEST_LOADED, and records a
-  `codecs` field on each manifest rendition and on selectedVariant. This is
-  DELIBERATELY ADDITIVE, not gating: matchesControlled() still compares
-  only width/height/bitrate exactly as v11 did, so verdict.proof's
-  detection behavior is unchanged and this cannot introduce a regression.
-  Instead, v12 logs a distinct scheduler:codec-mismatch-observed warning
-  event if a later onStreamAdded registration's properties.codecs disagrees
-  with the codecs recorded for the currently selected controlled variant -
-  turning the v10-baseline's item #16 concern from an unmeasured gap into
-  an observable, loggable fact for the next real multi-device run.
-
-v12 CHANGE 4 - DUPLICATE OBJECT KEY (cosmetic bug, fixed)
-  v11's initial R.connectivity object literal declared `dataChannelOpened:
-  false` twice (harmless in JS - second silently wins, same value both
-  times - but a copy-paste artifact, and inconsistent with resetRun()'s own
-  copy of the same object, which only declared it once). Removed the
-  duplicate.
-
-v12 CHANGE 5 - UNBOUNDED ARRAY GROWTH (source-review item #11, fixed)
-  docs/HiveStream-Phase1B-v10-Source-Level-Review-Baseline.md item #11
-  flagged that candidate records, candidate-pair records, scheduler events,
-  and transfer segment records could grow without bound across a long run,
-  unlike R.events (already capped at 1500) and the per-PC event buffer
-  (already capped at 300). v12 adds the same bounded-array pattern
-  (retain the most recent N, drop the oldest) to
-  R.webrtc.candidateRecords, R.webrtc.candidatePairRecords,
-  R.scheduler.events, and R.transfer.segments, each capped at 2000 entries.
-  This does not reduce evidence for any run under 2000 events in a given
-  category (well beyond what any run in this project's history has
-  produced) - it only prevents unbounded memory growth on a long-duration
-  run, per the project owner's own explicit preference (source-review item
-  #7) to keep verbose evidence rather than reduce it for performance.
-
-v12 CHANGE 6 - "P2P-ONLY" TERMINOLOGY (source-review item #10, UI text
-  only, fixed)
-  docs/HiveStream-Phase1B-v10-Source-Level-Review-Baseline.md item #10
-  noted that simultaneousHttpDownloads:0 disables HTTP MEDIA-SEGMENT
-  downloads specifically - manifest/playlist fetches still use HTTP
-  regardless, so "P2P-only" overstates what the mode actually does. v12
-  relabels the UI option and STREAM_TRANSPORT.p2ponly.label to
-  "P2P segment-only (manifest/playlist still HTTP)" without changing any
-  underlying config value or internal field name, to avoid a larger,
-  higher-risk rename across the codebase for a wording-only concern.
-
-v12.1 — SOURCE-LEVEL INSTRUMENTATION CORRECTIONS
-===============================================================================
-1. networkSummary() now reads the nested parsed candidate object stored in
-   candidateRecords, preventing false-negative IPv4/IPv6/UDP/TCP/relay flags.
-2. Successful addIceCandidate() calls are recorded as explicit remote ICE
-   evidence; normal WebTorrent negotiation does not require trickle ICE.
-3. The first controlled infoHash/codecs registration is locked for the run.
-   Later registrations remain evidence and can report identity/codec mismatch.
-4. Segment transport classification now requires downloadSource/source == p2p.
-   peerId remains correlation evidence and is not transport proof by itself.
-5. Peer-ID/RTCPeerConnection attribution exports confidence and candidate-pool
-   size directly in the compact browser protocol report.
-6. Existing stall rescue is documented as zero-P2P-evidence rescue; behavior
-   is unchanged.
-
-===============================================================================
-WHAT v12 DELIBERATELY DOES NOT DO
-------------------------------------
-Per the project owner's own explicit request to review before coding
-further, v12 stops short of the two larger, higher-risk items still open
-from the v10 baseline:
-- Explicit seed/receiver mode (source-review item #2: Device A = hybrid +
-  natural swarm + play-to-seed, Device B = P2P-segment-only + same variant
-  + same swarm) is a workflow/UI feature, not a bug fix, and deserves its
-  own design discussion rather than being folded silently into a
-  bugfix-and-conformance pass.
-- The historical ("ever happened") vs current-state connectivity flag
-  split (source-review items #8/#9) touches verdict-adjacent fields used
-  throughout the report; splitting it safely deserves its own dedicated
-  pass with test-run verification, not a same-session addition alongside
-  five other changes.
-Both remain open, tracked here for the next revision.
-===============================================================================
--->
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.0/dist/hls.min.js"></script>
 
 <script>
-/*
- * The RTCPeerConnection wrapper MUST be installed before p2p-media-loader is
- * constructed.  We keep the native constructor behavior intact and only retain
- * references to created connections.  This lets the diagnostic inspect ICE
- * states and getStats() later without replacing the application's WebRTC logic.
- */
+
 (function installPeerConnectionCapture() {
-  /*
-   * ==========================================================================
-   * v11 WEBRTC INSTRUMENTATION — SOURCE-MAPPED TO p2p-media-loader v4.0.0
-   * ==========================================================================
-   *
-   * Directly verified against commit:
-   * 527105b420c15dfdb0e8ed4b6f0a261f48411192
-   *
-   * p2p-media-loader's actual WebTorrentClient lifecycle is:
-   *
-   * OUTGOING:
-   *   new RTCPeerConnection
-   *   -> createDataChannel("webtorrent")
-   *   -> createOffer
-   *   -> setLocalDescription(offer)
-   *   -> wait for ICE gathering
-   *   -> send tracker announce containing offer + offer_id
-   *   -> receive answer for offer_id
-   *   -> setRemoteDescription(answer)
-   *   -> wait for RTCDataChannel "open"
-   *   -> onPeerConnect
-   *
-   * INCOMING:
-   *   tracker delivers offer + peer_id + offer_id
-   *   -> new RTCPeerConnection
-   *   -> setRemoteDescription(offer)
-   *   -> createAnswer
-   *   -> setLocalDescription(answer)
-   *   -> wait for ICE gathering
-   *   -> send answer to_peer_id + offer_id
-   *   -> wait for RTCDataChannel "open"
-   *   -> onPeerConnect
-   *
-   * The library waits for ICE gathering before signaling, so a missing
-   * addIceCandidate() call is NOT by itself a signaling failure here.
-   *
-   * v11 only retained PC references and sampled getStats(). That left a major
-   * blind spot: we could see a PC and ICE checking, but not which signaling
-   * operation was the first missing transition.
-   *
-   * v11 therefore instruments the browser API operations themselves and gives
-   * every PC the current HiveStream runId at construction time.
-   *
-   * SDP is recorded as metadata, not full text: type, length, media-section
-   * count, candidate-line count, ICE credentials, and application/data-channel
-   * presence. This proves whether the expected SDP artifact existed without
-   * multiplying the already-large JSON export by copying every offer/answer.
-   */
+  
 
   var Native = window.RTCPeerConnection;
   var pcs = [];
@@ -943,12 +337,32 @@ Both remain open, tracked here for the next revision.
       var summary = candidateSummary(candidate);
       ctx.record.signaling.addIceCandidateCalls++;
       ctx.event("signaling:addIceCandidate", summary);
-      return originalAddIceCandidate.call(self, candidate).then(function(result) {
-        /* Successful API delivery is explicit remote ICE evidence. */
-        if (summary) ctx.record.ice.remoteCandidates.push(summary);
-        ctx.event("signaling:addIceCandidate-success", summary);
-        return result;
-      });
+      var result;
+      try {
+        result = originalAddIceCandidate.call(self, candidate);
+      } catch (error) {
+        ctx.event("signaling:addIceCandidate-throw", {
+          summary: summary,
+          message: safeString(error)
+        });
+        throw error;
+      }
+      if (result && typeof result.then === "function") {
+        return result.then(function(value) {
+          if (summary) ctx.record.ice.remoteCandidates.push(summary);
+          ctx.event("signaling:addIceCandidate-success", summary);
+          return value;
+        }, function(error) {
+          ctx.event("signaling:addIceCandidate-rejected", {
+            summary: summary,
+            message: safeString(error)
+          });
+          throw error;
+        });
+      }
+      if (summary) ctx.record.ice.remoteCandidates.push(summary);
+      ctx.event("signaling:addIceCandidate-success", summary);
+      return result;
     };
     pc.createDataChannel = function(label, options) {
       var dc = originalCreateDataChannel.call(this, label, options);
@@ -1051,12 +465,9 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.2</h1>
   <div class="small">
-    William von Meister + Claude Sonnet 5 (v12: library-conformance review + bug fixes,
-    continuing GPT-5.6 Luna's v3-v9.1 and Claude Sonnet 5's v11 instrumentation) ·
-    source-verified against the pinned p2p-media-loader v4.0.0 commit and the published
-    hls.js 1.7.0 / p2p-media-loader-hlsjs 4.0.0 CDN bundles
+    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.2 diagnostic implementation
   </div>
 
   <section class="card" style="margin-top:12px">
@@ -1157,12 +568,7 @@ video {
   var P2PML_VERSION = "4.0.0";
   var DEFAULT_STREAM = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
   var TRACKER_HINTS = [
-    /*
-     * These are the three WSS trackers present in the reviewed
-     * p2p-media-loader v4 default configuration (core.ts,
-     * DEFAULT_STREAM_CONFIG.announceTrackers). v11 keeps v9.1's restoration
-     * of the library defaults rather than inventing a different tracker set.
-     */
+    
     "wss://tracker.novage.com.ua",
     "wss://tracker.webtorrent.dev",
     "wss://tracker.openwebtorrent.com"
@@ -1173,18 +579,7 @@ video {
     bitrate: 836280
   };
 
-  /*
-   * TRANSPORT MODES
-   * ----------------
-   * Two named, fully-specified StreamConfig profiles. "hybrid" is v9.1's own
-   * settings, unchanged, kept for direct comparability with every prior
-   * v9/v9.1 run. "p2ponly" changes exactly one field from "hybrid":
-   * simultaneousHttpDownloads 1 -> 0 - confirmed from hybrid-loader.ts to be
-   * the field that actually matters (see the v11 CHANGE 1 header comment).
-   * httpDownloadTimeWindow/p2pDownloadTimeWindow are left at the library's
-   * own defaults (3000/6000 SECONDS) in both modes - they were never
-   * actually customized in v9/v9.1 either; see v11 CHANGE 1.
-   */
+  
   var STREAM_TRANSPORT = {
     hybrid: {
       label: "Hybrid (HTTP + P2P)",
@@ -1198,16 +593,8 @@ video {
       isP2PUploadDisabled: false
     },
     p2ponly: {
-      /* v12 CHANGE 6: relabeled from "P2P-only" per source-review item #10
-         - simultaneousHttpDownloads:0 blocks HTTP MEDIA-SEGMENT downloads
-         specifically; manifest/playlist fetches still use HTTP regardless,
-         so "P2P-only" overstated what this mode actually does. Internal
-         field name/value ("p2ponly") intentionally left unchanged to avoid
-         a larger, higher-risk rename across the codebase for a
-         wording-only concern. */
+      
       label: "P2P segment-only (simultaneousHttpDownloads: 0; manifest/playlist still HTTP)",
-      // Kept for report parity; structurally redundant once
-      // simultaneousHttpDownloads is 0 (see v11 CHANGE 2).
       httpDownloadInitialTimeoutMs: 5000,
       simultaneousHttpDownloads: 0,
       simultaneousP2PDownloads: 3,
@@ -1219,13 +606,7 @@ video {
     }
   };
 
-  /*
-   * Source-verified library defaults for a single WebRTC connection attempt
-   * (p2p-media-loader-core/src/types.ts StreamConfig doc comments). v11 does
-   * NOT override any of these - they are recorded here, verbatim, purely so
-   * an exported report's connect-error timestamps can be checked directly
-   * against the library's own stated budget instead of guessed at.
-   */
+  
   var WEBRTC_CONNECTION_BUDGET_LIBRARY_DEFAULTS = {
     webRtcOffersCount: 5,
     webRtcOfferTimeoutMs: 50000,
@@ -1237,14 +618,7 @@ video {
       "wait it needs, before the library itself gives up."
   };
 
-  /*
-   * hls.js-level overrides. fragLoadingTimeOut default (confirmed by
-   * grepping the actual pinned 1.7.0 dist bundle) is 20000ms - shorter than
-   * the WebRTC budget above, which is the most likely real cause of the
-   * "CONTROLLED level doesn't stay locked" bug from the second real v6 run
-   * (hls.js timing out and reacting on its own schedule while p2p-media-
-   * loader was still legitimately trying). Raised well past that budget.
-   */
+  
   var HLS_JS_OVERRIDES = {
     fragLoadingTimeOut: 120000
   };
@@ -1288,13 +662,7 @@ video {
     });
   }
 
-  /*
-   * Browser identity is an application-generated identifier, NOT a hardware
-   * fingerprint. localStorage lets ordinary repeated runs from the same
-   * browser profile be correlated. Private browsing, cleared storage, or
-   * privacy restrictions may prevent persistence; the report explicitly says
-   * session-only in that case instead of pretending this is hardware identity.
-   */
+  
   function getBrowserInstanceId() {
     var key = "hivestream.phase1b.browserInstanceId.v1";
     try {
@@ -1319,11 +687,7 @@ video {
     }
   }
 
-  /*
-   * Friendly browser fields make reports easier to compare while preserving
-   * navigator.userAgent as the authoritative raw browser identification.
-   * Parsing is intentionally conservative because UA strings vary by browser.
-   */
+  
   function detectBrowserFamily() {
     var ua = navigator.userAgent || "";
     if (/Firefox\//i.test(ua)) return "Firefox";
@@ -1397,12 +761,7 @@ video {
     try { return JSON.parse(JSON.stringify(v)); } catch (e) { return null; }
   }
 
-  /*
-   * Pre-populate the Trackers panel with all three configured trackers at
-   * status "configured" before any event has fired - v11 CHANGE 4(d). Without
-   * this, a tracker that is silently healthy and one that was never reached
-   * at all looked identical (both simply absent from the panel).
-   */
+  
   function initialTrackerState() {
     var trackers = {};
     TRACKER_HINTS.forEach(function (url) {
@@ -1421,10 +780,10 @@ video {
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-      version: "12.0",
+      version: "12.2",
       startedAt: null,
       elapsedMs: 0,
-      authorship: "William von Meister (Project Owner) + Claude Sonnet 5 (Anthropic, v11 and v12) " +
+      authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (Anthropic, v11 and v12) " +
         "+ GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
     },
 
@@ -1524,9 +883,7 @@ video {
     swarm: {
       resolvedSwarmId: null,
       controlledInfoHash: null,
-      /* v12 CHANGE 3: last-seen codecs string for the locked controlled
-         variant, used to detect a codec mismatch across registrations
-         (see the onStreamAdded handler). null until first observed. */
+      
       controlledCodecs: null,
       streams: []
     },
@@ -1580,10 +937,7 @@ video {
       remotePeerKnown: false,
       iceCandidatesGathered: false,
       candidatePairSucceeded: false,
-      /* v12 CHANGE 4: v11 declared dataChannelOpened twice in this object
-         literal (harmless - same value, second silently wins - but a
-         copy-paste artifact inconsistent with resetRun()'s own copy of
-         this object, which only declared it once). Duplicate removed. */
+      
       p2pPeerConnected: false,
       p2pBytesReceived: 0
     },
@@ -1601,16 +955,7 @@ video {
     events: []
   };
 
-  /*
-   * v12 CHANGE 5 (source-review item #11): R.events (above) and the per-PC
-   * event buffer were already bounded in v11 - candidateRecords,
-   * candidatePairRecords, scheduler.events, and transfer.segments were not,
-   * and could grow without limit across a long run. Shared helper applying
-   * the same retain-most-recent-N pattern already used above, at a 2000-
-   * entry cap - comfortably above anything any run in this project's
-   * history has produced, so no evidence is lost for any realistic run;
-   * it only prevents unbounded memory growth on a very long one.
-   */
+  
   var V12_ARRAY_CAP = 2000;
   function boundedPush(arr, item) {
     arr.push(item);
@@ -1648,15 +993,7 @@ video {
     return n;
   }
 
-  /*
-   * v12 note: deliberately left width/height/bitrate-only, unchanged from
-   * v11 (see v12 CHANGE 3 in the header comment). Codecs are now captured
-   * separately (R.swarm.controlledCodecs, R.manifest renditions) and
-   * compared for a mismatch warning, but are NOT added as a gating
-   * condition here, to avoid any risk of regressing verdict.proof's
-   * detection behavior without a real multi-device test run to verify
-   * against.
-   */
+  
   function matchesControlled(props) {
     if (!props) return false;
     var w = Number(props.width);
@@ -1672,11 +1009,7 @@ video {
     return "other";
   }
 
-  /*
-   * ICE candidate strings have changed slightly between browser versions.
-   * Use the standards-facing RTCIceCandidate fields first and only fall back
-   * to a tolerant token parser.
-   */
+  
   function parseCandidate(candidate) {
     var raw = candidate && candidate.candidate ? candidate.candidate : "";
     var type = candidate && candidate.type ? candidate.type : null;
@@ -1918,7 +1251,7 @@ video {
   }
 
   function pollStats() {
-    /* v11 snapshots the browser negotiation trace before getStats(). */
+    
     syncV11BrowserProtocol();
     R.instrumentation.peerIdDiscoveryAttempts += 1;
     discoverActualPeerId();
@@ -1946,11 +1279,7 @@ video {
 
         report.forEach(function (s) {
           if (s.type === "candidate-pair") {
-            /*
-             * Standards-first selection:
-             * transport.selectedCandidatePairId identifies the selected pair.
-             * Firefox's candidate-pair.selected is retained only as fallback.
-             */
+            
             if (selectedPairId && s.id === selectedPairId) {
               pairHits.push(s);
             } else if (!selectedPairId && s.state === "succeeded" && (s.selected || s.nominated)) {
@@ -2045,12 +1374,7 @@ video {
 
   R._seenRemoteCandidateStats = {};
 
-  /*
-   * v11 CHANGE 4(a): direct peer-ID lookup first, generic recursive-walk
-   * fallback second. See the header comment for the source citation
-   * (core.ts "private readonly peerId", engine.ts "private readonly core"
-   * both compile to ordinary properties under TypeScript's `private`).
-   */
+  
   function discoverActualPeerId() {
     var direct = (hlsInstance && hlsInstance.p2pEngine && hlsInstance.p2pEngine.core)
       ? hlsInstance.p2pEngine.core.peerId
@@ -2070,13 +1394,7 @@ video {
       return;
     }
 
-    /*
-     * Fallback: v9.1's generic recursive object walk, kept in case a future
-     * library version renames or relocates the peerId property. Only a
-     * string matching the WebTorrent client-ID shape (-PMxxxx-...) reached
-     * through a small set of runtime objects is ever recorded - this
-     * function never creates or assigns such an ID itself.
-     */
+    
     var roots = [
       { name: "hlsInstance", value: hlsInstance },
       { name: "hlsInstance.p2pEngine", value: hlsInstance && hlsInstance.p2pEngine },
@@ -2173,9 +1491,6 @@ video {
     rec.eventCount += 1;
     rec.history.push({
       at: rec.lastEventAt,
-      // How long after this peer was first seen did this event happen -
-      // lets a connect-error be checked directly against
-      // scheduler.webrtcConnectionBudget instead of only knowing it failed.
       elapsedSinceFirstSeenMs: Math.round(mono() - rec.firstSeenMono),
       event: event,
       trackerUrl: d.trackerUrl || null,
@@ -2367,23 +1682,12 @@ video {
       R.swarm.streams.push(stream);
       R.verdict.streamIdentityObserved = true;
 
-      /*
-       * v12 CHANGE 1 (bug fix): v11 ran this controlled-variant match
-       * unconditionally, regardless of variantMode. But the MANIFEST_LOADED
-       * handler below explicitly documents that in AUTO mode "automatic
-       * level selection is not used as strict proof" - so if hls.js's own
-       * ABR happened to land on exactly the controlled bitrate/resolution
-       * while running in AUTO mode, v11 would silently flip
-       * controlledVariantFound (and potentially verdict.proof) to true,
-       * contradicting its own stated intent. v12 gates this check behind
-       * the same variantValue() === "480" guard MANIFEST_LOADED already
-       * uses, so both places now agree on when a controlled match counts.
-       */
+      
       if (variantValue() === "480" && matchesControlled(s && s.properties)) {
         var observedInfoHash = s && s.infoHash ? s.infoHash : null;
         var observedCodecs = s && s.properties ? s.properties.codecs : null;
 
-        /* Lock the first controlled stream identity for this run. */
+        
         if (!R.swarm.controlledInfoHash && observedInfoHash) {
           R.swarm.controlledInfoHash = observedInfoHash;
           R.swarm.controlledCodecs = observedCodecs;
@@ -2403,19 +1707,7 @@ video {
         R.selectedVariant.properties = cloneJson(s.properties);
         R.verdict.controlledVariantFound = true;
 
-        /*
-         * v12 CHANGE 3: stream-identity.ts (the real pinned library source)
-         * confirms codecs genuinely participates in the SHA-1 that becomes
-         * this stream's infoHash, alongside bitrate/width/height/etc. If a
-         * later registration for what we believe is "the same" controlled
-         * variant reports different codecs than the one we already locked
-         * onto, that is real diagnostic signal that two devices may not
-         * actually be landing in the same P2P swarm even though their
-         * width/height/bitrate match - surface it instead of staying
-         * silent (matchesControlled() itself is intentionally left
-         * width/height/bitrate-only, unchanged from v11, to avoid
-         * regressing verdict.proof's detection behavior).
-         */
+        
         var newCodecs = observedCodecs;
         var priorCodecs = R.swarm.controlledCodecs;
         if (priorCodecs != null && newCodecs != null && priorCodecs !== newCodecs) {
@@ -2428,11 +1720,9 @@ video {
               "codecs feed into the library's infoHash."
           });
         }
-        /* Never overwrite the locked controlledCodecs here. */
+        
       } else if (variantValue() !== "480" && matchesControlled(s && s.properties)) {
-        /* Still log that AUTO mode happened to touch the controlled
-           rendition's properties, for visibility - just don't let it
-           count toward the strict proof verdict. */
+        
         log("stream:added-matched-controlled-properties-in-auto-mode", {
           note: "AUTO mode's own ABR selected a stream matching the " +
             "controlled width/height/bitrate. Not counted toward " +
@@ -2542,15 +1832,11 @@ video {
       log("scheduler:segment-error", item);
     });
 
-    /*
-     * v3/v4 changed the high-frequency chunk events to positional arguments:
-     * onChunkDownloaded(bytesLength, downloadSource, peerId, streamType, infoHash)
-     * onChunkUploaded(bytesLength, peerId, streamType, infoHash)
-     */
+    
     on("onChunkDownloaded", function (bytesLength, downloadSource, peerId, streamType, infoHash) {
       var bytes = Number(bytesLength) || 0;
       var source = safeString(downloadSource || "").toLowerCase();
-      var isP2P = !!peerId || source === "p2p";
+      var isP2P = source === "p2p";
 
       if (isP2P) {
         R.transfer.bytes.p2pDown += bytes;
@@ -2632,13 +1918,7 @@ video {
     });
   }
 
-  /*
-   * v11 CHANGE 3: the stall-rescue watchdog. Only ever acts in P2P-only
-   * mode, only ever fires once per run, and only uses the library's own
-   * public, documented applyDynamicConfig API - see the header comment for
-   * the exact source citation (types.ts DynamicStreamProperties lists
-   * simultaneousHttpDownloads as safely changeable at runtime).
-   */
+  
   function checkStallRescue() {
     if (!started || !hlsInstance) return;
     if (R.scheduler.transportMode !== "p2ponly") return;
@@ -2685,12 +1965,7 @@ video {
     var transportConfig = STREAM_TRANSPORT[transport];
     var core = {};
 
-    /*
-     * CRITICAL v6-v11 RULE:
-     * Natural mode does not set swarmId at all. The property is omitted
-     * rather than assigned null/undefined, so the library exercises its own
-     * documented default (manifest-URL-derived) swarm identity.
-     */
+    
     if (mode === "custom") {
       var v = customSwarmIdInput.value.trim();
       if (!v) {
@@ -2772,13 +2047,7 @@ video {
       R.manifest.activeLevelIndex = d && d.level != null ? d.level : null;
       log("hls:level-switched", { level: R.manifest.activeLevelIndex });
 
-      /*
-       * v11 CHANGE 4(c): re-force the CONTROLLED level if hls.js's own ABR
-       * drifted away from it. Previously currentLevel was only ever set
-       * once (above, at MANIFEST_LOADED) and never re-applied - every real
-       * v8.1/v9/v9.1 run to date shows controlledVariantFound staying false
-       * for exactly this reason, even runs with genuine non-zero P2P bytes.
-       */
+      
       if (
         variantValue() === "480" &&
         R.selectedVariant.found &&
@@ -2810,12 +2079,7 @@ video {
 
       if (!d || !d.fatal) return;
 
-      /*
-       * v11 CHANGE 4(b): standard hls.js fatal-error recovery, previously
-       * entirely absent. Every attempt is logged with the action taken, so
-       * a run that needed recovery is visibly distinguishable from one that
-       * didn't, rather than the page just silently going dark.
-       */
+      
       var action = "unrecoverable";
       try {
         if (Hls.ErrorTypes && d.type === Hls.ErrorTypes.NETWORK_ERROR) {
@@ -2947,10 +2211,10 @@ video {
     R = {
       test: {
         name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-        version: "12.0",
+        version: "12.2",
         startedAt: now(),
         elapsedMs: 0,
-        authorship: "William von Meister (Project Owner) + Claude Sonnet 5 (Anthropic, v11 and v12) " +
+        authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (Anthropic, v11 and v12) " +
           "+ GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
       },
       identity: {
@@ -3080,18 +2344,12 @@ video {
     R._monoStart = mono();
     R._seenRemoteCandidateStats = {};
 
-    /* v11: every RTCPeerConnection created after this point is tagged with
-       the current diagnostic runId before p2p-media-loader creates it. */
+    
     window.__HS_V11_ACTIVE_RUN_ID = R.identity.runId;
   }
 
 
-  /*
-   * v11 run-scoped browser protocol synchronization.
-   * The capture lives outside the diagnostic IIFE because the browser API
-   * wrapper must be installed before p2p-media-loader is constructed.
-   * R is reset between runs, so this function projects only the current run.
-   */
+  
   function syncV11BrowserProtocol() {
     var all = window.__HS_V11_PEER_CONNECTIONS || [];
     var runId = R.identity && R.identity.runId;
@@ -3102,12 +2360,7 @@ video {
     R.webrtc.browserProtocol.totalCaptured = all.length;
     R.webrtc.browserProtocol.currentRunCaptured = selected.length;
 
-    /*
-     * The v10 compact peerConnections array remains as a report-compatible
-     * view, but v11 is now its authoritative source. We do not attach a
-     * second set of event listeners here; the browser-level wrapper already
-     * captured those events exactly once.
-     */
+    
     R.webrtc.peerConnections = selected.map(function(pc, index){
       var p = pc.__hsV11;
       var local = (p.ice.candidates || []).filter(function(c){ return c; });
@@ -3148,14 +2401,7 @@ video {
     });
 
     R.webrtc.candidateRecords = [];
-    /* v12 CHANGE 5 note: this array is fully rebuilt from each open PC's
-       own (inherently small, self-limiting - a real ICE gathering pass
-       produces roughly single digits to a few dozen candidates) candidate
-       list every sync cycle, not accumulated indefinitely, so it does not
-       need the same 2000-entry cap applied to scheduler.events and
-       transfer.segments below - the real growth risk there was accumulating
-       records for every scheduled/transferred segment across an entire
-       long run, which this rebuild-from-bounded-source pattern doesn't share. */
+    
     R.webrtc.ice.host = 0;
     R.webrtc.ice.srflx = 0;
     R.webrtc.ice.relay = 0;
@@ -3242,33 +2488,7 @@ video {
     Object.keys(m).forEach(function(k){ R.connectivity[k] = m[k]; });
   }
 
-  /*
-   * v12 CHANGE 2 (attribution-quality fix): v11 picked "whichever open,
-   * not-closed PC for this run was most recently created" with no regard
-   * for whether that PC had already been correlated to a different peerId,
-   * and no record of how many candidates existed - a silent single guess.
-   * The library's public event contract genuinely does not expose a
-   * PC<->peerId linkage (peerId only arrives via onPeerConnect /
-   * onPeerConnectError, confirmed by reading the pinned source), so v12
-   * cannot invent a stronger signal - but it CAN make the guess's
-   * confidence observable instead of hiding it:
-   *   1. Prefer PCs not yet correlated to any peerId ("unclaimed") - a new
-   *      peer-connect event is far more likely to belong to a PC that
-   *      hasn't already been matched than to one that has.
-   *   2. If exactly one unclaimed candidate exists (the common case per
-   *      this project's own v8.1/v10 evidence), attribute to it with
-   *      confidence "unambiguous" - identical behavior to v11 in this case.
-   *   3. If more than one unclaimed candidate exists, still attribute to
-   *      the most recently created (best available guess), but log a
-   *      distinct webrtc:peer-correlation-ambiguous event naming every
-   *      candidate PC's id, and record confidence "ambiguous" on the
-   *      chosen PC's own event so a report reader can see this attribution
-   *      was a guess among several plausible PCs, not a certainty.
-   *   4. If there are no unclaimed candidates at all (every open PC for
-   *      this run already has a peerId), fall back to the full open-PC
-   *      pool as v11 did, and mark confidence "reattribution-fallback" so
-   *      it's visibly distinct from a fresh, confident match.
-   */
+  
   function correlatePeerIdToBrowserPc(peerId) {
     if(!peerId) return;
     var all = window.__HS_V11_PEER_CONNECTIONS || [];
@@ -3310,12 +2530,7 @@ video {
   function updateVerdict() {
     updateV11ProtocolMilestones();
 
-    /*
-     * Proof is deliberately strict. Merely seeing a peer, merely establishing
-     * ICE, or merely receiving a generic P2P chunk is not enough. The
-     * controlled proof requires a P2P-loaded segment whose infoHash equals
-     * the controlled rendition's observed infoHash, plus actual P2P bytes.
-     */
+    
     R.verdict.proof =
       !!R.selectedVariant.found &&
       !!R.swarm.controlledInfoHash &&
@@ -3401,7 +2616,7 @@ video {
     };
 
     records.forEach(function (record) {
-      /* candidateRecords preserve the parsed candidate under .candidate. */
+      
       var c = record && record.candidate ? record.candidate : record;
       if (!c) return;
       if (c.addressFamily === "IPv4") summary.ipv4 = true;
@@ -3469,7 +2684,7 @@ video {
       export: {
         savedAt: now(),
         format: "HiveStream Phase 1B diagnostic JSON",
-        exporterVersion: "12.0",
+        exporterVersion: "12.2",
         privacy: "Diagnostic export may include WebRTC ICE candidate addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
       },
       dependencies: R.dependencies,
@@ -3589,12 +2804,7 @@ video {
     }
   });
 
-  /*
-   * Save JSON is entirely client-side. A Blob and object URL let the browser
-   * download the same complete report produced by Copy JSON without sending
-   * diagnostic data to a server. The filename contains the device label when
-   * supplied, plus the UTC test start time, so multiple files remain sortable.
-   */
+  
   function saveJsonToFile() {
     var report = publicReport();
     var jsonText = JSON.stringify(report, null, 2);
@@ -3608,7 +2818,7 @@ video {
       .slice(0, 40) || "browser";
     var transportTag = report.transport && report.transport.mode ? report.transport.mode : "unknown";
 
-    var filename = "HiveStream-Phase1B-v12-" + transportTag + "-" + label + "-" + stamp + ".json";
+    var filename = "HiveStream-Phase1B-v12.2-" + transportTag + "-" + label + "-" + stamp + ".json";
 
     try {
       var blob = new Blob([jsonText], {
@@ -3659,11 +2869,7 @@ video {
   R.test.startedAt = null;
   R.test.elapsedMs = 0;
 
-  /*
-   * The first call to draw() is intentionally quiet: it does not claim that
-   * WebRTC exists or that a tracker is connected. Those are only recorded
-   * after the browser/loader actually produces observable evidence.
-   */
+  
   draw();
 })();
 </script>

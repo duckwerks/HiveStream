@@ -1,0 +1,3619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12</title>
+
+<!--
+===============================================================================
+HIVESTREAM PHASE 1B — NATURAL SWARM DIAGNOSTIC v11
+===============================================================================
+
+AUTHORS
+-------
+William von Meister — Project Owner / HiveStream Developer
+Claude Sonnet 5 (Anthropic) — v10 historical revision retained as baseline.
+GPT-5.6 Luna (OpenAI, GPT-5.6 Luna) — v11 research, source audit,
+  instrumentation redesign, and implementation.
+
+v11 is a forward revision of the v11 experiment. It preserves the natural-swarm
+experiment, public Mux fixture, tracker set, controlled rendition, transport
+modes, JSON export, and the existing evidence ladder while correcting the
+WebRTC instrumentation so it follows the actual p2p-media-loader v4.0.0
+WebTorrent client lifecycle observed directly in the pinned source commit.
+
+Per this project's own convention (see AI-COLLABORATION-AND-AUTHORSHIP.md,
+referenced in the v7 Drive docs): an author line identifies provenance of a
+given revision's changes, not technical authority over the file as a whole.
+v11 keeps essentially all of v9.1's instrumentation intact and adds to it;
+it does not re-litigate or discard the Luna-authored evidence chain.
+
+PURPOSE
+-------
+This page is a diagnostic instrument for HiveStream Phase 1B. It intentionally
+does NOT redesign the HiveStream architecture.
+
+v11 keeps the v6-v9.1 experiment structure (natural/custom swarm identity,
+WebRTC boundary instrumentation, P2P event/runtime-surface audit, browser
+identity, JSON export) and adds four things, each grounded directly in the
+actual library source rather than guessed or inferred from behavior alone.
+The source used for all of this is a direct clone of github.com/Novage/
+p2p-media-loader at commit 527105b420c15dfdb0e8ed4b6f0a261f48411192 (the same
+commit v9/v9.1 cite) - confirmed byte-identical to the published v4.0.0 tag
+for every file this diagnostic depends on (hybrid-loader.ts, core.ts,
+utils/stream.ts, utils/queue.ts, types.ts) - plus the actual pinned
+hls.js@1.7.0 dist bundle loaded by this page's own script element, downloaded
+and grepped directly rather than assumed from memory.
+
+The evidence chain recorded by this version is unchanged from v9.1:
+
+    tracker
+      -> peer discovery
+      -> signaling / RTCPeerConnection creation
+      -> ICE gathering
+      -> ICE candidate exchange
+      -> ICE connectivity checking
+      -> selected candidate pair
+      -> DTLS / connection establishment
+      -> data channel
+      -> p2p-media-loader peer connection
+      -> P2P chunk
+      -> controlled media segment
+
+IMPORTANT INTERPRETATION RULE
+-----------------------------
+A tracker "peer-seen" event proves that the P2P layer observed a peer through
+the tracker. It does NOT prove that the two browsers established a WebRTC
+transport, nor that the peer supplied media bytes. ICE candidates being
+gathered does not prove that any candidate pair succeeded. Instrumentation
+tells us what the library actually did; it does not force a P2P result,
+fabricate peer availability, or treat a tracker sighting as media proof.
+This rule is unchanged from v3 onward and still governs every field below.
+
+LOCAL PEER ID NOTE
+------------------
+p2p-media-loader v4's own local peer ID IS reachable this time, via a
+source-verified direct property rather than only the v9.1 heuristic walk -
+see "v11 CHANGE 4" below.
+
+===============================================================================
+v11 CHANGE 1 — A REAL "AS CLOSE TO P2P-ONLY AS THE LIBRARY PROTOCOL ALLOWS"
+              TRANSPORT MODE, PLUS A CORRECTION ABOUT WHAT v9/v9.1 ACTUALLY
+              CONFIGURED
+===============================================================================
+v9/v9.1's "P2P-first scheduler" experiment set:
+    httpDownloadInitialTimeoutMs: 5000   (milliseconds)
+    simultaneousHttpDownloads:    1
+    httpDownloadTimeWindow:       3000   (SECONDS, not milliseconds)
+    p2pDownloadTimeWindow:        6000   (SECONDS, not milliseconds)
+
+Reading utils/stream.ts directly: highDemandTimeWindow, httpDownloadTimeWindow,
+and p2pDownloadTimeWindow are all playback-ahead windows measured in SECONDS
+(isSegmentInTimeWindow computes position + timeWindowLength * rate, where
+position/rate are playback seconds/rate - there is no unit conversion).
+3000 and 6000 are, byte-for-byte, this library's own DEFAULT_STREAM_CONFIG
+values (core.ts, DEFAULT_STREAM_CONFIG). So v9/v9.1 did not actually narrow
+either time window at all - both were left at the library default the whole
+time. The only field genuinely changed from default was httpDownloadInitialTimeoutMs
+(library default: 0ms) and a modest drop of simultaneousHttpDownloads from
+the default of 2 to 1. Flagging this because the project asked directly
+whether "the http timeout of 3000 (changed to 5000)" was long enough - those
+are actually two different, differently-scoped settings, and the 3000 one was
+never changed. See v11 CHANGE 2 for the real answer about the 5000ms figure.
+
+THE ACTUAL P2P-ONLY LEVER, READ DIRECTLY FROM hybrid-loader.ts
+----------------------------------------------------------------
+processQueue() and loadRandomThroughHttp() gate every HTTP-eligibility
+check in the scheduler behind the same comparison:
+this.requests.executingHttpCount < simultaneousHttpDownloads. This is true
+for all three scheduling tiers:
+  (a) the segment HLS.js is actively blocked on right now (canLoadThroughHttp
+      in the shouldStartLoadImmediatelyEngineRequest branch),
+  (b) "high-demand" segments (within highDemandTimeWindow of the playhead -
+      library default 15s - which can even cancel an in-progress P2P download
+      to switch to HTTP once an HTTP slot frees up), and
+  (c) the interval-driven background prefetcher loadRandomThroughHttp(),
+      which returns immediately if executingHttpCount >= simultaneousHttpDownloads.
+With simultaneousHttpDownloads: 0, "0 < 0" is always false and
+"0 >= 0" is always true - so all three tiers are permanently blocked from
+using HTTP, for the entire lifetime of the HybridLoader instance, not just a
+startup window. This is a first-class, documented Core option
+(types.ts: "The maximum number of simultaneous HTTP downloads allowed",
+default 2) - setting it to 0 is not a hack, timing race, or reinterpretation
+of the library; it is the library's own supported mechanism for exactly this
+question, which is why it is the right answer to "as close to a P2P-only test
+as the library protocol allows."
+
+Documented, expected, and intentional consequence: if simultaneousHttpDownloads: 0
+and no peer has a given segment, that segment never loads and playback stalls
+indefinitely. The project's own v7 research (Drive doc "P2P-Only Mode &
+Improvements") already reached this exact conclusion independently; v11 is
+the first revision to actually implement it as a selectable mode instead of
+only proposing it. See v11 CHANGE 3 for how this diagnostic keeps a real
+stall from meaning an unusable page during actual test sessions.
+
+v11 THEREFORE ADDS A "Transport mode" TOGGLE, ORTHOGONAL TO THE EXISTING
+"Swarm mode" (Natural/Custom) TOGGLE:
+  - Hybrid    — identical to v9.1's own settings (unchanged, so hybrid-mode
+                runs stay directly comparable to every prior v9/v9.1 run).
+  - P2P-only  — simultaneousHttpDownloads: 0, everything else unchanged.
+Nothing about swarm identity, the controlled-variant selector, tracker list,
+or the WebRTC/event instrumentation changes between the two transport modes.
+
+===============================================================================
+v11 CHANGE 2 — IS 5000ms "LONG ENOUGH"? A SOURCE-GROUNDED ANSWER
+===============================================================================
+Two independent problems with treating httpDownloadInitialTimeoutMs as the
+main P2P-favoring lever, both confirmed from source:
+
+1. It is a ONE-TIME window. HybridLoader.createdAt is set once, in the
+   constructor (performance.now()), and every check of isInitialHttpWait
+   compares against that same fixed timestamp for the life of the loader.
+   It does not reset on ABR level switches or on later segment requests.
+   It can only ever help the very first requested segment(s) at page load -
+   it structurally cannot help any segment requested later in the session,
+   no matter its value.
+
+2. Even for that first window, 5000ms is short relative to the library's own
+   documented WebRTC connection budget (types.ts, StreamConfig defaults):
+       webRtcIceGatheringTimeoutMs: 5000    (ms to gather ICE candidates
+                                              before sending an offer)
+       webRtcOfferTimeoutMs:        50000   (ms to keep a pending offer
+                                              alive waiting for an answer)
+       webRtcConnectionTimeoutMs:   15000   (ms to wait for the data channel
+                                              to actually open after
+                                              signaling completes)
+   A single legitimate connection attempt can legitimately still be
+   in-progress tens of seconds after the page loads under the library's own
+   defaults - the ICE-gathering step alone can legitimately take the full
+   5000ms before an offer is even sent. So a 5000ms "give P2P a head start"
+   window is, structurally, not reliably enough time for a cold WebRTC
+   handshake to complete - it can only help when a peer connection is
+   already warm (e.g. reconnecting mid-session), which the "first segment
+   only" framing above means basically never applies here anyway.
+
+v11's answer: don't rely on httpDownloadInitialTimeoutMs as the P2P-favoring
+mechanism at all. It is still set (5000ms, unchanged) in both transport modes
+purely for parity with v9/v9.1's own reporting and because it is genuinely
+redundant-but-harmless once simultaneousHttpDownloads: 0 already blocks
+HTTP outright in P2P-only mode. The real lever is CHANGE 1. The WebRTC
+budget numbers above are recorded verbatim in the exported report
+(transport.webrtcConnectionBudget) specifically so a connect-error's
+elapsed time can be checked directly against them during analysis, instead
+of guessed at.
+
+===============================================================================
+v11 CHANGE 3 — STALL-RESCUE WATCHDOG (library-native, not a hack)
+===============================================================================
+A genuine P2P-only run can legitimately hang forever if no peer ever shows
+up - that is the correct, informative outcome for the test, not a bug to
+paper over. But it also means a real multi-device test session can be left
+staring at a frozen video element with no way to tell "still trying" from
+"actually broken," and no way to let the page recover without a full reload
+(which would lose the whole event log).
+
+The library exposes a genuinely public, documented, runtime-safe way to
+change this without reconstructing the player: Core.applyDynamicConfig()
+(core.ts), surfaced through the hlsjs wrapper as
+HlsJsP2PEngine.applyDynamicConfig() (engine.ts). simultaneousHttpDownloads
+is explicitly listed in DynamicStreamProperties (types.ts) - i.e. it is
+one of the properties the library itself documents as safely changeable
+after construction, not something v11 is forcing through a private field.
+
+v11 adds a "Stall-rescue timeout" input (seconds, default 90, 0 = disabled).
+While running in P2P-only mode, if p2pBytesReceived is still exactly 0 once
+that many seconds have elapsed since the run started, v11 calls:
+
+    hlsInstance.p2pEngine.applyDynamicConfig({
+      core: { simultaneousHttpDownloads: 1 }
+    });
+
+- exactly once per run - opening a single HTTP slot so the page can recover
+and finish loading, while leaving every other P2P-only setting untouched.
+This is logged as a distinct, clearly-timestamped event
+(scheduler:stall-rescue-triggered) and recorded in the exported report
+under transport.stallRescue, so analysis can cleanly separate "the pure
+P2P-only phase" (before the rescue) from "the rescued phase" (after it) -
+a stall that gets rescued should never be silently read as a successful
+P2P-only run.
+
+The 90-second default is deliberately larger than a single full WebRTC
+connection attempt under the library's own default budget (ICE gathering
+5000ms + up to a 50000ms offer wait + up to a 15000ms data-channel wait,
+per CHANGE 2 above), so a rescue firing means real evidence that the
+attempt was actually stuck, not just still in progress.
+
+===============================================================================
+v11 CHANGE 4 — DIRECT PEER-ID LOOKUP, FATAL-ERROR RECOVERY, LEVEL RE-LOCK,
+              TRACKERS LISTED UPFRONT
+===============================================================================
+Four smaller fixes, each tracked as an open item in this project's own prior
+research (the v7 Drive doc's improvement list) and each now verified against
+source rather than left as a proposal:
+
+(a) Direct peer-ID lookup. core.ts declares "private readonly peerId: string"
+    on the Core class, and engine.ts declares "private readonly core: Core"
+    on HlsJsP2PEngine. TypeScript's `private` (not the true ES `#private`
+    syntax) compiles away entirely - it is a compile-time-only check, so at
+    runtime hlsInstance.p2pEngine.core.peerId is an ordinary, readable
+    property. v11 reads it directly first, and falls back to v9.1's own
+    generic recursive-walk heuristic only if the direct read is ever empty
+    (e.g. a future library version renames or relocates the field) - so
+    nothing from v9.1's approach is lost, it is just no longer the primary
+    path.
+
+(b) Fatal hls.js error recovery. hls.js 1.7.0's own defaults (read directly
+    from the pinned dist bundle) include fragLoadingTimeOut: 20000 -
+    meaningfully shorter than the WebRTC connection budget in CHANGE 2. This
+    is almost certainly what was firing the fragLoadError/levelLoadTimeOut
+    events that triggered the "CONTROLLED level doesn't stay locked" bug
+    found in the second real v6 run: hls.js was independently timing out and
+    reacting on its own schedule while p2p-media-loader was still legitimately
+    trying. v11 raises fragLoadingTimeOut to 120000ms (comfortably past the
+    WebRTC budget) and adds the standard hls.js fatal-error recovery pattern
+    that was simply missing before: hls.startLoad() on a fatal
+    Hls.ErrorTypes.NETWORK_ERROR, hls.recoverMediaError() on a fatal
+    Hls.ErrorTypes.MEDIA_ERROR. Every recovery attempt is logged with the
+    error type/details and which action was taken
+    (playerRecovery.fatalErrorRecoveries in the report).
+
+(c) Level re-lock on drift. When CONTROLLED variant mode is selected and
+    LEVEL_SWITCHED reports a level other than the one v11 originally
+    locked to, v11 now re-applies hls.currentLevel immediately and logs
+    the correction (playerRecovery.levelDriftCorrections). Previously the
+    level was only set once, at MANIFEST_PARSED, and hls.js's own ABR was
+    free to drift away from the controlled rendition afterward with nothing
+    recorded except the resulting mismatch. This directly targets the
+    finding in this project's own evidence: every real v8.1/v9/v9.1 run to
+    date has controlledVariantFound: false, even the runs with genuine
+    non-zero P2P byte transfer - meaning the strict proof verdict has been
+    failing specifically because of this drift, not because P2P doesn't
+    work.
+
+(d) Trackers listed upfront. The Trackers panel previously only ever showed
+    a tracker once it produced a peer-sighting or error/warning event, so a
+    tracker that was silently working (or silently doing nothing) looked
+    identical to one that was never configured at all. v11 pre-populates
+    R.trackers with all three configured trackers at status "configured"
+    before the run starts, so the panel and the exported report always show
+    all three, whether or not any of them ever produced an event.
+
+===============================================================================
+v11 SOURCE AUDIT — p2p-media-loader v4.0.0 WEBRTC PROTOCOL
+====================================================================
+
+The v11 browser instrumentation is derived from the pinned source commit
+527105b420c15dfdb0e8ed4b6f0a261f48411192, especially:
+
+  packages/p2p-media-loader-core/src/webtorrent/webtorrent-client/index.ts
+  packages/p2p-media-loader-core/src/types.ts
+  packages/p2p-media-loader-core/src/core.ts
+  packages/p2p-media-loader-core/src/p2p/peer-protocol.ts
+  packages/p2p-media-loader-core/src/p2p/loader.ts
+
+Source-level findings:
+
+1. OUTGOING NEGOTIATION
+   WebTorrentClient creates a PC, creates RTCDataChannel("webtorrent"),
+   createOffer(), setLocalDescription(), waits for ICE gathering, then sends
+   the offer and offer_id in a WebTorrent tracker announce.
+
+2. INCOMING NEGOTIATION
+   A tracker offer causes setRemoteDescription(offer), createAnswer(),
+   setLocalDescription(answer), ICE gathering, then an answer announce
+   containing to_peer_id and offer_id.
+
+3. ANSWER COMPLETION
+   An outgoing offer is not considered connected merely because an answer
+   exists at the tracker. The library calls setRemoteDescription(answer) and
+   then waits for the RTCDataChannel to open.
+
+4. CONNECTION SUCCESS
+   The library's waitForConnection() resolves on data-channel "open". Terminal
+   ICE states reject the connection. Therefore v11 treats "data channel open"
+   as a separate milestone from "ICE checking" and "candidate pair exists".
+
+5. ICE SIGNALING MODEL
+   The library waits for ICE gathering and sends the gathered SDP. This is not
+   the same as a trickle-ICE design. v11 records addIceCandidate() defensively,
+   but does not require it for success.
+
+6. PUBLIC P2P EVENT CONTRACT
+   p2p-media-loader v4 peer events carry peerId, infoHash, streamType, trackerUrl.
+   Chunk events are positional:
+     (bytesLength, downloadSource, peerId, streamType, infoHash)
+   v11 preserves this contract.
+
+7. STREAM IDENTITY
+   Core computes streamSwarmId/infoHash at registration. v11 keeps the existing
+   onStreamAdded/getStreams-based identity evidence and does not mutate swarm
+   identity dynamically.
+
+8. RUN ISOLATION
+   Every browser PC is tagged with the current HiveStream runId at construction.
+   Old PCs cannot silently become current-run evidence.
+
+9. STATS
+   Candidate-pair selection is read from transport.selectedCandidatePairId
+   first, with Firefox's non-standard candidate-pair.selected as fallback.
+   Candidate-pair state, nominated flag, RTT, packet/byte counts, and candidate
+   linkage remain distinct facts.
+
+10. HLS EVENT BINDING
+    v11 attached HLS events twice. v11 retains the onHlsJsCreated binding and
+    removes the second attachHlsEvents() call after new HlsWithP2P(options).
+
+WHAT v11 DELIBERATELY DOES NOT CHANGE
+===============================================================================
+- No TURN server is added by this diagnostic. This project's own v7
+  run-sequence decision doc reasoned that a no-TURN P2P-only run would
+  likely just reproduce an uninformative stall, given prior evidence
+  pointing at NAT/CGNAT reachability as the actual blocker - and the
+  duckwerks/HiveStream experiment evidence gathered since (2026-09-21,
+  v8.1 runs) is consistent with that: the only real P2P byte exchange seen
+  in any run so far was between two browsers on the SAME physical device,
+  never across genuinely separate devices/networks. v11's changes (a real
+  P2P-only mode, a stall-rescue watchdog, and a fix for the bug that was
+  silently preventing proof:true even when P2P worked) are offered as
+  this project's stated "correct and robust instrumentation" priority
+  before reaching for TURN - not as a replacement for eventually testing
+  it. Whether to add TURN in a v11 remains an open, separate decision.
+- Natural mode still deliberately omits the swarmId property; Custom mode
+  is unchanged; the CONTROLLED 848x480/836280 variant selector, AUTO mode,
+  and the underlying WebRTC/tracker/peer/P2P-event instrumentation from
+  v6-v9.1 are all unchanged.
+- The Mux test stream remains the default fixture used since v6.
+===============================================================================
+
+===============================================================================
+v12 — LIBRARY-PROTOCOL CONFORMANCE REVIEW + BUG FIXES
+===============================================================================
+AUTHOR OF THIS REVISION: Claude Sonnet 5 (Anthropic).
+DATE: 2026-09-21/22.
+REQUESTED BY: William von Meister (Project Owner).
+
+WHAT THIS REVIEW DID
+---------------------
+Before changing anything, this revision re-verified v11's own source-audit
+claims against the actual library rather than trusting v11's code comments
+at face value. This was done by cloning github.com/Novage/p2p-media-loader
+at the exact pinned commit 527105b420c15dfdb0e8ed4b6f0a261f48411192 and
+diffing it against the published v4.0.0 tag, then separately pulling the
+real published npm package p2p-media-loader-hlsjs@4.0.0 (the same artifact
+loaded by this page's own <script> tag from jsdelivr) and grepping its
+built UMD bundle for the exact runtime symbols this diagnostic depends on.
+
+CONFORMANCE RESULT: CLEAN.
+- packages/p2p-media-loader-core/src is BYTE-IDENTICAL between the pinned
+  commit and the v4.0.0 tag, for every file, not just the five files v11's
+  header already named (hybrid-loader.ts, core.ts, utils/stream.ts,
+  utils/queue.ts, types.ts).
+- The only diff anywhere in the packages this diagnostic touches is a
+  type-only signature simplification in p2p-media-loader-hlsjs/src/engine.ts
+  (PartialHlsJsP2PEngineConfig) - zero behavioral effect on core.peerId,
+  applyDynamicConfig, or anything else this diagnostic reads.
+- npm confirms "4.0.0" is genuinely the current stable dist-tag ("latest":
+  "4.0.0"), with 5.0.0-alpha.x correctly isolated on a separate "alpha"
+  dist-tag - this diagnostic is not accidentally tracking a prerelease.
+- The published p2p-media-loader-hlsjs.iife.min.js CDN bundle (the exact
+  file this page loads) was unpacked and grepped directly: it contains
+  peerId, applyDynamicConfig, and simultaneousHttpDownloads - confirming
+  the symbols v11/v12 depend on at runtime are actually shipped in the
+  artifact the browser fetches, not just present in the repository source.
+- Every specific numeric/behavioral claim in v11's header was independently
+  re-derived from source and matches exactly: DEFAULT_STREAM_CONFIG
+  (simultaneousHttpDownloads:2, httpDownloadTimeWindow:3000,
+  p2pDownloadTimeWindow:6000, httpDownloadInitialTimeoutMs:0);
+  isSegmentInTimeWindow's lack of unit conversion (confirming the time
+  windows are SECONDS); the simultaneousHttpDownloads:0 gating logic across
+  all three hybrid-loader.ts scheduling tiers, INCLUDING the
+  abortLastHttpLoadingInQueueAfterItem() OR-bypass in the high-demand tier,
+  which was specifically checked and confirmed to be dead code under
+  simultaneousHttpDownloads:0 (it can only abort a request already in
+  status:"loading" with downloadSource:"http", and nothing can ever reach
+  that state when the count gate is 0 with no bypass in the other two
+  tiers); the WebRTC connection budget constants
+  (webRtcOffersCount:5, webRtcOfferTimeoutMs:50000,
+  webRtcIceGatheringTimeoutMs:5000, webRtcConnectionTimeoutMs:15000); the
+  `private readonly peerId: string` / `private readonly core: Core` field
+  declarations that make the direct-property-read trick legitimate; and
+  waitForConnection()'s exact resolve/reject semantics around data-channel
+  "open" and terminal ICE connection states. hls.js 1.7.0's own published
+  dist bundle was also pulled and grepped directly, confirming
+  fragLoadingTimeOut's default of 20000ms.
+
+ONE LIBRARY BEHAVIOR v11 DID NOT MENTION (informational, not a bug):
+packages/p2p-media-loader-core/src/utils/stream.ts's calculateTimeWindows()
+silently zeroes httpDownloadTimeWindow/p2pDownloadTimeWindow when available
+browser storage is <=5%, and collapses the P2P window down to the HTTP
+window when <=10%. Not relevant to this project's current test devices,
+but worth knowing if a run on a nearly-full phone ever behaves oddly.
+
+ONE LIBRARY BEHAVIOR THAT DIRECTLY MOTIVATES A v12 FIX:
+packages/p2p-media-loader-core/src/stream-identity.ts's
+computeStreamIdentityHash() was read in full. It confirms that stream
+identity (and therefore the infoHash announced to trackers) is a SHA-1 of
+NORMALIZED bitrate, codecs, width, height, language, channels, name,
+frameRate, and videoRange - codecs genuinely participates in whether two
+devices land in the same P2P swarm for "the same" rendition, exactly as
+the project's own docs/HiveStream-Phase1B-v10-Source-Level-Review-Baseline.md
+(review item #16) already suspected. This is why v12 CHANGE 3 below adds
+codec/frameRate/videoRange capture.
+
+BUGS FOUND IN v11's OWN CODE (not the library) AND FIXED IN v12
+------------------------------------------------------------------
+v12 CHANGE 1 - AUTO-MODE PROOF LEAK (real correctness bug, fixed)
+  v11's onStreamAdded handler called matchesControlled(s.properties) and,
+  on a match, set BOTH R.selectedVariant.found = true AND
+  R.verdict.controlledVariantFound = true - UNCONDITIONALLY, with no check
+  of the current variantMode. But v11's own MANIFEST_LOADED handler
+  explicitly documents (selectedVariant.reason) that in AUTO mode
+  "automatic level selection is not used as strict proof." Concretely:
+  if a run were started in AUTO mode and hls.js's own ABR algorithm
+  happened to land on exactly 848x480/836280 for some segment, v11 would
+  silently flip controlledVariantFound (and therefore verdict.proof, if the
+  other three conditions also held) to true - contradicting the
+  diagnostic's own stated intent that AUTO-mode matches are not strict
+  proof. v12 gates this exact check behind `variantValue() === "480"`, the
+  same guard MANIFEST_LOADED already uses, so onStreamAdded and
+  MANIFEST_LOADED now agree on when a controlled match counts.
+
+v12 CHANGE 2 - PEER-TO-PEERCONNECTION CORRELATION AMBIGUITY (real
+  attribution-quality bug, mitigated)
+  v11's correlatePeerIdToBrowserPc() attributed an incoming p2p-media-loader
+  peerId to "whichever captured RTCPeerConnection for this run is most
+  recently created and not yet closed" - a single best-guess heuristic with
+  no signal of when that guess might be wrong. Given this project's own
+  evidence (the v8.1 four-browser run, and v10's three-tracker natural-swarm
+  run) that multiple simultaneous negotiations are a realistic condition,
+  not a corner case, and given that precise peer/segment attribution is the
+  explicit point of this instrumentation (see the v8.1 findings doc's
+  entire "peer attribution" section), a silent single-best-guess is a real
+  quality gap. v12 does not have a stronger correlation signal available
+  from the library's public event contract (peerId only arrives on
+  onPeerConnect/onPeerConnectError, with no PC-level linkage exposed) - so
+  v12 instead makes the ambiguity OBSERVABLE rather than inventing a
+  fake-precise fix: when more than one open, not-yet-attributed PC exists
+  at correlation time, v12 logs a distinct
+  webrtc:peer-correlation-ambiguous event naming every candidate PC and
+  marks the eventual attribution's confidence as "ambiguous" in the PC's
+  own event record, instead of silently picking one with no trace. When
+  exactly one candidate exists (the common case per the v8.1/v10 evidence),
+  attribution proceeds exactly as v11 did, now recorded as confidence
+  "unambiguous".
+
+v12 CHANGE 3 - CODEC/FRAMERATE/VIDEORANGE CAPTURE (source-motivated
+  addition, additive/non-regressive)
+  Per the stream-identity.ts finding above, v12 now reads level.videoCodec /
+  level.audioCodec (hls.js 1.7.0's own level object fields - confirmed
+  present by grepping the pinned hls.js@1.7.0 dist bundle) alongside the
+  existing width/height/bitrate capture in MANIFEST_LOADED, and records a
+  `codecs` field on each manifest rendition and on selectedVariant. This is
+  DELIBERATELY ADDITIVE, not gating: matchesControlled() still compares
+  only width/height/bitrate exactly as v11 did, so verdict.proof's
+  detection behavior is unchanged and this cannot introduce a regression.
+  Instead, v12 logs a distinct scheduler:codec-mismatch-observed warning
+  event if a later onStreamAdded registration's properties.codecs disagrees
+  with the codecs recorded for the currently selected controlled variant -
+  turning the v10-baseline's item #16 concern from an unmeasured gap into
+  an observable, loggable fact for the next real multi-device run.
+
+v12 CHANGE 4 - DUPLICATE OBJECT KEY (cosmetic bug, fixed)
+  v11's initial R.connectivity object literal declared `dataChannelOpened:
+  false` twice (harmless in JS - second silently wins, same value both
+  times - but a copy-paste artifact, and inconsistent with resetRun()'s own
+  copy of the same object, which only declared it once). Removed the
+  duplicate.
+
+v12 CHANGE 5 - UNBOUNDED ARRAY GROWTH (source-review item #11, fixed)
+  docs/HiveStream-Phase1B-v10-Source-Level-Review-Baseline.md item #11
+  flagged that candidate records, candidate-pair records, scheduler events,
+  and transfer segment records could grow without bound across a long run,
+  unlike R.events (already capped at 1500) and the per-PC event buffer
+  (already capped at 300). v12 adds the same bounded-array pattern
+  (retain the most recent N, drop the oldest) to
+  R.webrtc.candidateRecords, R.webrtc.candidatePairRecords,
+  R.scheduler.events, and R.transfer.segments, each capped at 2000 entries.
+  This does not reduce evidence for any run under 2000 events in a given
+  category (well beyond what any run in this project's history has
+  produced) - it only prevents unbounded memory growth on a long-duration
+  run, per the project owner's own explicit preference (source-review item
+  #7) to keep verbose evidence rather than reduce it for performance.
+
+v12 CHANGE 6 - "P2P-ONLY" TERMINOLOGY (source-review item #10, UI text
+  only, fixed)
+  docs/HiveStream-Phase1B-v10-Source-Level-Review-Baseline.md item #10
+  noted that simultaneousHttpDownloads:0 disables HTTP MEDIA-SEGMENT
+  downloads specifically - manifest/playlist fetches still use HTTP
+  regardless, so "P2P-only" overstates what the mode actually does. v12
+  relabels the UI option and STREAM_TRANSPORT.p2ponly.label to
+  "P2P segment-only (manifest/playlist still HTTP)" without changing any
+  underlying config value or internal field name, to avoid a larger,
+  higher-risk rename across the codebase for a wording-only concern.
+
+WHAT v12 DELIBERATELY DOES NOT DO
+------------------------------------
+Per the project owner's own explicit request to review before coding
+further, v12 stops short of the two larger, higher-risk items still open
+from the v10 baseline:
+- Explicit seed/receiver mode (source-review item #2: Device A = hybrid +
+  natural swarm + play-to-seed, Device B = P2P-segment-only + same variant
+  + same swarm) is a workflow/UI feature, not a bug fix, and deserves its
+  own design discussion rather than being folded silently into a
+  bugfix-and-conformance pass.
+- The historical ("ever happened") vs current-state connectivity flag
+  split (source-review items #8/#9) touches verdict-adjacent fields used
+  throughout the report; splitting it safely deserves its own dedicated
+  pass with test-run verification, not a same-session addition alongside
+  five other changes.
+Both remain open, tracked here for the next revision.
+===============================================================================
+-->
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.0/dist/hls.min.js"></script>
+
+<script>
+/*
+ * The RTCPeerConnection wrapper MUST be installed before p2p-media-loader is
+ * constructed.  We keep the native constructor behavior intact and only retain
+ * references to created connections.  This lets the diagnostic inspect ICE
+ * states and getStats() later without replacing the application's WebRTC logic.
+ */
+(function installPeerConnectionCapture() {
+  /*
+   * ==========================================================================
+   * v11 WEBRTC INSTRUMENTATION — SOURCE-MAPPED TO p2p-media-loader v4.0.0
+   * ==========================================================================
+   *
+   * Directly verified against commit:
+   * 527105b420c15dfdb0e8ed4b6f0a261f48411192
+   *
+   * p2p-media-loader's actual WebTorrentClient lifecycle is:
+   *
+   * OUTGOING:
+   *   new RTCPeerConnection
+   *   -> createDataChannel("webtorrent")
+   *   -> createOffer
+   *   -> setLocalDescription(offer)
+   *   -> wait for ICE gathering
+   *   -> send tracker announce containing offer + offer_id
+   *   -> receive answer for offer_id
+   *   -> setRemoteDescription(answer)
+   *   -> wait for RTCDataChannel "open"
+   *   -> onPeerConnect
+   *
+   * INCOMING:
+   *   tracker delivers offer + peer_id + offer_id
+   *   -> new RTCPeerConnection
+   *   -> setRemoteDescription(offer)
+   *   -> createAnswer
+   *   -> setLocalDescription(answer)
+   *   -> wait for ICE gathering
+   *   -> send answer to_peer_id + offer_id
+   *   -> wait for RTCDataChannel "open"
+   *   -> onPeerConnect
+   *
+   * The library waits for ICE gathering before signaling, so a missing
+   * addIceCandidate() call is NOT by itself a signaling failure here.
+   *
+   * v11 only retained PC references and sampled getStats(). That left a major
+   * blind spot: we could see a PC and ICE checking, but not which signaling
+   * operation was the first missing transition.
+   *
+   * v11 therefore instruments the browser API operations themselves and gives
+   * every PC the current HiveStream runId at construction time.
+   *
+   * SDP is recorded as metadata, not full text: type, length, media-section
+   * count, candidate-line count, ICE credentials, and application/data-channel
+   * presence. This proves whether the expected SDP artifact existed without
+   * multiplying the already-large JSON export by copying every offer/answer.
+   */
+
+  var Native = window.RTCPeerConnection;
+  var pcs = [];
+  var seq = 0;
+  window.__HS_V11_PEER_CONNECTIONS = pcs;
+  window.__HS_V11_ACTIVE_RUN_ID = null;
+
+  if (!Native) return;
+
+  function mono() {
+    return typeof performance !== "undefined" && performance.now
+      ? performance.now()
+      : Date.now();
+  }
+
+  function activeRunId() {
+    return window.__HS_V11_ACTIVE_RUN_ID || null;
+  }
+
+  function safeCall(fn, fallback) {
+    try { return fn(); } catch (e) { return fallback; }
+  }
+
+  function sdpSummary(desc) {
+    if (!desc) return null;
+    var sdp = desc.sdp || "";
+    return {
+      type: desc.type || null,
+      length: sdp.length,
+      mediaSections: (sdp.match(/^m=/gm) || []).length,
+      candidateLines: (sdp.match(/^a=candidate:/gm) || []).length,
+      hasApplicationSection: /^m=application\b/m.test(sdp),
+      hasWebTorrentDataChannelLabel: /webtorrent/i.test(sdp),
+      hasIceUfrag: /^a=ice-ufrag:/m.test(sdp),
+      hasIcePwd: /^a=ice-pwd:/m.test(sdp)
+    };
+  }
+
+  function candidateSummary(c) {
+    if (!c) return null;
+    var text = c.candidate || "";
+    var parts = text.trim().split(/\s+/);
+    var type = null;
+    var protocol = c.protocol || (parts[2] ? String(parts[2]).toLowerCase() : null);
+    var address = c.address || parts[4] || null;
+    var port = c.port != null ? c.port : (parts[5] ? parseInt(parts[5], 10) : null);
+    var typIndex = parts.indexOf("typ");
+    if (typIndex >= 0 && parts[typIndex + 1]) type = parts[typIndex + 1];
+
+    var family = null;
+    if (address) {
+      if (String(address).indexOf(":") >= 0) family = "IPv6";
+      else if (/^\d+\.\d+\.\d+\.\d+$/.test(String(address))) family = "IPv4";
+    }
+
+    return {
+      candidateType: type,
+      protocol: protocol,
+      address: address,
+      addressFamily: family,
+      port: Number.isFinite(port) ? port : null,
+      foundation: c.foundation || (parts[0] || null),
+      component: c.component || null,
+      relatedAddress: c.relatedAddress || null,
+      relatedPort: c.relatedPort || null,
+      sdpMid: c.sdpMid || null,
+      sdpMLineIndex: c.sdpMLineIndex == null ? null : c.sdpMLineIndex,
+      url: c.url || null,
+      raw: text
+    };
+  }
+
+  function makeRecord(pc) {
+    var r = {
+      pcId: "pc-" + (++seq),
+      runId: activeRunId(),
+      createdAt: new Date().toISOString(),
+      createdMono: mono(),
+      peerId: null,
+      remotePeerId: null,
+      signaling: {
+        state: safeCall(function(){ return pc.signalingState; }, null),
+        operations: [],
+        localDescriptions: [],
+        remoteDescriptions: [],
+        addIceCandidateCalls: 0
+      },
+      ice: {
+        gatheringState: safeCall(function(){ return pc.iceGatheringState; }, null),
+        connectionState: safeCall(function(){ return pc.iceConnectionState; }, null),
+        candidates: [],
+        candidateErrors: [],
+        stateHistory: []
+      },
+      connection: {
+        state: safeCall(function(){ return pc.connectionState; }, null),
+        stateHistory: []
+      },
+      dataChannels: [],
+      events: [],
+      stats: {
+        lastAt: null,
+        selectedCandidatePairId: null,
+        selectedCandidatePair: null,
+        transport: null,
+        candidatePairs: [],
+        peerConnection: null,
+        dataChannelStats: []
+      },
+      closed: false,
+      closeAt: null
+    };
+
+    function event(type, data) {
+      r.events.push({
+        at: new Date().toISOString(),
+        elapsedMs: Math.round(mono() - r.createdMono),
+        type: type,
+        data: data || null
+      });
+      if (r.events.length > 300) r.events.shift();
+    }
+
+    function operation(name, fn) {
+      var started = mono();
+      var op = {
+        name: name,
+        startedAt: new Date().toISOString(),
+        startedElapsedMs: Math.round(started - r.createdMono),
+        ok: false,
+        result: null,
+        error: null,
+        finishedElapsedMs: null
+      };
+      r.signaling.operations.push(op);
+
+      var p;
+      try {
+        p = fn();
+      } catch (e) {
+        op.error = String(e && e.message || e);
+        op.finishedElapsedMs = Math.round(mono() - r.createdMono);
+        event("operation:error", {name:name,error:op.error});
+        throw e;
+      }
+
+      return Promise.resolve(p).then(function(result) {
+        op.ok = true;
+        op.result = result && result.type ? {type:result.type} : null;
+        op.finishedElapsedMs = Math.round(mono() - r.createdMono);
+        event("operation:success", {name:name,result:op.result});
+        return result;
+      }, function(err) {
+        op.error = String(err && err.message || err);
+        op.finishedElapsedMs = Math.round(mono() - r.createdMono);
+        event("operation:error", {name:name,error:op.error});
+        throw err;
+      });
+    }
+
+    function bindDataChannel(dc, origin) {
+      if (!dc) return null;
+      var existing = r.dataChannels.filter(function(x){ return x.object === dc; })[0];
+      if (existing) return existing;
+
+      var d = {
+        object: dc,
+        origin: origin,
+        label: safeCall(function(){ return dc.label; }, null),
+        id: safeCall(function(){ return dc.id; }, null),
+        ordered: safeCall(function(){ return dc.ordered; }, null),
+        protocol: safeCall(function(){ return dc.protocol; }, null),
+        readyStateAtBind: safeCall(function(){ return dc.readyState; }, null),
+        openAt: null,
+        closeAt: null,
+        errorCount: 0,
+        messageCount: 0
+      };
+      r.dataChannels.push(d);
+
+      dc.addEventListener("open", function() {
+        d.openAt = new Date().toISOString();
+        event("datachannel:open", {label:d.label,id:d.id,origin:d.origin});
+      });
+      dc.addEventListener("close", function() {
+        d.closeAt = new Date().toISOString();
+        event("datachannel:close", {label:d.label,id:d.id,origin:d.origin});
+      });
+      dc.addEventListener("error", function(e) {
+        d.errorCount++;
+        event("datachannel:error", {
+          label:d.label,
+          id:d.id,
+          message:safeCall(function(){ return e.error && e.error.message; }, null)
+        });
+      });
+      dc.addEventListener("message", function(){ d.messageCount++; });
+
+      return d;
+    }
+
+    pc.__hsV11 = r;
+
+    function state(kind, value) {
+      var item = {
+        kind: kind,
+        at: new Date().toISOString(),
+        elapsedMs: Math.round(mono() - r.createdMono),
+        value: value
+      };
+      if (kind === "iceGathering") r.ice.gatheringState = value;
+      if (kind === "iceConnection") r.ice.connectionState = value;
+      if (kind === "connection") r.connection.state = value;
+      if (kind === "signaling") r.signaling.state = value;
+      r.events.push({at:item.at,elapsedMs:item.elapsedMs,type:"state:"+kind,data:{value:value}});
+      if (r.events.length > 300) r.events.shift();
+
+      if (kind !== "signaling") r.ice.stateHistory.push(item);
+      else r.events.push({at:item.at,elapsedMs:item.elapsedMs,type:"state:signaling",data:{value:value}});
+    }
+
+    pc.addEventListener("signalingstatechange", function() {
+      state("signaling", safeCall(function(){ return pc.signalingState; }, null));
+    });
+    pc.addEventListener("icegatheringstatechange", function() {
+      state("iceGathering", safeCall(function(){ return pc.iceGatheringState; }, null));
+    });
+    pc.addEventListener("iceconnectionstatechange", function() {
+      state("iceConnection", safeCall(function(){ return pc.iceConnectionState; }, null));
+    });
+    pc.addEventListener("connectionstatechange", function() {
+      state("connection", safeCall(function(){ return pc.connectionState; }, null));
+    });
+    pc.addEventListener("icecandidate", function(e) {
+      if (e.candidate) {
+        var c = candidateSummary(e.candidate);
+        r.ice.candidates.push(c);
+        event("icecandidate", c);
+      } else {
+        event("icecandidate:gathering-complete", null);
+      }
+    });
+    pc.addEventListener("icecandidateerror", function(e) {
+      var err = {
+        errorCode: e.errorCode == null ? null : e.errorCode,
+        errorText: e.errorText || null,
+        url: e.url || null,
+        address: e.address || null,
+        port: e.port || null
+      };
+      r.ice.candidateErrors.push(err);
+      event("icecandidateerror", err);
+    });
+    pc.addEventListener("datachannel", function(e) {
+      bindDataChannel(e.channel, "remote-datachannel-event");
+      event("datachannel:remote", {
+        label:safeCall(function(){ return e.channel.label; }, null),
+        id:safeCall(function(){ return e.channel.id; }, null)
+      });
+    });
+
+    return {record:r,operation:operation,bindDataChannel:bindDataChannel,event:event};
+  }
+
+  var originalCreateOffer = Native.prototype.createOffer;
+  var originalCreateAnswer = Native.prototype.createAnswer;
+  var originalSetLocalDescription = Native.prototype.setLocalDescription;
+  var originalSetRemoteDescription = Native.prototype.setRemoteDescription;
+  var originalAddIceCandidate = Native.prototype.addIceCandidate;
+  var originalCreateDataChannel = Native.prototype.createDataChannel;
+  var originalClose = Native.prototype.close;
+
+  function WrappedRTCPeerConnection() {
+    var args = Array.prototype.slice.call(arguments);
+    var pc = new (Function.prototype.bind.apply(Native, [null].concat(args)))();
+    var ctx = makeRecord(pc);
+    pcs.push(pc);
+
+    pc.createOffer = function() {
+      var self = this;
+      return ctx.operation("createOffer", function() {
+        return originalCreateOffer.apply(self, arguments);
+      });
+    };
+    pc.createAnswer = function() {
+      var self = this;
+      return ctx.operation("createAnswer", function() {
+        return originalCreateAnswer.apply(self, arguments);
+      });
+    };
+    pc.setLocalDescription = function(desc) {
+      var self = this;
+      return ctx.operation("setLocalDescription:" + (desc && desc.type || "implicit"), function() {
+        return originalSetLocalDescription.call(self, desc);
+      }).then(function(result) {
+        var actual = safeCall(function(){ return self.localDescription; }, desc);
+        ctx.record.signaling.localDescriptions.push(sdpSummary(actual));
+        ctx.event("signaling:local-description-set", sdpSummary(actual));
+        return result;
+      });
+    };
+    pc.setRemoteDescription = function(desc) {
+      var self = this;
+      return ctx.operation("setRemoteDescription:" + (desc && desc.type || "unknown"), function() {
+        return originalSetRemoteDescription.call(self, desc);
+      }).then(function(result) {
+        var actual = safeCall(function(){ return self.remoteDescription; }, desc);
+        ctx.record.signaling.remoteDescriptions.push(sdpSummary(actual));
+        ctx.event("signaling:remote-description-set", sdpSummary(actual));
+        return result;
+      });
+    };
+    pc.addIceCandidate = function(candidate) {
+      var self = this;
+      ctx.record.signaling.addIceCandidateCalls++;
+      ctx.event("signaling:addIceCandidate", candidateSummary(candidate));
+      return originalAddIceCandidate.call(self, candidate);
+    };
+    pc.createDataChannel = function(label, options) {
+      var dc = originalCreateDataChannel.call(this, label, options);
+      ctx.bindDataChannel(dc, "local-createDataChannel");
+      ctx.event("datachannel:created", {
+        label:safeCall(function(){ return dc.label; }, label || null),
+        id:safeCall(function(){ return dc.id; }, null),
+        readyState:safeCall(function(){ return dc.readyState; }, null)
+      });
+      return dc;
+    };
+    pc.close = function() {
+      if (!ctx.record.closed) {
+        ctx.record.closed = true;
+        ctx.record.closeAt = new Date().toISOString();
+        ctx.event("pc:close", {
+          signalingState:safeCall(function(){ return this.signalingState; }, null),
+          iceConnectionState:safeCall(function(){ return this.iceConnectionState; }, null),
+          connectionState:safeCall(function(){ return this.connectionState; }, null)
+        });
+      }
+      return originalClose.apply(this, arguments);
+    };
+    return pc;
+  }
+
+  WrappedRTCPeerConnection.prototype = Native.prototype;
+  try { Object.setPrototypeOf(WrappedRTCPeerConnection, Native); } catch (e) {}
+  window.RTCPeerConnection = WrappedRTCPeerConnection;
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/p2p-media-loader-hlsjs@4.0.0/dist/p2p-media-loader-hlsjs.iife.min.js"></script>
+
+<style>
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+body {
+  margin: 0;
+  background: #101318;
+  color: #e9edf2;
+}
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+}
+h1 { margin: 0 0 6px; font-size: 1.45rem; }
+h2 { font-size: 1rem; margin: 18px 0 8px; }
+p, label, button, input, select { font-size: .92rem; }
+.controls, .grid {
+  display: grid;
+  gap: 8px;
+}
+.controls { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.card {
+  background: #171c23;
+  border: 1px solid #303843;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 0;
+}
+label { display: block; margin-bottom: 4px; color: #aeb8c4; }
+input, select, button {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #3a4654;
+  border-radius: 6px;
+  background: #0f1318;
+  color: #e9edf2;
+  padding: 8px;
+}
+button { cursor: pointer; background: #202a35; }
+button:hover { background: #2a3745; }
+pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 440px;
+  overflow: auto;
+  margin: 0;
+  font-size: .78rem;
+  line-height: 1.35;
+}
+.small { color: #aeb8c4; font-size: .8rem; }
+.ok { color: #9be28f; }
+.bad { color: #ff9d9d; }
+.warn { color: #ffd28a; }
+video {
+  width: 100%;
+  max-height: 55vh;
+  background: #000;
+  border-radius: 8px;
+}
+#log { max-height: 360px; }
+</style>
+</head>
+
+<body>
+<main>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12</h1>
+  <div class="small">
+    William von Meister + Claude Sonnet 5 (v12: library-conformance review + bug fixes,
+    continuing GPT-5.6 Luna's v3-v9.1 and Claude Sonnet 5's v11 instrumentation) ·
+    source-verified against the pinned p2p-media-loader v4.0.0 commit and the published
+    hls.js 1.7.0 / p2p-media-loader-hlsjs 4.0.0 CDN bundles
+  </div>
+
+  <section class="card" style="margin-top:12px">
+    <div class="controls">
+      <div>
+        <label for="deviceLabel">Device label (optional)</label>
+        <input id="deviceLabel" value="" placeholder="Phone, Laptop, Desktop, etc.">
+      </div>
+      <div>
+        <label for="streamUrl">HLS master URL</label>
+        <input id="streamUrl" value="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">
+      </div>
+      <div>
+        <label for="swarmMode">Swarm mode</label>
+        <select id="swarmMode">
+          <option value="natural">Natural — loader default</option>
+          <option value="custom">Custom — explicit swarm ID</option>
+        </select>
+      </div>
+      <div>
+        <label for="customSwarmId">Custom swarm ID</label>
+        <input id="customSwarmId" value="hivestream-phase1-proof-v1">
+      </div>
+      <div>
+        <label for="variantMode">Variant</label>
+        <select id="variantMode">
+          <option value="480">CONTROLLED 848×480 / 836280</option>
+          <option value="auto">AUTO</option>
+        </select>
+      </div>
+      <div>
+        <label for="transportMode">Transport mode</label>
+        <select id="transportMode">
+          <option value="hybrid">Hybrid — HTTP + P2P (v9.1 settings)</option>
+          <option value="p2ponly">P2P segment-only — simultaneousHttpDownloads: 0 (manifest/playlist still HTTP)</option>
+        </select>
+      </div>
+      <div>
+        <label for="stallRescueSeconds">Stall-rescue timeout (s, 0 = off)</label>
+        <input id="stallRescueSeconds" type="number" min="0" step="5" value="90">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="startBtn">Start / Restart</button>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="stopBtn">Stop</button>
+      </div>
+    </div>
+    <p class="small">
+      Run the same stream and same variant on two or more browsers. Keep the
+      browser sessions alive long enough for tracker discovery and ICE retries
+      to become visible. Export the JSON from each browser. In P2P-only mode,
+      a stalled/black video with zero P2P bytes is the correct, informative
+      negative outcome, not a bug — the stall-rescue timeout exists only so a
+      real test session can recover instead of hanging forever; a rescue
+      firing is logged and reported as its own distinct event, not hidden.
+    </p>
+  </section>
+
+  <section style="margin-top:12px">
+    <video id="video" controls playsinline></video>
+  </section>
+
+  <section class="grid" style="margin-top:12px">
+    <div class="card"><h2>Identity / Environment</h2><pre id="identity"></pre></div>
+    <div class="card"><h2>Manifest / Swarm</h2><pre id="manifest"></pre></div>
+    <div class="card"><h2>Trackers / Peers</h2><pre id="peers"></pre></div>
+    <div class="card"><h2>WebRTC Connectivity</h2><pre id="webrtc"></pre></div>
+    <div class="card"><h2>P2P Scheduler / Decision Evidence</h2><pre id="scheduler"></pre></div>
+    <div class="card"><h2>Transport Mode / Stall-Rescue / Recovery</h2><pre id="transport"></pre></div>
+    <div class="card"><h2>Transfer / Proof</h2><pre id="transfer"></pre></div>
+    <div class="card"><h2>Event Log</h2><pre id="log"></pre></div>
+  </section>
+
+  <section class="card" style="margin-top:12px">
+    <h2>Full JSON</h2>
+    <div class="controls" style="margin-bottom:8px">
+      <button id="copyBtn">Copy JSON</button>
+      <button id="saveBtn">Save JSON to File</button>
+    </div>
+    <div class="small">
+      Save JSON downloads the complete diagnostic report with browser, device,
+      run, P2P identity, transport-mode, and network-capability identifiers.
+      It does not export public IP, cookies, local storage contents, browsing
+      history, or precise location.
+    </div>
+    <pre id="json" style="margin-top:8px"></pre>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var HLS_VERSION = "1.7.0";
+  var P2PML_VERSION = "4.0.0";
+  var DEFAULT_STREAM = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+  var TRACKER_HINTS = [
+    /*
+     * These are the three WSS trackers present in the reviewed
+     * p2p-media-loader v4 default configuration (core.ts,
+     * DEFAULT_STREAM_CONFIG.announceTrackers). v11 keeps v9.1's restoration
+     * of the library defaults rather than inventing a different tracker set.
+     */
+    "wss://tracker.novage.com.ua",
+    "wss://tracker.webtorrent.dev",
+    "wss://tracker.openwebtorrent.com"
+  ];
+  var CONTROLLED = {
+    width: 848,
+    height: 480,
+    bitrate: 836280
+  };
+
+  /*
+   * TRANSPORT MODES
+   * ----------------
+   * Two named, fully-specified StreamConfig profiles. "hybrid" is v9.1's own
+   * settings, unchanged, kept for direct comparability with every prior
+   * v9/v9.1 run. "p2ponly" changes exactly one field from "hybrid":
+   * simultaneousHttpDownloads 1 -> 0 - confirmed from hybrid-loader.ts to be
+   * the field that actually matters (see the v11 CHANGE 1 header comment).
+   * httpDownloadTimeWindow/p2pDownloadTimeWindow are left at the library's
+   * own defaults (3000/6000 SECONDS) in both modes - they were never
+   * actually customized in v9/v9.1 either; see v11 CHANGE 1.
+   */
+  var STREAM_TRANSPORT = {
+    hybrid: {
+      label: "Hybrid (HTTP + P2P)",
+      httpDownloadInitialTimeoutMs: 5000,
+      simultaneousHttpDownloads: 1,
+      simultaneousP2PDownloads: 3,
+      highDemandTimeWindow: 15,
+      httpDownloadTimeWindow: 3000,
+      p2pDownloadTimeWindow: 6000,
+      isP2PDisabled: false,
+      isP2PUploadDisabled: false
+    },
+    p2ponly: {
+      /* v12 CHANGE 6: relabeled from "P2P-only" per source-review item #10
+         - simultaneousHttpDownloads:0 blocks HTTP MEDIA-SEGMENT downloads
+         specifically; manifest/playlist fetches still use HTTP regardless,
+         so "P2P-only" overstated what this mode actually does. Internal
+         field name/value ("p2ponly") intentionally left unchanged to avoid
+         a larger, higher-risk rename across the codebase for a
+         wording-only concern. */
+      label: "P2P segment-only (simultaneousHttpDownloads: 0; manifest/playlist still HTTP)",
+      // Kept for report parity; structurally redundant once
+      // simultaneousHttpDownloads is 0 (see v11 CHANGE 2).
+      httpDownloadInitialTimeoutMs: 5000,
+      simultaneousHttpDownloads: 0,
+      simultaneousP2PDownloads: 3,
+      highDemandTimeWindow: 15,
+      httpDownloadTimeWindow: 3000,
+      p2pDownloadTimeWindow: 6000,
+      isP2PDisabled: false,
+      isP2PUploadDisabled: false
+    }
+  };
+
+  /*
+   * Source-verified library defaults for a single WebRTC connection attempt
+   * (p2p-media-loader-core/src/types.ts StreamConfig doc comments). v11 does
+   * NOT override any of these - they are recorded here, verbatim, purely so
+   * an exported report's connect-error timestamps can be checked directly
+   * against the library's own stated budget instead of guessed at.
+   */
+  var WEBRTC_CONNECTION_BUDGET_LIBRARY_DEFAULTS = {
+    webRtcOffersCount: 5,
+    webRtcOfferTimeoutMs: 50000,
+    webRtcIceGatheringTimeoutMs: 5000,
+    webRtcConnectionTimeoutMs: 15000,
+    note: "Library defaults, not overridden by this diagnostic. A single " +
+      "attempt can legitimately take up to roughly the sum of the ICE " +
+      "gathering and connection timeouts, plus however much of the offer " +
+      "wait it needs, before the library itself gives up."
+  };
+
+  /*
+   * hls.js-level overrides. fragLoadingTimeOut default (confirmed by
+   * grepping the actual pinned 1.7.0 dist bundle) is 20000ms - shorter than
+   * the WebRTC budget above, which is the most likely real cause of the
+   * "CONTROLLED level doesn't stay locked" bug from the second real v6 run
+   * (hls.js timing out and reacting on its own schedule while p2p-media-
+   * loader was still legitimately trying). Raised well past that budget.
+   */
+  var HLS_JS_OVERRIDES = {
+    fragLoadingTimeOut: 120000
+  };
+
+  var STALL_RESCUE_CHECK_INTERVAL_MS = 2000;
+
+  var video = document.getElementById("video");
+  var streamUrlInput = document.getElementById("streamUrl");
+  var swarmModeInput = document.getElementById("swarmMode");
+  var customSwarmIdInput = document.getElementById("customSwarmId");
+  var variantModeInput = document.getElementById("variantMode");
+  var transportModeInput = document.getElementById("transportMode");
+  var stallRescueSecondsInput = document.getElementById("stallRescueSeconds");
+  var startBtn = document.getElementById("startBtn");
+  var stopBtn = document.getElementById("stopBtn");
+  var copyBtn = document.getElementById("copyBtn");
+  var saveBtn = document.getElementById("saveBtn");
+  var deviceLabelInput = document.getElementById("deviceLabel");
+
+  var hlsInstance = null;
+  var hlsDestroying = false;
+  var renderTimer = null;
+  var statsTimer = null;
+  var stallRescueTimer = null;
+  var started = false;
+
+  function now() {
+    return new Date().toISOString();
+  }
+
+  function mono() {
+    return (window.performance && performance.now) ? performance.now() : Date.now();
+  }
+
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0;
+      var v = c === "x" ? r : (r & 3 | 8);
+      return v.toString(16);
+    });
+  }
+
+  /*
+   * Browser identity is an application-generated identifier, NOT a hardware
+   * fingerprint. localStorage lets ordinary repeated runs from the same
+   * browser profile be correlated. Private browsing, cleared storage, or
+   * privacy restrictions may prevent persistence; the report explicitly says
+   * session-only in that case instead of pretending this is hardware identity.
+   */
+  function getBrowserInstanceId() {
+    var key = "hivestream.phase1b.browserInstanceId.v1";
+    try {
+      var existing = window.localStorage.getItem(key);
+      if (existing && /^[0-9a-f-]{36}$/i.test(existing)) return existing;
+      var created = uuid();
+      window.localStorage.setItem(key, created);
+      return created;
+    } catch (e) {
+      return uuid();
+    }
+  }
+
+  function browserIdentityPersistence() {
+    try {
+      var key = "hivestream.phase1b.browserInstanceId.v1";
+      return window.localStorage && window.localStorage.getItem(key)
+        ? "localStorage"
+        : "session-only";
+    } catch (e) {
+      return "session-only";
+    }
+  }
+
+  /*
+   * Friendly browser fields make reports easier to compare while preserving
+   * navigator.userAgent as the authoritative raw browser identification.
+   * Parsing is intentionally conservative because UA strings vary by browser.
+   */
+  function detectBrowserFamily() {
+    var ua = navigator.userAgent || "";
+    if (/Firefox\//i.test(ua)) return "Firefox";
+    if (/Edg\//i.test(ua)) return "Edge";
+    if (/OPR\//i.test(ua)) return "Opera";
+    if (/Chrome\//i.test(ua)) return "Chrome";
+    if (/Safari\//i.test(ua) && !/Chrome\//i.test(ua)) return "Safari";
+    return "Unknown";
+  }
+
+  function detectBrowserVersion() {
+    var ua = navigator.userAgent || "";
+    var patterns = [
+      /Firefox\/([0-9.]+)/i,
+      /Edg\/([0-9.]+)/i,
+      /OPR\/([0-9.]+)/i,
+      /Chrome\/([0-9.]+)/i,
+      /Version\/([0-9.]+)/i
+    ];
+    for (var i = 0; i < patterns.length; i++) {
+      var m = patterns[i].exec(ua);
+      if (m) return m[1];
+    }
+    return null;
+  }
+
+  function detectDeviceClass() {
+    var ua = navigator.userAgent || "";
+    if (/Mobi|Android|iPhone|iPad|Tablet/i.test(ua)) return "mobile";
+    return "desktop";
+  }
+
+  function currentEnvironment() {
+    return {
+      userAgent: navigator.userAgent,
+      browserFamily: detectBrowserFamily(),
+      browserVersion: detectBrowserVersion(),
+      platform: navigator.platform,
+      deviceClass: detectDeviceClass(),
+      language: navigator.language || null,
+      languages: navigator.languages ? Array.prototype.slice.call(navigator.languages) : [],
+      screen: {
+        width: window.screen && Number(window.screen.width) || null,
+        height: window.screen && Number(window.screen.height) || null,
+        availWidth: window.screen && Number(window.screen.availWidth) || null,
+        availHeight: window.screen && Number(window.screen.availHeight) || null,
+        colorDepth: window.screen && Number(window.screen.colorDepth) || null,
+        pixelDepth: window.screen && Number(window.screen.pixelDepth) || null
+      },
+      devicePixelRatio: Number(window.devicePixelRatio) || null,
+      viewport: {
+        width: Number(window.innerWidth) || null,
+        height: Number(window.innerHeight) || null
+      },
+      online: navigator.onLine,
+      hardwareConcurrency: Number(navigator.hardwareConcurrency) || null,
+      maxTouchPoints: Number(navigator.maxTouchPoints) || 0,
+      webRtcSupported: !!window.RTCPeerConnection,
+      hlsSupported: !!(window.Hls && Hls.isSupported && Hls.isSupported()),
+      p2pGlobal: !!(window.p2pml && window.p2pml.hlsjs),
+      p2pEngineExport: !!(window.p2pml && window.p2pml.hlsjs && window.p2pml.hlsjs.HlsJsP2PEngine),
+      crossOriginIsolated: !!window.crossOriginIsolated
+    };
+  }
+
+  function safeString(v) {
+    try { return String(v); } catch (e) { return "[unprintable]"; }
+  }
+
+  function cloneJson(v) {
+    try { return JSON.parse(JSON.stringify(v)); } catch (e) { return null; }
+  }
+
+  /*
+   * Pre-populate the Trackers panel with all three configured trackers at
+   * status "configured" before any event has fired - v11 CHANGE 4(d). Without
+   * this, a tracker that is silently healthy and one that was never reached
+   * at all looked identical (both simply absent from the panel).
+   */
+  function initialTrackerState() {
+    var trackers = {};
+    TRACKER_HINTS.forEach(function (url) {
+      trackers[url] = {
+        status: "configured",
+        lastEvent: null,
+        lastEventAt: null,
+        infoHashes: [],
+        uniquePeerIds: [],
+        peerEvents: 0
+      };
+    });
+    return trackers;
+  }
+
+  var R = {
+    test: {
+      name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
+      version: "12.0",
+      startedAt: null,
+      elapsedMs: 0,
+      authorship: "William von Meister (Project Owner) + Claude Sonnet 5 (Anthropic, v11 and v12) " +
+        "+ GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
+    },
+
+    identity: {
+      browserInstanceId: getBrowserInstanceId(),
+      runId: uuid(),
+      deviceLabel: deviceLabelInput.value.trim(),
+      browserIdentityPersistence: browserIdentityPersistence(),
+      actualP2PIdentity: {
+        peerId: null,
+        source: null,
+        verified: false,
+        note: "No separate HiveStream peer ID is generated. Read directly " +
+          "from hlsInstance.p2pEngine.core.peerId (source-verified plain " +
+          "property, see v11 CHANGE 4(a)), with a generic recursive-walk " +
+          "fallback carried over from v9.1 if that direct read is ever empty."
+      }
+    },
+
+    environment: currentEnvironment(),
+
+    dependencies: {
+      hlsJs: HLS_VERSION,
+      p2pMediaLoaderHlsJs: P2PML_VERSION
+    },
+
+    configuration: {
+      streamUrl: DEFAULT_STREAM,
+      swarmMode: "natural",
+      customSwarmId: null,
+      variantMode: "480",
+      targetVariant: CONTROLLED,
+      transportMode: null,
+      announceTrackers: TRACKER_HINTS.slice()
+    },
+
+    instrumentation: {
+      engineEventBindings: [],
+      receivedP2PEvents: {},
+      engineSurface: null,
+      coreSurface: null,
+      peerIdDiscoveryAttempts: 0,
+      peerIdDiscoverySuccesses: 0,
+      peerIdDiscoveryMethod: null
+    },
+
+    scheduler: {
+      transportMode: null,
+      requestedStreamConfig: null,
+      observedCoreConfig: null,
+      actualConfigSource: null,
+      webrtcConnectionBudget: cloneJson(WEBRTC_CONNECTION_BUDGET_LIBRARY_DEFAULTS),
+      stallRescue: {
+        enabled: false,
+        timeoutMs: null,
+        armedAt: null,
+        triggeredAt: null,
+        triggeredElapsedMs: null,
+        reason: null,
+        action: null
+      },
+      events: [],
+      counts: {
+        segmentStartP2P: 0,
+        segmentStartHTTP: 0,
+        segmentLoadedP2P: 0,
+        segmentLoadedHTTP: 0,
+        segmentAbort: 0,
+        segmentError: 0
+      }
+    },
+
+    hlsConfig: {
+      requested: cloneJson(HLS_JS_OVERRIDES)
+    },
+
+    playerRecovery: {
+      levelDriftCorrections: [],
+      fatalErrorRecoveries: []
+    },
+
+    manifest: {
+      url: "",
+      loaded: false,
+      renditions: [],
+      activeLevelIndex: null,
+      duration: null
+    },
+
+    selectedVariant: {
+      found: false,
+      levelIndex: null,
+      properties: null,
+      reason: null
+    },
+
+    swarm: {
+      resolvedSwarmId: null,
+      controlledInfoHash: null,
+      /* v12 CHANGE 3: last-seen codecs string for the locked controlled
+         variant, used to detect a codec mismatch across registrations
+         (see the onStreamAdded handler). null until first observed. */
+      controlledCodecs: null,
+      streams: []
+    },
+
+    trackers: initialTrackerState(),
+
+    peers: {},
+
+    transfer: {
+      bytes: {
+        http: 0,
+        p2pDown: 0,
+        p2pUp: 0
+      },
+      segments: []
+    },
+
+    webrtc: {
+      browserProtocol: {
+        currentRunOnly: true,
+        totalCaptured: 0,
+        currentRunCaptured: 0,
+        records: []
+      },
+      peerConnections: [],
+      ice: {
+        host: 0,
+        srflx: 0,
+        relay: 0,
+        prflx: 0,
+        other: 0
+      },
+      candidateRecords: [],
+      candidatePairRecords: [],
+      stateHistory: [],
+      dataChannels: []
+    },
+
+    connectivity: {
+      offerCreated: false,
+      answerCreated: false,
+      localDescriptionSet: false,
+      remoteDescriptionSet: false,
+      iceGatheringCompleted: false,
+      iceConnectionChecking: false,
+      iceConnectionConnected: false,
+      dataChannelCreated: false,
+      dataChannelOpened: false,
+      trackerPeerDiscovered: false,
+      localPeerIdKnown: false,
+      remotePeerKnown: false,
+      iceCandidatesGathered: false,
+      candidatePairSucceeded: false,
+      /* v12 CHANGE 4: v11 declared dataChannelOpened twice in this object
+         literal (harmless - same value, second silently wins - but a
+         copy-paste artifact inconsistent with resetRun()'s own copy of
+         this object, which only declared it once). Duplicate removed. */
+      p2pPeerConnected: false,
+      p2pBytesReceived: 0
+    },
+
+    verdict: {
+      streamIdentityObserved: false,
+      controlledVariantFound: false,
+      peerConnected: false,
+      p2pChunkBytesReceived: false,
+      p2pSegmentLoaded: false,
+      p2pSegmentMatchedSelectedVariant: false,
+      proof: false
+    },
+
+    events: []
+  };
+
+  /*
+   * v12 CHANGE 5 (source-review item #11): R.events (above) and the per-PC
+   * event buffer were already bounded in v11 - candidateRecords,
+   * candidatePairRecords, scheduler.events, and transfer.segments were not,
+   * and could grow without limit across a long run. Shared helper applying
+   * the same retain-most-recent-N pattern already used above, at a 2000-
+   * entry cap - comfortably above anything any run in this project's
+   * history has produced, so no evidence is lost for any realistic run;
+   * it only prevents unbounded memory growth on a very long one.
+   */
+  var V12_ARRAY_CAP = 2000;
+  function boundedPush(arr, item) {
+    arr.push(item);
+    if (arr.length > V12_ARRAY_CAP) arr.shift();
+    return item;
+  }
+
+  function log(type, data) {
+    var entry = {
+      at: now(),
+      elapsedMs: Math.round(mono() - (R._monoStart || mono())),
+      type: type,
+      data: data || null
+    };
+    R.events.push(entry);
+    if (R.events.length > 1500) R.events.shift();
+    draw();
+  }
+
+  function modeValue() {
+    return swarmModeInput.value === "custom" ? "custom" : "natural";
+  }
+
+  function variantValue() {
+    return variantModeInput.value === "auto" ? "auto" : "480";
+  }
+
+  function transportModeValue() {
+    return transportModeInput.value === "p2ponly" ? "p2ponly" : "hybrid";
+  }
+
+  function stallRescueSecondsValue() {
+    var n = Number(stallRescueSecondsInput.value);
+    if (!isFinite(n) || n < 0) return 0;
+    return n;
+  }
+
+  /*
+   * v12 note: deliberately left width/height/bitrate-only, unchanged from
+   * v11 (see v12 CHANGE 3 in the header comment). Codecs are now captured
+   * separately (R.swarm.controlledCodecs, R.manifest renditions) and
+   * compared for a mismatch warning, but are NOT added as a gating
+   * condition here, to avoid any risk of regressing verdict.proof's
+   * detection behavior without a real multi-device test run to verify
+   * against.
+   */
+  function matchesControlled(props) {
+    if (!props) return false;
+    var w = Number(props.width);
+    var h = Number(props.height);
+    var br = Number(props.bitrate);
+    return w === CONTROLLED.width && h === CONTROLLED.height &&
+           br === CONTROLLED.bitrate;
+  }
+
+  function normalizeCandidateType(type) {
+    type = safeString(type || "").toLowerCase();
+    if (type === "host" || type === "srflx" || type === "relay" || type === "prflx") return type;
+    return "other";
+  }
+
+  /*
+   * ICE candidate strings have changed slightly between browser versions.
+   * Use the standards-facing RTCIceCandidate fields first and only fall back
+   * to a tolerant token parser.
+   */
+  function parseCandidate(candidate) {
+    var raw = candidate && candidate.candidate ? candidate.candidate : "";
+    var type = candidate && candidate.type ? candidate.type : null;
+    var protocol = candidate && candidate.protocol ? candidate.protocol : null;
+    var address = candidate && (candidate.address || candidate.ip) ? (candidate.address || candidate.ip) : null;
+    var port = candidate && candidate.port ? candidate.port : null;
+    var foundation = candidate && candidate.foundation ? candidate.foundation : null;
+    var component = candidate && candidate.component ? candidate.component : null;
+    var relatedAddress = candidate && candidate.relatedAddress ? candidate.relatedAddress : null;
+    var relatedPort = candidate && candidate.relatedPort ? candidate.relatedPort : null;
+
+    if (!type) {
+      var tm = /\btyp\s+([a-z0-9]+)/i.exec(raw);
+      type = tm ? tm[1].toLowerCase() : "other";
+    }
+
+    if (!protocol) {
+      var pm = /^(?:candidate:)?[^ ]+\s+\d+\s+(udp|tcp)\s+/i.exec(raw);
+      protocol = pm ? pm[1].toLowerCase() : null;
+    }
+
+    if (!foundation) {
+      var fm = /^(?:candidate:)?([^ ]+)/i.exec(raw);
+      foundation = fm ? fm[1] : null;
+    }
+
+    var family = "unknown";
+    var a = address || "";
+    if (a.indexOf(":") >= 0) family = "IPv6";
+    else if (/^\d+(?:\.\d+){3}$/.test(a)) family = "IPv4";
+
+    return {
+      raw: raw || null,
+      type: normalizeCandidateType(type),
+      protocol: protocol ? safeString(protocol).toLowerCase() : null,
+      address: address || null,
+      addressFamily: family,
+      port: port != null ? Number(port) : null,
+      foundation: foundation || null,
+      component: component != null ? Number(component) : null,
+      relatedAddress: relatedAddress || null,
+      relatedPort: relatedPort != null ? Number(relatedPort) : null,
+      sdpMid: candidate && candidate.sdpMid != null ? candidate.sdpMid : null,
+      sdpMLineIndex: candidate && candidate.sdpMLineIndex != null ? candidate.sdpMLineIndex : null
+    };
+  }
+
+  function addCandidateRecord(pcIndex, candidate, direction) {
+    var parsed = parseCandidate(candidate);
+    parsed.pcIndex = pcIndex;
+    parsed.direction = direction;
+    parsed.at = now();
+    boundedPush(R.webrtc.candidateRecords, parsed);
+
+    var t = parsed.type;
+    R.webrtc.ice[t] = (R.webrtc.ice[t] || 0) + 1;
+    R.connectivity.iceCandidatesGathered = true;
+
+    log("webrtc:icecandidate", {
+      pcIndex: pcIndex,
+      direction: direction,
+      type: parsed.type,
+      addressFamily: parsed.addressFamily,
+      protocol: parsed.protocol,
+      foundation: parsed.foundation,
+      component: parsed.component
+    });
+  }
+
+  function recordState(rec, field, value) {
+    if (!rec) return;
+    var previous = rec.states[field];
+    if (previous === value) return;
+    rec.states[field] = value;
+    var item = {
+      at: now(),
+      elapsedMs: Math.round(mono() - R._monoStart),
+      pcIndex: rec.index,
+      state: field,
+      value: value
+    };
+    rec.stateHistory.push(item);
+    R.webrtc.stateHistory.push(item);
+    log("webrtc:state", item);
+  }
+
+  function attachDataChannel(rec, channel) {
+    if (!channel) return;
+
+    var d = {
+      pcIndex: rec.index,
+      label: channel.label || null,
+      id: channel.id != null ? channel.id : null,
+      ordered: channel.ordered != null ? channel.ordered : null,
+      protocol: channel.protocol || null,
+      state: channel.readyState || null,
+      createdAt: now(),
+      openedAt: null,
+      closedAt: null,
+      messages: 0
+    };
+
+    R.webrtc.dataChannels.push(d);
+    rec.dataChannels.push(d);
+
+    function syncState(eventName) {
+      d.state = channel.readyState || null;
+      if (eventName === "open") {
+        d.openedAt = now();
+        R.connectivity.dataChannelOpened = true;
+      }
+      if (eventName === "close") d.closedAt = now();
+      recordState(rec, "datachannel:" + eventName, d.state);
+      log("webrtc:datachannel", {
+        pcIndex: rec.index,
+        event: eventName,
+        label: d.label,
+        state: d.state
+      });
+    }
+
+    try {
+      channel.addEventListener("open", function () { syncState("open"); });
+      channel.addEventListener("close", function () { syncState("close"); });
+      channel.addEventListener("error", function () { syncState("error"); });
+      channel.addEventListener("message", function () {
+        d.messages += 1;
+        log("webrtc:datachannel-message", {
+          pcIndex: rec.index,
+          label: d.label,
+          count: d.messages
+        });
+      });
+    } catch (e) {
+      log("webrtc:datachannel-listener-error", { message: safeString(e) });
+    }
+  }
+
+  function attachPC(pc, index) {
+    if (!pc || !pc.addEventListener) return null;
+
+    var rec = {
+      index: index,
+      createdAt: now(),
+      states: {
+        signaling: pc.signalingState,
+        iceGathering: pc.iceGatheringState,
+        ice: pc.iceConnectionState,
+        connection: pc.connectionState
+      },
+      candidateTypes: {},
+      localCandidates: [],
+      remoteCandidates: [],
+      selectedPair: null,
+      candidatePairHistory: [],
+      stateHistory: [],
+      dataChannels: [],
+      iceCandidateErrors: []
+    };
+
+    R.webrtc.peerConnections.push(rec);
+
+    ["signalingstatechange", "icegatheringstatechange", "iceconnectionstatechange", "connectionstatechange"].forEach(function (eventName) {
+      pc.addEventListener(eventName, function () {
+        var field =
+          eventName === "signalingstatechange" ? "signaling" :
+          eventName === "icegatheringstatechange" ? "iceGathering" :
+          eventName === "iceconnectionstatechange" ? "ice" :
+          "connection";
+
+        recordState(rec, field, pc[
+          field === "signaling" ? "signalingState" :
+          field === "iceGathering" ? "iceGatheringState" :
+          field === "ice" ? "iceConnectionState" :
+          "connectionState"
+        ]);
+      });
+    });
+
+    pc.addEventListener("icecandidate", function (e) {
+      if (!e || !e.candidate) return;
+      addCandidateRecord(index, e.candidate, "local");
+      rec.localCandidates.push(parseCandidate(e.candidate));
+    });
+
+    pc.addEventListener("icecandidateerror", function (e) {
+      var err = {
+        at: now(),
+        pcIndex: index,
+        address: e && e.address ? e.address : null,
+        port: e && e.port ? e.port : null,
+        url: e && e.url ? e.url : null,
+        errorCode: e && e.errorCode ? e.errorCode : null,
+        errorText: e && e.errorText ? e.errorText : null
+      };
+      rec.iceCandidateErrors.push(err);
+      log("webrtc:icecandidateerror", err);
+    });
+
+    pc.addEventListener("datachannel", function (e) {
+      attachDataChannel(rec, e.channel);
+    });
+
+    log("webrtc:pc-created", {
+      pcIndex: index,
+      signaling: pc.signalingState,
+      iceGathering: pc.iceGatheringState,
+      ice: pc.iceConnectionState,
+      connection: pc.connectionState
+    });
+
+    return rec;
+  }
+
+  function statObject(report, id) {
+    if (!id || !report) return null;
+    return report.get(id) || null;
+  }
+
+  function summarizeCandidateStat(c) {
+    if (!c) return null;
+    var address = c.address || c.ip || null;
+    var family = "unknown";
+    if (address && address.indexOf(":") >= 0) family = "IPv6";
+    else if (address && /^\d+(?:\.\d+){3}$/.test(address)) family = "IPv4";
+
+    return {
+      id: c.id || null,
+      candidateType: normalizeCandidateType(c.candidateType),
+      protocol: c.protocol || null,
+      address: address,
+      addressFamily: family,
+      port: c.port != null ? c.port : null,
+      foundation: c.foundation || null,
+      relayProtocol: c.relayProtocol || null,
+      relatedAddress: c.relatedAddress || null,
+      relatedPort: c.relatedPort != null ? c.relatedPort : null
+    };
+  }
+
+  function pollStats() {
+    /* v11 snapshots the browser negotiation trace before getStats(). */
+    syncV11BrowserProtocol();
+    R.instrumentation.peerIdDiscoveryAttempts += 1;
+    discoverActualPeerId();
+
+    var pcs = (window.__HS_V11_PEER_CONNECTIONS || []).filter(function(p){
+      return p && p.__hsV11 && p.__hsV11.runId === R.identity.runId;
+    });
+
+    pcs.forEach(function (pc, i) {
+      var rec = R.webrtc.peerConnections[i];
+      if (!pc || !rec || !pc.getStats) return;
+
+      pc.getStats().then(function (report) {
+        var pairHits = [];
+
+        var selectedPairId = null;
+        var transportHit = null;
+
+        report.forEach(function (s) {
+          if (s.type === "transport" && s.selectedCandidatePairId) {
+            selectedPairId = s.selectedCandidatePairId;
+            transportHit = s;
+          }
+        });
+
+        report.forEach(function (s) {
+          if (s.type === "candidate-pair") {
+            /*
+             * Standards-first selection:
+             * transport.selectedCandidatePairId identifies the selected pair.
+             * Firefox's candidate-pair.selected is retained only as fallback.
+             */
+            if (selectedPairId && s.id === selectedPairId) {
+              pairHits.push(s);
+            } else if (!selectedPairId && s.state === "succeeded" && (s.selected || s.nominated)) {
+              pairHits.push(s);
+            }
+          }
+        });
+
+        var browserRec = pcs[i] && pcs[i].__hsV11;
+        if (browserRec) {
+          browserRec.stats.lastAt = now();
+          browserRec.stats.selectedCandidatePairId = selectedPairId;
+          browserRec.stats.selectedCandidatePair = null;
+          browserRec.stats.transport = transportHit ? {
+            id:transportHit.id || null,
+            selectedCandidatePairId:transportHit.selectedCandidatePairId || null,
+            bytesSent:transportHit.bytesSent == null ? null : transportHit.bytesSent,
+            bytesReceived:transportHit.bytesReceived == null ? null : transportHit.bytesReceived,
+            packetsSent:transportHit.packetsSent == null ? null : transportHit.packetsSent,
+            packetsReceived:transportHit.packetsReceived == null ? null : transportHit.packetsReceived,
+            dtlsState:transportHit.dtlsState || null,
+            dtlsCipher:transportHit.dtlsCipher || null,
+            tlsVersion:transportHit.tlsVersion || null
+          } : null;
+          browserRec.stats.peerConnection = null;
+          browserRec.stats.candidatePairs = [];
+        }
+
+        pairHits.forEach(function (pair) {
+          var local = statObject(report, pair.localCandidateId);
+          var remote = statObject(report, pair.remoteCandidateId);
+
+          var browserRec = pcs[i] && pcs[i].__hsV11;
+          var summary = {
+            at: now(),
+            pcIndex: i,
+            pairId: pair.id || null,
+            state: pair.state || null,
+            nominated: !!pair.nominated,
+            selected: !!pair.selected,
+            bytesSent: pair.bytesSent != null ? pair.bytesSent : null,
+            bytesReceived: pair.bytesReceived != null ? pair.bytesReceived : null,
+            packetsSent: pair.packetsSent != null ? pair.packetsSent : null,
+            packetsReceived: pair.packetsReceived != null ? pair.packetsReceived : null,
+            currentRoundTripTime: pair.currentRoundTripTime != null ? pair.currentRoundTripTime : null,
+            local: summarizeCandidateStat(local),
+            remote: summarizeCandidateStat(remote)
+          };
+
+          rec.selectedPair = summary;
+          rec.candidatePairHistory.push(summary);
+          boundedPush(R.webrtc.candidatePairRecords, summary);
+          if (browserRec) {
+            browserRec.stats.candidatePairs.push(summary);
+            browserRec.stats.selectedCandidatePair = summary;
+          }
+          R.connectivity.candidatePairSucceeded = true;
+
+          log("webrtc:candidate-pair-succeeded", {
+            pcIndex: i,
+            local: summary.local,
+            remote: summary.remote,
+            rtt: summary.currentRoundTripTime
+          });
+        });
+
+        report.forEach(function (s) {
+          if (s.type !== "remote-candidate") return;
+          var key = "remote:" + i + ":" + (s.id || "");
+          if (R._seenRemoteCandidateStats[key]) return;
+          R._seenRemoteCandidateStats[key] = true;
+
+          var remoteSummary = summarizeCandidateStat(s);
+          remoteSummary.at = now();
+          remoteSummary.pcIndex = i;
+          remoteSummary.direction = "remote";
+          boundedPush(R.webrtc.candidateRecords, remoteSummary);
+          rec.remoteCandidates.push(remoteSummary);
+
+          log("webrtc:remote-candidate-observed", {
+            pcIndex: i,
+            type: remoteSummary.candidateType,
+            addressFamily: remoteSummary.addressFamily,
+            protocol: remoteSummary.protocol
+          });
+        });
+      }).catch(function (e) {
+        log("webrtc:getstats-error", { pcIndex: i, message: safeString(e) });
+      });
+    });
+  }
+
+  R._seenRemoteCandidateStats = {};
+
+  /*
+   * v11 CHANGE 4(a): direct peer-ID lookup first, generic recursive-walk
+   * fallback second. See the header comment for the source citation
+   * (core.ts "private readonly peerId", engine.ts "private readonly core"
+   * both compile to ordinary properties under TypeScript's `private`).
+   */
+  function discoverActualPeerId() {
+    var direct = (hlsInstance && hlsInstance.p2pEngine && hlsInstance.p2pEngine.core)
+      ? hlsInstance.p2pEngine.core.peerId
+      : null;
+
+    if (typeof direct === "string" && direct.length > 0) {
+      var wasKnownDirect = !!R.identity.actualP2PIdentity.peerId;
+      R.identity.actualP2PIdentity = {
+        peerId: direct,
+        source: "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        verified: true
+      };
+      R.connectivity.localPeerIdKnown = true;
+      R.instrumentation.peerIdDiscoveryMethod = "direct";
+      if (!wasKnownDirect) R.instrumentation.peerIdDiscoverySuccesses += 1;
+      log("identity:actual-p2p-peer-id-observed", R.identity.actualP2PIdentity);
+      return;
+    }
+
+    /*
+     * Fallback: v9.1's generic recursive object walk, kept in case a future
+     * library version renames or relocates the peerId property. Only a
+     * string matching the WebTorrent client-ID shape (-PMxxxx-...) reached
+     * through a small set of runtime objects is ever recorded - this
+     * function never creates or assigns such an ID itself.
+     */
+    var roots = [
+      { name: "hlsInstance", value: hlsInstance },
+      { name: "hlsInstance.p2pEngine", value: hlsInstance && hlsInstance.p2pEngine },
+      { name: "hlsInstance.p2p", value: hlsInstance && hlsInstance.p2p },
+      { name: "hlsInstance.core", value: hlsInstance && hlsInstance.core }
+    ];
+
+    var seen = [];
+    var found = null;
+
+    function already(v) {
+      return seen.indexOf(v) >= 0;
+    }
+
+    function walk(value, path, depth) {
+      if (found || depth > 4 || value == null) return;
+
+      var kind = typeof value;
+      if (kind === "string") {
+        if (/^-PM\d{4}-[A-Za-z0-9]{8,}$/.test(value)) {
+          found = { peerId: value, source: path, verified: true };
+        }
+        return;
+      }
+
+      if (kind !== "object" && kind !== "function") return;
+      if (already(value)) return;
+      seen.push(value);
+
+      var keys = [];
+      try { keys = Object.keys(value); } catch (e) { return; }
+
+      keys.slice(0, 80).forEach(function (key) {
+        if (found) return;
+        var child;
+        try { child = value[key]; } catch (e) { return; }
+        walk(child, path + "." + key, depth + 1);
+      });
+    }
+
+    roots.forEach(function (root) {
+      if (!found) walk(root.value, root.name, 0);
+    });
+
+    if (found) {
+      var wasKnownWalk = !!R.identity.actualP2PIdentity.peerId;
+      R.identity.actualP2PIdentity = found;
+      R.connectivity.localPeerIdKnown = true;
+      R.instrumentation.peerIdDiscoveryMethod = "recursive-walk-fallback";
+      if (!wasKnownWalk) R.instrumentation.peerIdDiscoverySuccesses += 1;
+      log("identity:actual-p2p-peer-id-observed", found);
+    }
+  }
+
+  function touchTracker(url, infoHash) {
+    if (!url) return null;
+
+    var rec = R.trackers[url] || (R.trackers[url] = {
+      status: "idle",
+      lastEvent: null,
+      lastEventAt: null,
+      infoHashes: [],
+      uniquePeerIds: [],
+      peerEvents: 0
+    });
+
+    if (infoHash && rec.infoHashes.indexOf(infoHash) < 0) {
+      rec.infoHashes.push(infoHash);
+    }
+
+    return rec;
+  }
+
+  function notePeer(d, event, note) {
+    var id = d && d.peerId;
+    if (!id) return;
+
+    var isNewPeer = !R.peers[id];
+    var rec = R.peers[id] || (R.peers[id] = {
+      peerId: id,
+      trackerUrl: d.trackerUrl || null,
+      infoHash: d.infoHash || null,
+      connected: false,
+      firstSeen: now(),
+      firstSeenMono: mono(),
+      lastEvent: null,
+      lastEventAt: null,
+      eventCount: 0,
+      history: []
+    });
+
+    rec.lastEvent = event;
+    rec.lastEventAt = now();
+    rec.eventCount += 1;
+    rec.history.push({
+      at: rec.lastEventAt,
+      // How long after this peer was first seen did this event happen -
+      // lets a connect-error be checked directly against
+      // scheduler.webrtcConnectionBudget instead of only knowing it failed.
+      elapsedSinceFirstSeenMs: Math.round(mono() - rec.firstSeenMono),
+      event: event,
+      trackerUrl: d.trackerUrl || null,
+      infoHash: d.infoHash || null,
+      detail: note ? safeString(note) : null
+    });
+
+    if (d.trackerUrl) rec.trackerUrl = d.trackerUrl;
+    if (d.infoHash) rec.infoHash = d.infoHash;
+
+    if (event === "connected") {
+      rec.connected = true;
+      R.verdict.peerConnected = true;
+      R.connectivity.p2pPeerConnected = true;
+    }
+
+    if (event === "closed") rec.connected = false;
+
+    var trec = touchTracker(d.trackerUrl, d.infoHash);
+    if (trec) {
+      trec.peerEvents += 1;
+      if (trec.uniquePeerIds.indexOf(id) < 0) {
+        trec.uniquePeerIds.push(id);
+      }
+      trec.lastEventAt = now();
+      trec.status = "peer-seen";
+      trec.lastEvent = "peer-seen";
+    }
+
+    R.connectivity.trackerPeerDiscovered = true;
+    R.connectivity.remotePeerKnown = true;
+
+    log("peer:" + event, {
+      peerId: id,
+      isNewPeer: isNewPeer,
+      trackerUrl: d.trackerUrl || null,
+      infoHash: d.infoHash || null,
+      elapsedSinceFirstSeenMs: rec.history[rec.history.length - 1].elapsedSinceFirstSeenMs,
+      detail: note ? safeString(note) : null
+    });
+  }
+
+  function publicSurface(value, label) {
+    if (!value) return null;
+
+    var result = {
+      label: label,
+      constructor: null,
+      ownKeys: [],
+      functionKeys: []
+    };
+
+    try {
+      result.constructor = value.constructor && value.constructor.name
+        ? value.constructor.name
+        : null;
+    } catch (e) {}
+
+    try {
+      result.ownKeys = Object.keys(value).slice(0, 120);
+      result.functionKeys = result.ownKeys.filter(function (key) {
+        try { return typeof value[key] === "function"; } catch (e) { return false; }
+      });
+    } catch (e) {
+      result.ownKeys = [];
+      result.functionKeys = [];
+    }
+
+    return result;
+  }
+
+  function summarizeEventArguments(args) {
+    return Array.prototype.slice.call(args || []).map(function (arg, index) {
+      var type = typeof arg;
+
+      if (arg === null) {
+        return { index: index, type: "null" };
+      }
+
+      if (type !== "object" && type !== "function") {
+        return {
+          index: index,
+          type: type,
+          value: type === "string" ? safeString(arg).slice(0, 160) : arg
+        };
+      }
+
+      var keys = [];
+      try { keys = Object.keys(arg).slice(0, 60); } catch (e) {}
+
+      return {
+        index: index,
+        type: type,
+        constructor: arg && arg.constructor && arg.constructor.name
+          ? arg.constructor.name
+          : null,
+        keys: keys
+      };
+    });
+  }
+
+  function recordReceivedP2PEvent(name, args) {
+    var count = (R.instrumentation.receivedP2PEvents[name] || 0) + 1;
+    R.instrumentation.receivedP2PEvents[name] = count;
+
+    log("p2p:event-received", {
+      event: name,
+      count: count,
+      arguments: summarizeEventArguments(args)
+    });
+  }
+
+  function recordEventBinding(name, success, errorMessage) {
+    R.instrumentation.engineEventBindings.push({
+      event: name,
+      registered: !!success,
+      error: errorMessage || null,
+      at: now()
+    });
+  }
+
+  function wireCoreEvents() {
+    if (!hlsInstance || !hlsInstance.p2pEngine) {
+      log("fatal:p2p-engine-missing");
+      return;
+    }
+
+    var engine = hlsInstance.p2pEngine;
+
+    R.instrumentation.engineSurface = publicSurface(engine, "hlsInstance.p2pEngine");
+    R.instrumentation.coreSurface = publicSurface(engine.core, "hlsInstance.p2pEngine.core");
+
+    log("p2p:runtime-surface", {
+      engine: R.instrumentation.engineSurface,
+      core: R.instrumentation.coreSurface
+    });
+
+    try {
+      var coreForConfig = engine.core || (hlsInstance.p2pEngine && hlsInstance.p2pEngine.core);
+      if (coreForConfig && typeof coreForConfig.getConfig === "function") {
+        var observedConfig = coreForConfig.getConfig();
+        R.scheduler.observedCoreConfig = cloneJson(observedConfig);
+        R.scheduler.actualConfigSource = "p2pEngine.core.getConfig()";
+        log("scheduler:core-config-observed", {
+          mainStream: observedConfig && observedConfig.mainStream
+            ? cloneJson(observedConfig.mainStream)
+            : null,
+          secondaryStream: observedConfig && observedConfig.secondaryStream
+            ? cloneJson(observedConfig.secondaryStream)
+            : null
+        });
+      } else {
+        R.scheduler.actualConfigSource = "core.getConfig() unavailable";
+        log("scheduler:core-config-unavailable");
+      }
+    } catch (e) {
+      R.scheduler.actualConfigSource = "core.getConfig() threw";
+      log("scheduler:core-config-error", { message: safeString(e) });
+    }
+
+    function on(name, fn) {
+      try {
+        engine.addEventListener(name, function () {
+          var args = Array.prototype.slice.call(arguments);
+          recordReceivedP2PEvent(name, args);
+          return fn.apply(this, args);
+        });
+        recordEventBinding(name, true);
+      } catch (e) {
+        recordEventBinding(name, false, safeString(e));
+        log("p2p:event-listener-error", {
+          event: name,
+          message: safeString(e)
+        });
+      }
+    }
+
+    on("onStreamAdded", function (s) {
+      R.swarm.resolvedSwarmId = s && s.swarmId ? s.swarmId : R.swarm.resolvedSwarmId;
+
+      var stream = {
+        streamSwarmId: s && s.streamSwarmId ? s.streamSwarmId : null,
+        swarmId: s && s.swarmId ? s.swarmId : null,
+        identityHash: s && s.identityHash ? s.identityHash : null,
+        infoHash: s && s.infoHash ? s.infoHash : null,
+        properties: cloneJson(s && s.properties)
+      };
+
+      R.swarm.streams.push(stream);
+      R.verdict.streamIdentityObserved = true;
+
+      /*
+       * v12 CHANGE 1 (bug fix): v11 ran this controlled-variant match
+       * unconditionally, regardless of variantMode. But the MANIFEST_LOADED
+       * handler below explicitly documents that in AUTO mode "automatic
+       * level selection is not used as strict proof" - so if hls.js's own
+       * ABR happened to land on exactly the controlled bitrate/resolution
+       * while running in AUTO mode, v11 would silently flip
+       * controlledVariantFound (and potentially verdict.proof) to true,
+       * contradicting its own stated intent. v12 gates this check behind
+       * the same variantValue() === "480" guard MANIFEST_LOADED already
+       * uses, so both places now agree on when a controlled match counts.
+       */
+      if (variantValue() === "480" && matchesControlled(s && s.properties)) {
+        R.swarm.controlledInfoHash = s.infoHash || null;
+        R.selectedVariant.found = true;
+        R.selectedVariant.properties = cloneJson(s.properties);
+        R.verdict.controlledVariantFound = true;
+
+        /*
+         * v12 CHANGE 3: stream-identity.ts (the real pinned library source)
+         * confirms codecs genuinely participates in the SHA-1 that becomes
+         * this stream's infoHash, alongside bitrate/width/height/etc. If a
+         * later registration for what we believe is "the same" controlled
+         * variant reports different codecs than the one we already locked
+         * onto, that is real diagnostic signal that two devices may not
+         * actually be landing in the same P2P swarm even though their
+         * width/height/bitrate match - surface it instead of staying
+         * silent (matchesControlled() itself is intentionally left
+         * width/height/bitrate-only, unchanged from v11, to avoid
+         * regressing verdict.proof's detection behavior).
+         */
+        var newCodecs = s && s.properties ? s.properties.codecs : null;
+        var priorCodecs = R.swarm.controlledCodecs;
+        if (priorCodecs != null && newCodecs != null && priorCodecs !== newCodecs) {
+          log("scheduler:codec-mismatch-observed", {
+            priorCodecs: priorCodecs,
+            newCodecs: newCodecs,
+            note: "Two stream registrations matched width/height/bitrate " +
+              "for the controlled variant but reported different codecs. " +
+              "Per stream-identity.ts, codecs feed into the infoHash, so " +
+              "these may NOT be the same P2P swarm despite matching on the " +
+              "properties this diagnostic's matchesControlled() checks."
+          });
+        }
+        if (newCodecs != null) R.swarm.controlledCodecs = newCodecs;
+      } else if (variantValue() !== "480" && matchesControlled(s && s.properties)) {
+        /* Still log that AUTO mode happened to touch the controlled
+           rendition's properties, for visibility - just don't let it
+           count toward the strict proof verdict. */
+        log("stream:added-matched-controlled-properties-in-auto-mode", {
+          note: "AUTO mode's own ABR selected a stream matching the " +
+            "controlled width/height/bitrate. Not counted toward " +
+            "verdict.controlledVariantFound per this diagnostic's AUTO-mode " +
+            "policy (see MANIFEST_LOADED's selectedVariant.reason)."
+        });
+      }
+
+      log("stream:added", stream);
+    });
+
+    on("onStreamRegistrationError", function (d) {
+      log("stream:registration-error", cloneJson(d));
+    });
+
+    on("onPeerConnect", function (d) {
+      notePeer(d, "connected");
+      correlatePeerIdToBrowserPc(d && d.peerId);
+    });
+
+    on("onPeerClose", function (d) {
+      notePeer(d, "closed");
+    });
+
+    on("onPeerError", function (d) {
+      notePeer(d, "error", d && (d.error || d.message));
+    });
+
+    on("onPeerWarning", function (d) {
+      notePeer(d, "warning", d && (d.warning || d.message));
+    });
+
+    on("onPeerConnectError", function (d) {
+      notePeer(d, "connect-error", d && (d.error || d.message));
+      correlatePeerIdToBrowserPc(d && d.peerId);
+    });
+
+    on("onTrackerError", function (d) {
+      var url = d && d.trackerUrl ? d.trackerUrl : null;
+      var t = touchTracker(url, d && d.infoHash);
+      if (t) {
+        t.status = "error";
+        t.lastEvent = "error";
+        t.lastEventAt = now();
+      }
+      log("tracker:error", cloneJson(d));
+    });
+
+    on("onTrackerWarning", function (d) {
+      var url = d && d.trackerUrl ? d.trackerUrl : null;
+      var t = touchTracker(url, d && d.infoHash);
+      if (t) {
+        t.status = "warning";
+        t.lastEvent = "warning";
+        t.lastEventAt = now();
+      }
+      log("tracker:warning", cloneJson(d));
+    });
+
+    on("onSegmentStart", function (d) {
+      var source = d && d.downloadSource ? safeString(d.downloadSource).toLowerCase() : null;
+      var item = {
+        at: now(),
+        elapsedMs: Math.round(mono() - (R._monoStart || mono())),
+        source: source,
+        peerId: d && d.peerId ? d.peerId : null,
+        infoHash: d && d.infoHash ? d.infoHash : null,
+        streamType: d && d.streamType ? d.streamType : null,
+        segment: d && d.segment ? cloneJson(d.segment) : null,
+        playbackPosition: Number(video.currentTime) || 0,
+        transportMode: R.scheduler.transportMode
+      };
+
+      boundedPush(R.scheduler.events, { type: "segment-start", detail: item });
+      if (source === "p2p") R.scheduler.counts.segmentStartP2P += 1;
+      if (source === "http") R.scheduler.counts.segmentStartHTTP += 1;
+      log("scheduler:segment-start", item);
+    });
+
+    on("onSegmentAbort", function (d) {
+      var item = {
+        at: now(),
+        source: d && d.downloadSource ? d.downloadSource : null,
+        peerId: d && d.peerId ? d.peerId : null,
+        infoHash: d && d.infoHash ? d.infoHash : null,
+        streamType: d && d.streamType ? d.streamType : null,
+        segment: d && d.segment ? cloneJson(d.segment) : null
+      };
+      boundedPush(R.scheduler.events, { type: "segment-abort", detail: item });
+      R.scheduler.counts.segmentAbort += 1;
+      log("scheduler:segment-abort", item);
+    });
+
+    on("onSegmentError", function (d) {
+      var item = {
+        at: now(),
+        source: d && d.downloadSource ? d.downloadSource : null,
+        peerId: d && d.peerId ? d.peerId : null,
+        infoHash: d && d.infoHash ? d.infoHash : null,
+        streamType: d && d.streamType ? d.streamType : null,
+        errorType: d && d.error && d.error.type ? d.error.type : null,
+        errorMessage: d && d.error && d.error.message ? d.error.message : null,
+        segment: d && d.segment ? cloneJson(d.segment) : null
+      };
+      boundedPush(R.scheduler.events, { type: "segment-error", detail: item });
+      R.scheduler.counts.segmentError += 1;
+      log("scheduler:segment-error", item);
+    });
+
+    /*
+     * v3/v4 changed the high-frequency chunk events to positional arguments:
+     * onChunkDownloaded(bytesLength, downloadSource, peerId, streamType, infoHash)
+     * onChunkUploaded(bytesLength, peerId, streamType, infoHash)
+     */
+    on("onChunkDownloaded", function (bytesLength, downloadSource, peerId, streamType, infoHash) {
+      var bytes = Number(bytesLength) || 0;
+      var source = safeString(downloadSource || "").toLowerCase();
+      var isP2P = !!peerId || source === "p2p";
+
+      if (isP2P) {
+        R.transfer.bytes.p2pDown += bytes;
+        R.connectivity.p2pBytesReceived += bytes;
+        R.verdict.p2pChunkBytesReceived = R.transfer.bytes.p2pDown > 0;
+      } else {
+        R.transfer.bytes.http += bytes;
+      }
+
+      if (peerId) {
+        R.connectivity.remotePeerKnown = true;
+      }
+
+      log("transfer:chunk-downloaded", {
+        bytes: bytes,
+        downloadSource: downloadSource || null,
+        peerId: peerId || null,
+        streamType: streamType || null,
+        infoHash: infoHash || null,
+        p2p: isP2P
+      });
+    });
+
+    on("onChunkUploaded", function (bytesLength, peerId, streamType, infoHash) {
+      var bytes = Number(bytesLength) || 0;
+      R.transfer.bytes.p2pUp += bytes;
+
+      log("transfer:chunk-uploaded", {
+        bytes: bytes,
+        peerId: peerId || null,
+        streamType: streamType || null,
+        infoHash: infoHash || null
+      });
+    });
+
+    on("onSegmentLoaded", function (d) {
+      var source = d && (d.downloadSource || d.source || d.type || d.downloadType);
+      var peerId = d && d.peerId ? d.peerId : null;
+      var isP2P = safeString(source || "").toLowerCase() === "p2p" || !!peerId;
+
+      var seg = {
+        at: now(),
+        infoHash: d && d.infoHash ? d.infoHash : null,
+        source: source || null,
+        peerId: peerId,
+        segmentId: d && (d.segmentId || d.id || d.index) != null
+          ? (d.segmentId || d.id || d.index)
+          : null
+      };
+
+      boundedPush(R.transfer.segments, seg);
+
+      if (isP2P) R.scheduler.counts.segmentLoadedP2P += 1;
+      else if (safeString(source || "").toLowerCase() === "http") {
+        R.scheduler.counts.segmentLoadedHTTP += 1;
+      }
+
+      if (isP2P) {
+        R.verdict.p2pSegmentLoaded = true;
+        if (R.swarm.controlledInfoHash &&
+            seg.infoHash === R.swarm.controlledInfoHash) {
+          R.verdict.p2pSegmentMatchedSelectedVariant = true;
+        }
+      }
+
+      log("transfer:segment-loaded", {
+        source: seg.source,
+        peerId: seg.peerId,
+        infoHash: seg.infoHash,
+        controlledInfoHash: R.swarm.controlledInfoHash,
+        controlledMatch: isP2P && seg.infoHash === R.swarm.controlledInfoHash
+      });
+    });
+  }
+
+  /*
+   * v11 CHANGE 3: the stall-rescue watchdog. Only ever acts in P2P-only
+   * mode, only ever fires once per run, and only uses the library's own
+   * public, documented applyDynamicConfig API - see the header comment for
+   * the exact source citation (types.ts DynamicStreamProperties lists
+   * simultaneousHttpDownloads as safely changeable at runtime).
+   */
+  function checkStallRescue() {
+    if (!started || !hlsInstance) return;
+    if (R.scheduler.transportMode !== "p2ponly") return;
+    if (!R.scheduler.stallRescue.enabled) return;
+    if (R.scheduler.stallRescue.triggeredAt) return;
+
+    var elapsedMs = Math.round(mono() - (R._monoStart || mono()));
+    if (elapsedMs < R.scheduler.stallRescue.timeoutMs) return;
+    if (R.connectivity.p2pBytesReceived > 0) return;
+
+    R.scheduler.stallRescue.triggeredAt = now();
+    R.scheduler.stallRescue.triggeredElapsedMs = elapsedMs;
+    R.scheduler.stallRescue.reason =
+      "zero P2P bytes received after " + R.scheduler.stallRescue.timeoutMs +
+      "ms in P2P-only mode";
+
+    try {
+      if (hlsInstance.p2pEngine && typeof hlsInstance.p2pEngine.applyDynamicConfig === "function") {
+        hlsInstance.p2pEngine.applyDynamicConfig({
+          core: { simultaneousHttpDownloads: 1 }
+        });
+        R.scheduler.stallRescue.action =
+          "applyDynamicConfig({ core: { simultaneousHttpDownloads: 1 } })";
+        log("scheduler:stall-rescue-triggered", {
+          reason: R.scheduler.stallRescue.reason,
+          elapsedMs: elapsedMs,
+          action: R.scheduler.stallRescue.action
+        });
+      } else {
+        R.scheduler.stallRescue.action = "unavailable: applyDynamicConfig missing";
+        log("scheduler:stall-rescue-apply-failed", {
+          reason: "hlsInstance.p2pEngine.applyDynamicConfig is not a function"
+        });
+      }
+    } catch (e) {
+      R.scheduler.stallRescue.action = "threw: " + safeString(e);
+      log("scheduler:stall-rescue-error", { message: safeString(e) });
+    }
+  }
+
+  function buildP2PConfig() {
+    var mode = modeValue();
+    var transport = transportModeValue();
+    var transportConfig = STREAM_TRANSPORT[transport];
+    var core = {};
+
+    /*
+     * CRITICAL v6-v11 RULE:
+     * Natural mode does not set swarmId at all. The property is omitted
+     * rather than assigned null/undefined, so the library exercises its own
+     * documented default (manifest-URL-derived) swarm identity.
+     */
+    if (mode === "custom") {
+      var v = customSwarmIdInput.value.trim();
+      if (!v) {
+        alert("Custom swarm mode requires a swarm ID.");
+        return null;
+      }
+      core.swarmId = v;
+    }
+
+    core.announceTrackers = TRACKER_HINTS.slice();
+    core.httpDownloadInitialTimeoutMs = transportConfig.httpDownloadInitialTimeoutMs;
+    core.simultaneousHttpDownloads = transportConfig.simultaneousHttpDownloads;
+    core.simultaneousP2PDownloads = transportConfig.simultaneousP2PDownloads;
+    core.highDemandTimeWindow = transportConfig.highDemandTimeWindow;
+    core.httpDownloadTimeWindow = transportConfig.httpDownloadTimeWindow;
+    core.p2pDownloadTimeWindow = transportConfig.p2pDownloadTimeWindow;
+    core.isP2PDisabled = transportConfig.isP2PDisabled;
+    core.isP2PUploadDisabled = transportConfig.isP2PUploadDisabled;
+
+    return {
+      mode: mode,
+      transport: transport,
+      core: core
+    };
+  }
+
+  function attachHlsEvents() {
+    if (!hlsInstance || !hlsInstance.on || !window.Hls) return;
+
+    hlsInstance.on(Hls.Events.MANIFEST_LOADING, function (e, d) {
+      log("hls:manifest-loading", { url: d && d.url ? d.url : null });
+    });
+
+    hlsInstance.on(Hls.Events.MANIFEST_LOADED, function (e, d) {
+      R.manifest.loaded = true;
+      R.manifest.url = d && d.url ? d.url : R.configuration.streamUrl;
+      R.manifest.renditions = (d && d.levels ? d.levels : []).map(function (l, i) {
+        return {
+          index: i,
+          width: l.width || null,
+          height: l.height || null,
+          bitrate: l.bitrate || null,
+          codecs: l.codecs || null,
+          url: l.url || null
+        };
+      });
+
+      if (variantValue() === "480") {
+        var found = R.manifest.renditions.find(function (l) {
+          return matchesControlled(l);
+        });
+
+        if (found) {
+          R.selectedVariant.found = true;
+          R.selectedVariant.levelIndex = found.index;
+          R.selectedVariant.properties = cloneJson(found);
+          R.selectedVariant.reason = "Exact controlled rendition matched manifest.";
+
+          try {
+            hlsInstance.currentLevel = found.index;
+          } catch (err) {
+            log("hls:current-level-error", { message: safeString(err) });
+          }
+        } else {
+          R.selectedVariant.reason = "Controlled 848x480 / 836280 rendition was not present.";
+        }
+      } else {
+        R.selectedVariant.reason =
+          "AUTO mode retained for comparison; automatic level selection is not used as strict proof.";
+      }
+
+      log("hls:manifest-loaded", {
+        levels: R.manifest.renditions.length,
+        selectedVariant: R.selectedVariant
+      });
+    });
+
+    hlsInstance.on(Hls.Events.LEVEL_SWITCHED, function (e, d) {
+      R.manifest.activeLevelIndex = d && d.level != null ? d.level : null;
+      log("hls:level-switched", { level: R.manifest.activeLevelIndex });
+
+      /*
+       * v11 CHANGE 4(c): re-force the CONTROLLED level if hls.js's own ABR
+       * drifted away from it. Previously currentLevel was only ever set
+       * once (above, at MANIFEST_LOADED) and never re-applied - every real
+       * v8.1/v9/v9.1 run to date shows controlledVariantFound staying false
+       * for exactly this reason, even runs with genuine non-zero P2P bytes.
+       */
+      if (
+        variantValue() === "480" &&
+        R.selectedVariant.found &&
+        R.selectedVariant.levelIndex != null &&
+        R.manifest.activeLevelIndex !== R.selectedVariant.levelIndex
+      ) {
+        var correction = {
+          at: now(),
+          elapsedMs: Math.round(mono() - (R._monoStart || mono())),
+          driftedTo: R.manifest.activeLevelIndex,
+          correctedTo: R.selectedVariant.levelIndex
+        };
+        R.playerRecovery.levelDriftCorrections.push(correction);
+        log("hls:level-drift-corrected", correction);
+        try {
+          hlsInstance.currentLevel = R.selectedVariant.levelIndex;
+        } catch (err) {
+          log("hls:level-relock-error", { message: safeString(err) });
+        }
+      }
+    });
+
+    hlsInstance.on(Hls.Events.ERROR, function (e, d) {
+      log("hls:error", {
+        type: d && d.type ? d.type : null,
+        details: d && d.details ? d.details : null,
+        fatal: !!(d && d.fatal)
+      });
+
+      if (!d || !d.fatal) return;
+
+      /*
+       * v11 CHANGE 4(b): standard hls.js fatal-error recovery, previously
+       * entirely absent. Every attempt is logged with the action taken, so
+       * a run that needed recovery is visibly distinguishable from one that
+       * didn't, rather than the page just silently going dark.
+       */
+      var action = "unrecoverable";
+      try {
+        if (Hls.ErrorTypes && d.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          action = "startLoad";
+          hlsInstance.startLoad();
+        } else if (Hls.ErrorTypes && d.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          action = "recoverMediaError";
+          hlsInstance.recoverMediaError();
+        }
+      } catch (err) {
+        action = "recovery-threw: " + safeString(err);
+      }
+
+      var rec = {
+        at: now(),
+        elapsedMs: Math.round(mono() - (R._monoStart || mono())),
+        errorType: d.type || null,
+        errorDetails: d.details || null,
+        action: action
+      };
+      R.playerRecovery.fatalErrorRecoveries.push(rec);
+      log("hls:fatal-recovery-action", rec);
+    });
+  }
+
+  function createPlayer() {
+    if (!window.Hls || !Hls.isSupported()) {
+      log("fatal:hls-not-supported");
+      return false;
+    }
+
+    var cfg = buildP2PConfig();
+    if (!cfg) return false;
+
+    R.configuration.streamUrl = streamUrlInput.value.trim() || DEFAULT_STREAM;
+    R.configuration.swarmMode = cfg.mode;
+    R.configuration.customSwarmId = cfg.mode === "custom" ? cfg.core.swarmId : null;
+    R.configuration.variantMode = variantValue();
+    R.configuration.transportMode = cfg.transport;
+
+    R.scheduler.transportMode = cfg.transport;
+    R.scheduler.requestedStreamConfig = cloneJson(STREAM_TRANSPORT[cfg.transport]);
+    R.scheduler.stallRescue.enabled = cfg.transport === "p2ponly" && stallRescueSecondsValue() > 0;
+    R.scheduler.stallRescue.timeoutMs = stallRescueSecondsValue() * 1000;
+    R.scheduler.stallRescue.armedAt = R.scheduler.stallRescue.enabled ? now() : null;
+
+    var options = {
+      fragLoadingTimeOut: HLS_JS_OVERRIDES.fragLoadingTimeOut,
+      p2p: {
+        core: cfg.core,
+        onHlsJsCreated: function (h) {
+          hlsInstance = h;
+          wireCoreEvents();
+          attachHlsEvents();
+          discoverActualPeerId();
+        }
+      }
+    };
+
+    try {
+      var p2pNamespace = window.p2pml && window.p2pml.hlsjs;
+      var HlsJsP2PEngine = p2pNamespace && p2pNamespace.HlsJsP2PEngine;
+
+      if (!HlsJsP2PEngine) {
+        log("fatal:p2pml-global-missing", {
+          p2pml: !!window.p2pml,
+          hlsjs: !!p2pNamespace,
+          HlsJsP2PEngine: false,
+          availableGlobals: Object.keys(window).filter(function (k) {
+            return /p2p|hls/i.test(k);
+          }).slice(0, 40)
+        });
+        return false;
+      }
+
+      var HlsWithP2P = HlsJsP2PEngine.injectMixin(window.Hls);
+      if (typeof HlsWithP2P !== "function") {
+        log("fatal:injectMixin-invalid", {
+          returnedType: typeof HlsWithP2P
+        });
+        return false;
+      }
+
+      hlsInstance = new HlsWithP2P(options);
+
+      hlsInstance.loadSource(R.configuration.streamUrl);
+      hlsInstance.attachMedia(video);
+
+      log("player:created", {
+        loaderGlobal: "window.p2pml.hlsjs.HlsJsP2PEngine",
+        swarmMode: R.configuration.swarmMode,
+        transportMode: R.configuration.transportMode,
+        stallRescueEnabled: R.scheduler.stallRescue.enabled,
+        stallRescueTimeoutMs: R.scheduler.stallRescue.timeoutMs,
+        swarmIdPropertyPresent: Object.prototype.hasOwnProperty.call(cfg.core, "swarmId"),
+        streamUrl: R.configuration.streamUrl
+      });
+
+      return true;
+    } catch (e) {
+      log("fatal:player-create-error", { message: safeString(e), stack: e && e.stack ? e.stack : null });
+      return false;
+    }
+  }
+
+  function stopPlayer() {
+    if (!hlsInstance) return;
+
+    hlsDestroying = true;
+    try {
+      if (typeof hlsInstance.destroy === "function") hlsInstance.destroy();
+    } catch (e) {
+      log("player:destroy-error", { message: safeString(e) });
+    }
+    hlsInstance = null;
+    hlsDestroying = false;
+
+    try {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    } catch (e) {}
+  }
+
+  function resetRun() {
+    stopPlayer();
+
+    var keepId = R.identity.browserInstanceId;
+    R = {
+      test: {
+        name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
+        version: "12.0",
+        startedAt: now(),
+        elapsedMs: 0,
+        authorship: "William von Meister (Project Owner) + Claude Sonnet 5 (Anthropic, v11 and v12) " +
+          "+ GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
+      },
+      identity: {
+        browserInstanceId: keepId,
+        deviceLabel: deviceLabelInput.value.trim(),
+        browserIdentityPersistence: browserIdentityPersistence(),
+        runId: uuid(),
+        actualP2PIdentity: {
+          peerId: null,
+          source: null,
+          verified: false,
+          note: "No separate HiveStream peer ID is generated. Read directly " +
+            "from hlsInstance.p2pEngine.core.peerId, with a generic " +
+            "recursive-walk fallback carried over from v9.1."
+        }
+      },
+      environment: currentEnvironment(),
+      dependencies: {
+        hlsJs: HLS_VERSION,
+        p2pMediaLoaderHlsJs: P2PML_VERSION
+      },
+      configuration: {
+        streamUrl: streamUrlInput.value.trim() || DEFAULT_STREAM,
+        swarmMode: modeValue(),
+        customSwarmId: modeValue() === "custom" ? customSwarmIdInput.value.trim() : null,
+        variantMode: variantValue(),
+        targetVariant: CONTROLLED,
+        transportMode: transportModeValue(),
+        announceTrackers: TRACKER_HINTS.slice()
+      },
+      instrumentation: {
+        engineEventBindings: [],
+        receivedP2PEvents: {},
+        engineSurface: null,
+        coreSurface: null,
+        peerIdDiscoveryAttempts: 0,
+        peerIdDiscoverySuccesses: 0,
+        peerIdDiscoveryMethod: null
+      },
+      scheduler: {
+        transportMode: null,
+        requestedStreamConfig: null,
+        observedCoreConfig: null,
+        actualConfigSource: null,
+        webrtcConnectionBudget: cloneJson(WEBRTC_CONNECTION_BUDGET_LIBRARY_DEFAULTS),
+        stallRescue: {
+          enabled: false,
+          timeoutMs: null,
+          armedAt: null,
+          triggeredAt: null,
+          triggeredElapsedMs: null,
+          reason: null,
+          action: null
+        },
+        events: [],
+        counts: {
+          segmentStartP2P: 0,
+          segmentStartHTTP: 0,
+          segmentLoadedP2P: 0,
+          segmentLoadedHTTP: 0,
+          segmentAbort: 0,
+          segmentError: 0
+        }
+      },
+      hlsConfig: {
+        requested: cloneJson(HLS_JS_OVERRIDES)
+      },
+      playerRecovery: {
+        levelDriftCorrections: [],
+        fatalErrorRecoveries: []
+      },
+      manifest: {
+        url: "",
+        loaded: false,
+        renditions: [],
+        activeLevelIndex: null,
+        duration: null
+      },
+      selectedVariant: {
+        found: false,
+        levelIndex: null,
+        properties: null,
+        reason: null
+      },
+      swarm: {
+        resolvedSwarmId: null,
+        controlledInfoHash: null,
+        controlledCodecs: null,
+        streams: []
+      },
+      trackers: initialTrackerState(),
+      peers: {},
+      transfer: {
+        bytes: { http: 0, p2pDown: 0, p2pUp: 0 },
+        segments: []
+      },
+      webrtc: {
+        peerConnections: [],
+        ice: { host: 0, srflx: 0, relay: 0, prflx: 0, other: 0 },
+        candidateRecords: [],
+        candidatePairRecords: [],
+        stateHistory: [],
+        dataChannels: []
+      },
+      connectivity: {
+        trackerPeerDiscovered: false,
+        localPeerIdKnown: false,
+        remotePeerKnown: false,
+        iceCandidatesGathered: false,
+        candidatePairSucceeded: false,
+        dataChannelOpened: false,
+        p2pPeerConnected: false,
+        p2pBytesReceived: 0
+      },
+      verdict: {
+        streamIdentityObserved: false,
+        controlledVariantFound: false,
+        peerConnected: false,
+        p2pChunkBytesReceived: false,
+        p2pSegmentLoaded: false,
+        p2pSegmentMatchedSelectedVariant: false,
+        proof: false
+      },
+      events: []
+    };
+
+    R._monoStart = mono();
+    R._seenRemoteCandidateStats = {};
+
+    /* v11: every RTCPeerConnection created after this point is tagged with
+       the current diagnostic runId before p2p-media-loader creates it. */
+    window.__HS_V11_ACTIVE_RUN_ID = R.identity.runId;
+  }
+
+
+  /*
+   * v11 run-scoped browser protocol synchronization.
+   * The capture lives outside the diagnostic IIFE because the browser API
+   * wrapper must be installed before p2p-media-loader is constructed.
+   * R is reset between runs, so this function projects only the current run.
+   */
+  function syncV11BrowserProtocol() {
+    var all = window.__HS_V11_PEER_CONNECTIONS || [];
+    var runId = R.identity && R.identity.runId;
+    var selected = all.filter(function(pc){
+      return pc && pc.__hsV11 && pc.__hsV11.runId === runId;
+    });
+
+    R.webrtc.browserProtocol.totalCaptured = all.length;
+    R.webrtc.browserProtocol.currentRunCaptured = selected.length;
+
+    /*
+     * The v10 compact peerConnections array remains as a report-compatible
+     * view, but v11 is now its authoritative source. We do not attach a
+     * second set of event listeners here; the browser-level wrapper already
+     * captured those events exactly once.
+     */
+    R.webrtc.peerConnections = selected.map(function(pc, index){
+      var p = pc.__hsV11;
+      var local = (p.ice.candidates || []).filter(function(c){ return c; });
+      var candidateTypes = {};
+      local.forEach(function(c){
+        var t = c.candidateType || "other";
+        candidateTypes[t] = (candidateTypes[t] || 0) + 1;
+      });
+
+      return {
+        index: index,
+        pcId: p.pcId,
+        peerId: p.peerId || p.remotePeerId || null,
+        createdAt: p.createdAt,
+        states: {
+          signaling: p.signaling.state,
+          iceGathering: p.ice.gatheringState,
+          ice: p.ice.connectionState,
+          connection: p.connection.state
+        },
+        candidateTypes: candidateTypes,
+        localCandidates: local,
+        remoteCandidates: [],
+        selectedPair: p.stats.selectedCandidatePair,
+        candidatePairHistory: p.stats.candidatePairs || [],
+        stateHistory: p.ice.stateHistory || [],
+        dataChannels: p.dataChannels.map(function(d){
+          return {
+            label:d.label,id:d.id,ordered:d.ordered,protocol:d.protocol,
+            readyStateAtBind:d.readyStateAtBind,openAt:d.openAt,
+            closeAt:d.closeAt,errorCount:d.errorCount,messageCount:d.messageCount
+          };
+        }),
+        iceCandidateErrors: p.ice.candidateErrors || []
+      };
+    });
+
+    R.webrtc.candidateRecords = [];
+    /* v12 CHANGE 5 note: this array is fully rebuilt from each open PC's
+       own (inherently small, self-limiting - a real ICE gathering pass
+       produces roughly single digits to a few dozen candidates) candidate
+       list every sync cycle, not accumulated indefinitely, so it does not
+       need the same 2000-entry cap applied to scheduler.events and
+       transfer.segments below - the real growth risk there was accumulating
+       records for every scheduled/transferred segment across an entire
+       long run, which this rebuild-from-bounded-source pattern doesn't share. */
+    R.webrtc.ice.host = 0;
+    R.webrtc.ice.srflx = 0;
+    R.webrtc.ice.relay = 0;
+    R.webrtc.ice.prflx = 0;
+    R.webrtc.ice.other = 0;
+
+    selected.forEach(function(pc, index){
+      var p = pc.__hsV11;
+      (p.ice.candidates || []).forEach(function(c){
+        var t = c.candidateType || "other";
+        if (R.webrtc.ice[t] === undefined) R.webrtc.ice.other++;
+        else R.webrtc.ice[t]++;
+        R.webrtc.candidateRecords.push({
+          at:p.createdAt,
+          pcIndex:index,
+          source:"local-event",
+          candidate:c
+        });
+      });
+    });
+
+    R.webrtc.browserProtocol.records = selected.map(function(pc){
+      var p = pc.__hsV11;
+      return {
+        pcId:p.pcId,
+        runId:p.runId,
+        createdAt:p.createdAt,
+        peerId:p.peerId || p.remotePeerId || null,
+        signaling:p.signaling,
+        ice:p.ice,
+        connection:p.connection,
+        dataChannels:p.dataChannels.map(function(d){
+          return {
+            origin:d.origin,label:d.label,id:d.id,ordered:d.ordered,
+            protocol:d.protocol,readyStateAtBind:d.readyStateAtBind,
+            openAt:d.openAt,closeAt:d.closeAt,errorCount:d.errorCount,
+            messageCount:d.messageCount
+          };
+        }),
+        events:p.events.slice(-200),
+        stats:p.stats,
+        closed:p.closed,
+        closeAt:p.closeAt
+      };
+    });
+  }
+
+  function updateV11ProtocolMilestones() {
+    syncV11BrowserProtocol();
+
+    var records = R.webrtc.browserProtocol.records || [];
+    var m = {
+      offerCreated:false,
+      answerCreated:false,
+      localDescriptionSet:false,
+      remoteDescriptionSet:false,
+      iceGatheringCompleted:false,
+      iceConnectionChecking:false,
+      iceConnectionConnected:false,
+      dataChannelCreated:false,
+      dataChannelOpened:false
+    };
+
+    records.forEach(function(p){
+      (p.signaling.operations || []).forEach(function(op){
+        if(op.ok && op.name === "createOffer") m.offerCreated = true;
+        if(op.ok && op.name === "createAnswer") m.answerCreated = true;
+      });
+      if((p.signaling.localDescriptions || []).length) m.localDescriptionSet = true;
+      if((p.signaling.remoteDescriptions || []).length) m.remoteDescriptionSet = true;
+
+      (p.ice.stateHistory || []).forEach(function(s){
+        if(s.value === "complete") m.iceGatheringCompleted = true;
+        if(s.value === "checking") m.iceConnectionChecking = true;
+        if(s.value === "connected" || s.value === "completed") m.iceConnectionConnected = true;
+      });
+
+      (p.dataChannels || []).forEach(function(d){
+        m.dataChannelCreated = true;
+        if(d.openAt) m.dataChannelOpened = true;
+      });
+    });
+
+    Object.keys(m).forEach(function(k){ R.connectivity[k] = m[k]; });
+  }
+
+  /*
+   * v12 CHANGE 2 (attribution-quality fix): v11 picked "whichever open,
+   * not-closed PC for this run was most recently created" with no regard
+   * for whether that PC had already been correlated to a different peerId,
+   * and no record of how many candidates existed - a silent single guess.
+   * The library's public event contract genuinely does not expose a
+   * PC<->peerId linkage (peerId only arrives via onPeerConnect /
+   * onPeerConnectError, confirmed by reading the pinned source), so v12
+   * cannot invent a stronger signal - but it CAN make the guess's
+   * confidence observable instead of hiding it:
+   *   1. Prefer PCs not yet correlated to any peerId ("unclaimed") - a new
+   *      peer-connect event is far more likely to belong to a PC that
+   *      hasn't already been matched than to one that has.
+   *   2. If exactly one unclaimed candidate exists (the common case per
+   *      this project's own v8.1/v10 evidence), attribute to it with
+   *      confidence "unambiguous" - identical behavior to v11 in this case.
+   *   3. If more than one unclaimed candidate exists, still attribute to
+   *      the most recently created (best available guess), but log a
+   *      distinct webrtc:peer-correlation-ambiguous event naming every
+   *      candidate PC's id, and record confidence "ambiguous" on the
+   *      chosen PC's own event so a report reader can see this attribution
+   *      was a guess among several plausible PCs, not a certainty.
+   *   4. If there are no unclaimed candidates at all (every open PC for
+   *      this run already has a peerId), fall back to the full open-PC
+   *      pool as v11 did, and mark confidence "reattribution-fallback" so
+   *      it's visibly distinct from a fresh, confident match.
+   */
+  function correlatePeerIdToBrowserPc(peerId) {
+    if(!peerId) return;
+    var all = window.__HS_V11_PEER_CONNECTIONS || [];
+    var runId = R.identity && R.identity.runId;
+    var open = all.filter(function(p){ return p && p.runId === runId && !p.closed; });
+    var unclaimed = open.filter(function(p){ return !p.peerId; });
+    var pool = unclaimed.length ? unclaimed : open;
+    var confidence;
+    if (!unclaimed.length && open.length) {
+      confidence = "reattribution-fallback";
+    } else if (pool.length > 1) {
+      confidence = "ambiguous";
+      log("webrtc:peer-correlation-ambiguous", {
+        peerId: peerId,
+        candidateCount: pool.length,
+        candidatePcIds: pool.map(function(p){ return p.pcId || p.id || null; }),
+        note: "More than one open, unclaimed RTCPeerConnection existed for " +
+          "this run when peerId " + peerId + " arrived. Attributing to the " +
+          "most recently created candidate as a best guess; this may be wrong."
+      });
+    } else {
+      confidence = "unambiguous";
+    }
+    pool.sort(function(a,b){ return (b.createdMono||0) - (a.createdMono||0); });
+    if(pool[0]){
+      pool[0].peerId = peerId;
+      pool[0].remotePeerId = peerId;
+      pool[0].peerCorrelationConfidence = confidence;
+      pool[0].events.push({
+        at:now(),
+        elapsedMs:Math.round(mono()-(pool[0].createdMono||mono())),
+        type:"p2pml:peer-id-correlated",
+        data:{peerId:peerId, confidence:confidence, candidatePoolSize:pool.length}
+      });
+    }
+  }
+
+  function updateVerdict() {
+    updateV11ProtocolMilestones();
+
+    /*
+     * Proof is deliberately strict. Merely seeing a peer, merely establishing
+     * ICE, or merely receiving a generic P2P chunk is not enough. The
+     * controlled proof requires a P2P-loaded segment whose infoHash equals
+     * the controlled rendition's observed infoHash, plus actual P2P bytes.
+     */
+    R.verdict.proof =
+      !!R.selectedVariant.found &&
+      !!R.swarm.controlledInfoHash &&
+      R.verdict.p2pChunkBytesReceived &&
+      R.verdict.p2pSegmentMatchedSelectedVariant;
+
+    R.test.elapsedMs = Math.round(mono() - (R._monoStart || mono()));
+  }
+
+  function compactPeerView() {
+    var peers = Object.keys(R.peers).map(function (id) {
+      var p = R.peers[id];
+      return {
+        peerId: id,
+        connected: p.connected,
+        trackerUrl: p.trackerUrl,
+        infoHash: p.infoHash,
+        eventCount: p.eventCount,
+        firstSeen: p.firstSeen,
+        lastEvent: p.lastEvent,
+        lastEventAt: p.lastEventAt,
+        history: p.history.slice(-10)
+      };
+    });
+
+    var trackers = {};
+    Object.keys(R.trackers).forEach(function (url) {
+      var t = R.trackers[url];
+      trackers[url] = {
+        status: t.status,
+        infoHashes: t.infoHashes,
+        uniquePeers: t.uniquePeerIds.length,
+        peerEvents: t.peerEvents,
+        lastEvent: t.lastEvent,
+        lastEventAt: t.lastEventAt
+      };
+    });
+
+    return { trackers: trackers, peers: peers };
+  }
+
+  function compactWebRTC() {
+    syncV11BrowserProtocol();
+    return {
+      connectivity: R.connectivity,
+      browserProtocol: R.webrtc.browserProtocol,
+      iceCandidateCounts: R.webrtc.ice,
+      peerConnections: R.webrtc.peerConnections.map(function (p) {
+        return {
+          index: p.index,
+          createdAt: p.createdAt,
+          states: p.states,
+          stateHistory: p.stateHistory,
+          candidateTypes: p.candidateTypes,
+          localCandidates: p.localCandidates,
+          remoteCandidates: p.remoteCandidates,
+          selectedPair: p.selectedPair,
+          candidatePairHistory: p.candidatePairHistory.slice(-20),
+          iceCandidateErrors: p.iceCandidateErrors,
+          dataChannels: p.dataChannels
+        };
+      }),
+      candidatePairRecords: R.webrtc.candidatePairRecords.slice(-50),
+      dataChannels: R.webrtc.dataChannels
+    };
+  }
+
+  function networkSummary() {
+    var records = R.webrtc.candidateRecords || [];
+    var summary = {
+      candidateTypes: {
+        host: R.webrtc.ice.host || 0,
+        srflx: R.webrtc.ice.srflx || 0,
+        relay: R.webrtc.ice.relay || 0,
+        prflx: R.webrtc.ice.prflx || 0,
+        other: R.webrtc.ice.other || 0
+      },
+      ipv4: false,
+      ipv6: false,
+      udp: false,
+      tcp: false,
+      turnRelay: false
+    };
+
+    records.forEach(function (c) {
+      if (c.addressFamily === "IPv4") summary.ipv4 = true;
+      if (c.addressFamily === "IPv6") summary.ipv6 = true;
+      if (c.protocol === "udp") summary.udp = true;
+      if (c.protocol === "tcp") summary.tcp = true;
+      if (c.type === "relay") summary.turnRelay = true;
+    });
+
+    return summary;
+  }
+
+  function schedulerSummary() {
+    var starts = R.scheduler.events.filter(function (e) {
+      return e.type === "segment-start";
+    });
+
+    var first = starts.length ? starts[0].detail : null;
+
+    return {
+      interpretation: "Observed library segment lifecycle; not an independent proof verdict.",
+      transportMode: R.scheduler.transportMode,
+      requestedStreamConfig: R.scheduler.requestedStreamConfig,
+      observedCoreConfig: cloneJson(R.scheduler.observedCoreConfig),
+      actualConfigSource: R.scheduler.actualConfigSource,
+      counts: cloneJson(R.scheduler.counts),
+      firstSegmentStart: first
+        ? {
+            source: first.source,
+            peerId: first.peerId,
+            infoHash: first.infoHash,
+            elapsedMs: first.elapsedMs
+          }
+        : null,
+      p2pSegmentStartObserved: R.scheduler.counts.segmentStartP2P > 0,
+      httpSegmentStartObserved: R.scheduler.counts.segmentStartHTTP > 0,
+      p2pLoadedSegmentObserved: R.scheduler.counts.segmentLoadedP2P > 0,
+      httpFallbackObserved: R.scheduler.counts.segmentLoadedHTTP > 0
+    };
+  }
+
+  function transportSummary() {
+    return {
+      mode: R.scheduler.transportMode,
+      requestedStreamConfig: R.scheduler.requestedStreamConfig,
+      webrtcConnectionBudget: R.scheduler.webrtcConnectionBudget,
+      stallRescue: R.scheduler.stallRescue,
+      hlsConfig: R.hlsConfig,
+      playerRecovery: R.playerRecovery
+    };
+  }
+
+  function publicReport() {
+    updateVerdict();
+
+    R.identity.deviceLabel = deviceLabelInput.value.trim();
+    R.identity.browserIdentityPersistence = browserIdentityPersistence();
+    R.environment = currentEnvironment();
+
+    return {
+      test: R.test,
+      identity: R.identity,
+      environment: R.environment,
+      network: networkSummary(),
+      export: {
+        savedAt: now(),
+        format: "HiveStream Phase 1B diagnostic JSON",
+        exporterVersion: "12.0",
+        privacy: "Diagnostic export may include WebRTC ICE candidate addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
+      },
+      dependencies: R.dependencies,
+      configuration: R.configuration,
+      instrumentation: R.instrumentation,
+      scheduler: schedulerSummary(),
+      schedulerEvents: R.scheduler.events,
+      transport: transportSummary(),
+      manifest: R.manifest,
+      selectedVariant: R.selectedVariant,
+      swarm: R.swarm,
+      trackers: compactPeerView().trackers,
+      peers: compactPeerView().peers,
+      transfer: R.transfer,
+      connectivity: R.connectivity,
+      webrtc: compactWebRTC(),
+      browserProtocol: R.webrtc.browserProtocol,
+      verdict: R.verdict,
+      events: R.events
+    };
+  }
+
+  function draw() {
+    updateVerdict();
+
+    document.getElementById("identity").textContent =
+      JSON.stringify({
+        browserInstanceId: R.identity.browserInstanceId,
+        runId: R.identity.runId,
+        actualP2PIdentity: R.identity.actualP2PIdentity,
+        peerIdDiscoveryMethod: R.instrumentation.peerIdDiscoveryMethod,
+        environment: R.environment
+      }, null, 2);
+
+    document.getElementById("manifest").textContent =
+      JSON.stringify({
+        manifest: R.manifest,
+        selectedVariant: R.selectedVariant,
+        swarm: R.swarm
+      }, null, 2);
+
+    document.getElementById("peers").textContent =
+      JSON.stringify(compactPeerView(), null, 2);
+
+    document.getElementById("webrtc").textContent =
+      JSON.stringify(compactWebRTC(), null, 2);
+
+    document.getElementById("scheduler").textContent =
+      JSON.stringify({
+        instrumentation: R.instrumentation,
+        focus: schedulerSummary(),
+        events: R.scheduler.events.slice(-200)
+      }, null, 2);
+
+    document.getElementById("transport").textContent =
+      JSON.stringify(transportSummary(), null, 2);
+
+    document.getElementById("transfer").textContent =
+      JSON.stringify({
+        transfer: R.transfer,
+        connectivity: R.connectivity,
+        verdict: R.verdict
+      }, null, 2);
+
+    document.getElementById("log").textContent =
+      R.events.slice(-250).map(function (e) {
+        return "[" + e.at + "] " + e.type + " " +
+          (e.data ? JSON.stringify(e.data) : "");
+      }).join("\n");
+
+    document.getElementById("json").textContent =
+      JSON.stringify(publicReport(), null, 2);
+  }
+
+  startBtn.addEventListener("click", function () {
+    resetRun();
+    started = true;
+    createPlayer();
+
+    if (renderTimer) clearInterval(renderTimer);
+    if (statsTimer) clearInterval(statsTimer);
+    if (stallRescueTimer) clearInterval(stallRescueTimer);
+
+    renderTimer = setInterval(draw, 1000);
+    statsTimer = setInterval(pollStats, 1500);
+    stallRescueTimer = setInterval(checkStallRescue, STALL_RESCUE_CHECK_INTERVAL_MS);
+
+    draw();
+  });
+
+  stopBtn.addEventListener("click", function () {
+    started = false;
+    stopPlayer();
+    if (renderTimer) clearInterval(renderTimer);
+    if (statsTimer) clearInterval(statsTimer);
+    if (stallRescueTimer) clearInterval(stallRescueTimer);
+    renderTimer = null;
+    statsTimer = null;
+    stallRescueTimer = null;
+    log("player:stopped");
+    draw();
+  });
+
+  saveBtn.addEventListener("click", saveJsonToFile);
+
+  copyBtn.addEventListener("click", function () {
+    var textValue = JSON.stringify(publicReport(), null, 2);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textValue).then(function () {
+        log("json:copied");
+      }).catch(function () {
+        fallbackCopy(textValue);
+      });
+    } else {
+      fallbackCopy(textValue);
+    }
+  });
+
+  /*
+   * Save JSON is entirely client-side. A Blob and object URL let the browser
+   * download the same complete report produced by Copy JSON without sending
+   * diagnostic data to a server. The filename contains the device label when
+   * supplied, plus the UTC test start time, so multiple files remain sortable.
+   */
+  function saveJsonToFile() {
+    var report = publicReport();
+    var jsonText = JSON.stringify(report, null, 2);
+    var started = report.test.startedAt || now();
+    var stamp = started.replace(/[:.]/g, "").replace(/Z$/, "Z");
+    var label = (report.identity.deviceLabel ||
+      (report.environment.browserFamily + "-" + report.environment.deviceClass) ||
+      "browser")
+      .replace(/[^a-z0-9_-]+/gi, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40) || "browser";
+    var transportTag = report.transport && report.transport.mode ? report.transport.mode : "unknown";
+
+    var filename = "HiveStream-Phase1B-v12-" + transportTag + "-" + label + "-" + stamp + ".json";
+
+    try {
+      var blob = new Blob([jsonText], {
+        type: "application/json;charset=utf-8"
+      });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
+      log("json:saved", {
+        filename: filename,
+        bytes: jsonText.length
+      });
+    } catch (e) {
+      log("json:save-failed", {
+        filename: filename,
+        message: safeString(e)
+      });
+    }
+  }
+
+  function fallbackCopy(value) {
+    var ta = document.createElement("textarea");
+    ta.value = value;
+    ta.style.position = "fixed";
+    ta.style.left = "-10000px";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand("copy");
+      log("json:copied-fallback");
+    } catch (e) {
+      log("json:copy-failed", { message: safeString(e) });
+    }
+    document.body.removeChild(ta);
+  }
+
+  R._monoStart = mono();
+  R.test.startedAt = null;
+  R.test.elapsedMs = 0;
+
+  /*
+   * The first call to draw() is intentionally quiet: it does not claim that
+   * WebRTC exists or that a tracker is connected. Those are only recorded
+   * after the browser/loader actually produces observable evidence.
+   */
+  draw();
+})();
+</script>
+</body>
+</html>

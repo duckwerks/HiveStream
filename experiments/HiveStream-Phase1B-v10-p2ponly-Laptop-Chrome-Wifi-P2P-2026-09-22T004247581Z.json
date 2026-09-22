@@ -1,0 +1,1889 @@
+{
+  "test": {
+    "name": "HiveStream Phase 1B — Natural Swarm Diagnostic",
+    "version": "10.0",
+    "startedAt": "2026-09-22T00:42:47.581Z",
+    "elapsedMs": 48047,
+    "authorship": "William von Meister (Project Owner) + Claude Sonnet 5 (Anthropic, v10) + GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
+  },
+  "identity": {
+    "browserInstanceId": "bf32a23f-f6b2-4014-858c-c28f3a5f0d56",
+    "deviceLabel": "Laptop-Chrome-Wifi-P2P",
+    "browserIdentityPersistence": "localStorage",
+    "runId": "bf9363e1-752a-4223-a1d4-2866adc1d038",
+    "actualP2PIdentity": {
+      "peerId": "-PM0400-8LDdZdA4cChU",
+      "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+      "verified": true
+    }
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "browserFamily": "Chrome",
+    "browserVersion": "153.0.0.0",
+    "platform": "Win32",
+    "deviceClass": "desktop",
+    "language": "en-US",
+    "languages": [
+      "en-US",
+      "en"
+    ],
+    "screen": {
+      "width": 1536,
+      "height": 864,
+      "availWidth": 1536,
+      "availHeight": 816,
+      "colorDepth": 24,
+      "pixelDepth": 24
+    },
+    "devicePixelRatio": 1.25,
+    "viewport": {
+      "width": 1536,
+      "height": 730
+    },
+    "online": true,
+    "hardwareConcurrency": 24,
+    "maxTouchPoints": 0,
+    "webRtcSupported": true,
+    "hlsSupported": true,
+    "p2pGlobal": true,
+    "p2pEngineExport": true,
+    "crossOriginIsolated": false
+  },
+  "network": {
+    "candidateTypes": {
+      "host": 0,
+      "srflx": 0,
+      "relay": 0,
+      "prflx": 0,
+      "other": 0
+    },
+    "ipv4": true,
+    "ipv6": false,
+    "udp": true,
+    "tcp": false,
+    "turnRelay": false
+  },
+  "export": {
+    "savedAt": "2026-09-22T00:43:35.629Z",
+    "format": "HiveStream Phase 1B diagnostic JSON",
+    "exporterVersion": "10.0",
+    "privacy": "No public IP, cookies, local storage contents, browsing history, or precise location are exported."
+  },
+  "dependencies": {
+    "hlsJs": "1.7.0",
+    "p2pMediaLoaderHlsJs": "4.0.0"
+  },
+  "configuration": {
+    "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "swarmMode": "natural",
+    "customSwarmId": null,
+    "variantMode": "480",
+    "targetVariant": {
+      "width": 848,
+      "height": 480,
+      "bitrate": 836280
+    },
+    "transportMode": "p2ponly",
+    "announceTrackers": [
+      "wss://tracker.novage.com.ua",
+      "wss://tracker.webtorrent.dev",
+      "wss://tracker.openwebtorrent.com"
+    ]
+  },
+  "instrumentation": {
+    "engineEventBindings": [
+      {
+        "event": "onStreamAdded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onStreamRegistrationError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onPeerConnect",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onPeerClose",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onPeerError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onPeerWarning",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onPeerConnectError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onTrackerError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onTrackerWarning",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onSegmentStart",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onSegmentAbort",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onSegmentError",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onChunkDownloaded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onChunkUploaded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      },
+      {
+        "event": "onSegmentLoaded",
+        "registered": true,
+        "error": null,
+        "at": "2026-09-22T00:42:47.589Z"
+      }
+    ],
+    "receivedP2PEvents": {
+      "onStreamAdded": 5,
+      "onPeerConnectError": 1
+    },
+    "engineSurface": {
+      "label": "hlsInstance.p2pEngine",
+      "constructor": "Oa",
+      "ownKeys": [
+        "core",
+        "segmentManager",
+        "hlsInstanceGetter",
+        "currentHlsInstance",
+        "debug",
+        "updateMediaElementEventHandlers",
+        "handleManifestLoaded",
+        "handleLevelSwitching",
+        "handleLevelUpdated",
+        "handleMediaAttached",
+        "handleMediaDetached",
+        "handlePlaybackUpdate",
+        "destroyCore",
+        "destroy"
+      ],
+      "functionKeys": [
+        "hlsInstanceGetter",
+        "debug",
+        "updateMediaElementEventHandlers",
+        "handleManifestLoaded",
+        "handleLevelSwitching",
+        "handleLevelUpdated",
+        "handleMediaAttached",
+        "handleMediaDetached",
+        "handlePlaybackUpdate",
+        "destroyCore",
+        "destroy"
+      ]
+    },
+    "coreSurface": {
+      "label": "hlsInstance.p2pEngine.core",
+      "constructor": "e",
+      "ownKeys": [
+        "eventTarget",
+        "manifestResponseUrl",
+        "streams",
+        "mainStreamConfig",
+        "secondaryStreamConfig",
+        "commonCoreConfig",
+        "bandwidthCalculators",
+        "segmentStorage",
+        "webTorrentSocketPool",
+        "logger",
+        "socketPoolLogger",
+        "peerId",
+        "mainStreamLoader",
+        "secondaryStreamLoader",
+        "streamDetails",
+        "storageInitPromise"
+      ],
+      "functionKeys": [
+        "logger",
+        "socketPoolLogger"
+      ]
+    },
+    "peerIdDiscoveryAttempts": 32,
+    "peerIdDiscoverySuccesses": 1,
+    "peerIdDiscoveryMethod": "direct"
+  },
+  "scheduler": {
+    "interpretation": "Observed library segment lifecycle; not an independent proof verdict.",
+    "transportMode": "p2ponly",
+    "requestedStreamConfig": {
+      "label": "P2P-only (simultaneousHttpDownloads: 0)",
+      "httpDownloadInitialTimeoutMs": 5000,
+      "simultaneousHttpDownloads": 0,
+      "simultaneousP2PDownloads": 3,
+      "highDemandTimeWindow": 15,
+      "httpDownloadTimeWindow": 3000,
+      "p2pDownloadTimeWindow": 6000,
+      "isP2PDisabled": false,
+      "isP2PUploadDisabled": false
+    },
+    "observedCoreConfig": {
+      "trackerClientVersionPrefix": "-PM0400-",
+      "mainStream": {
+        "isP2PUploadDisabled": false,
+        "isP2PDisabled": false,
+        "simultaneousHttpDownloads": 0,
+        "simultaneousP2PDownloads": 3,
+        "highDemandTimeWindow": 15,
+        "httpDownloadInitialTimeoutMs": 5000,
+        "httpDownloadTimeWindow": 3000,
+        "p2pDownloadTimeWindow": 6000,
+        "webRtcMaxMessageSize": 65535,
+        "p2pNotReceivingBytesTimeoutMs": 2000,
+        "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+        "httpNotReceivingBytesTimeoutMs": 3000,
+        "httpErrorRetries": 3,
+        "p2pErrorRetries": 3,
+        "announceTrackers": [
+          "wss://tracker.novage.com.ua",
+          "wss://tracker.webtorrent.dev",
+          "wss://tracker.openwebtorrent.com"
+        ],
+        "rtcConfig": {
+          "iceServers": [
+            {
+              "urls": "stun:stun.l.google.com:19302"
+            },
+            {
+              "urls": "stun:global.stun.twilio.com:3478"
+            }
+          ]
+        },
+        "p2pMaxPeers": 50,
+        "p2pChurnMaxPeersMultiplier": 1.5,
+        "p2pChurnCleanupIntervalMs": 30000,
+        "p2pChurnGracePeriodMs": 15000,
+        "webRtcOffersCount": 5,
+        "webRtcOfferTimeoutMs": 50000,
+        "webRtcIceGatheringTimeoutMs": 5000,
+        "webRtcConnectionTimeoutMs": 15000
+      },
+      "secondaryStream": {
+        "isP2PUploadDisabled": false,
+        "isP2PDisabled": false,
+        "simultaneousHttpDownloads": 0,
+        "simultaneousP2PDownloads": 3,
+        "highDemandTimeWindow": 15,
+        "httpDownloadInitialTimeoutMs": 5000,
+        "httpDownloadTimeWindow": 3000,
+        "p2pDownloadTimeWindow": 6000,
+        "webRtcMaxMessageSize": 65535,
+        "p2pNotReceivingBytesTimeoutMs": 2000,
+        "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+        "httpNotReceivingBytesTimeoutMs": 3000,
+        "httpErrorRetries": 3,
+        "p2pErrorRetries": 3,
+        "announceTrackers": [
+          "wss://tracker.novage.com.ua",
+          "wss://tracker.webtorrent.dev",
+          "wss://tracker.openwebtorrent.com"
+        ],
+        "rtcConfig": {
+          "iceServers": [
+            {
+              "urls": "stun:stun.l.google.com:19302"
+            },
+            {
+              "urls": "stun:global.stun.twilio.com:3478"
+            }
+          ]
+        },
+        "p2pMaxPeers": 50,
+        "p2pChurnMaxPeersMultiplier": 1.5,
+        "p2pChurnCleanupIntervalMs": 30000,
+        "p2pChurnGracePeriodMs": 15000,
+        "webRtcOffersCount": 5,
+        "webRtcOfferTimeoutMs": 50000,
+        "webRtcIceGatheringTimeoutMs": 5000,
+        "webRtcConnectionTimeoutMs": 15000
+      }
+    },
+    "actualConfigSource": "p2pEngine.core.getConfig()",
+    "counts": {
+      "segmentStartP2P": 0,
+      "segmentStartHTTP": 0,
+      "segmentLoadedP2P": 0,
+      "segmentLoadedHTTP": 0,
+      "segmentAbort": 0,
+      "segmentError": 0
+    },
+    "firstSegmentStart": null,
+    "p2pSegmentStartObserved": false,
+    "httpSegmentStartObserved": false,
+    "p2pLoadedSegmentObserved": false,
+    "httpFallbackObserved": false
+  },
+  "schedulerEvents": [],
+  "transport": {
+    "mode": "p2ponly",
+    "requestedStreamConfig": {
+      "label": "P2P-only (simultaneousHttpDownloads: 0)",
+      "httpDownloadInitialTimeoutMs": 5000,
+      "simultaneousHttpDownloads": 0,
+      "simultaneousP2PDownloads": 3,
+      "highDemandTimeWindow": 15,
+      "httpDownloadTimeWindow": 3000,
+      "p2pDownloadTimeWindow": 6000,
+      "isP2PDisabled": false,
+      "isP2PUploadDisabled": false
+    },
+    "webrtcConnectionBudget": {
+      "webRtcOffersCount": 5,
+      "webRtcOfferTimeoutMs": 50000,
+      "webRtcIceGatheringTimeoutMs": 5000,
+      "webRtcConnectionTimeoutMs": 15000,
+      "note": "Library defaults, not overridden by this diagnostic. A single attempt can legitimately take up to roughly the sum of the ICE gathering and connection timeouts, plus however much of the offer wait it needs, before the library itself gives up."
+    },
+    "stallRescue": {
+      "enabled": true,
+      "timeoutMs": 90000,
+      "armedAt": "2026-09-22T00:42:47.582Z",
+      "triggeredAt": null,
+      "triggeredElapsedMs": null,
+      "reason": null,
+      "action": null
+    },
+    "hlsConfig": {
+      "requested": {
+        "fragLoadingTimeOut": 120000
+      }
+    },
+    "playerRecovery": {
+      "levelDriftCorrections": [],
+      "fatalErrorRecoveries": []
+    }
+  },
+  "manifest": {
+    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "loaded": true,
+    "renditions": [
+      {
+        "index": 0,
+        "width": 1280,
+        "height": 720,
+        "bitrate": 2149280,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_0/193039199_mp4_h264_aac_hd_7.m3u8"
+      },
+      {
+        "index": 1,
+        "width": 320,
+        "height": 184,
+        "bitrate": 246440,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_2/193039199_mp4_h264_aac_ld_7.m3u8"
+      },
+      {
+        "index": 2,
+        "width": 512,
+        "height": 288,
+        "bitrate": 460560,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_4/193039199_mp4_h264_aac_7.m3u8"
+      },
+      {
+        "index": 3,
+        "width": 848,
+        "height": 480,
+        "bitrate": 836280,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+      },
+      {
+        "index": 4,
+        "width": 1920,
+        "height": 1080,
+        "bitrate": 6221600,
+        "codecs": null,
+        "url": "https://test-streams.mux.dev/x36xhzz/url_8/193039199_mp4_h264_aac_fhd_7.m3u8"
+      }
+    ],
+    "activeLevelIndex": null,
+    "duration": null
+  },
+  "selectedVariant": {
+    "found": true,
+    "levelIndex": 3,
+    "properties": {
+      "index": 3,
+      "width": 848,
+      "height": 480,
+      "bitrate": 836280,
+      "codecs": null,
+      "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+    },
+    "reason": "Exact controlled rendition matched manifest."
+  },
+  "swarm": {
+    "resolvedSwarmId": null,
+    "controlledInfoHash": null,
+    "streams": [
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      },
+      {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    ]
+  },
+  "trackers": {
+    "wss://tracker.novage.com.ua": {
+      "status": "configured",
+      "infoHashes": [],
+      "uniquePeers": 0,
+      "peerEvents": 0,
+      "lastEvent": null,
+      "lastEventAt": null
+    },
+    "wss://tracker.webtorrent.dev": {
+      "status": "configured",
+      "infoHashes": [],
+      "uniquePeers": 0,
+      "peerEvents": 0,
+      "lastEvent": null,
+      "lastEventAt": null
+    },
+    "wss://tracker.openwebtorrent.com": {
+      "status": "peer-seen",
+      "infoHashes": [
+        "Dd+yrwrnofWI3vWhfz1l"
+      ],
+      "uniquePeers": 1,
+      "peerEvents": 1,
+      "lastEvent": "peer-seen",
+      "lastEventAt": "2026-09-22T00:43:09.203Z"
+    }
+  },
+  "peers": [
+    {
+      "peerId": "-PM0400-Tv4d89LU0svY",
+      "connected": false,
+      "trackerUrl": "wss://tracker.openwebtorrent.com",
+      "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+      "eventCount": 1,
+      "firstSeen": "2026-09-22T00:43:09.203Z",
+      "lastEvent": "connect-error",
+      "lastEventAt": "2026-09-22T00:43:09.203Z",
+      "history": [
+        {
+          "at": "2026-09-22T00:43:09.203Z",
+          "elapsedSinceFirstSeenMs": 0,
+          "event": "connect-error",
+          "trackerUrl": "wss://tracker.openwebtorrent.com",
+          "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+          "detail": "PeerConnectError: Data channel open timeout"
+        }
+      ]
+    }
+  ],
+  "transfer": {
+    "bytes": {
+      "http": 0,
+      "p2pDown": 0,
+      "p2pUp": 0
+    },
+    "segments": []
+  },
+  "connectivity": {
+    "trackerPeerDiscovered": true,
+    "localPeerIdKnown": true,
+    "remotePeerKnown": true,
+    "iceCandidatesGathered": false,
+    "candidatePairSucceeded": false,
+    "dataChannelOpened": false,
+    "p2pPeerConnected": false,
+    "p2pBytesReceived": 0
+  },
+  "webrtc": {
+    "connectivity": {
+      "trackerPeerDiscovered": true,
+      "localPeerIdKnown": true,
+      "remotePeerKnown": true,
+      "iceCandidatesGathered": false,
+      "candidatePairSucceeded": false,
+      "dataChannelOpened": false,
+      "p2pPeerConnected": false,
+      "p2pBytesReceived": 0
+    },
+    "iceCandidateCounts": {
+      "host": 0,
+      "srflx": 0,
+      "relay": 0,
+      "prflx": 0,
+      "other": 0
+    },
+    "peerConnections": [
+      {
+        "index": 0,
+        "createdAt": "2026-09-22T00:42:49.096Z",
+        "states": {
+          "signaling": "closed",
+          "iceGathering": "new",
+          "ice": "closed",
+          "connection": "closed"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 1,
+        "createdAt": "2026-09-22T00:42:49.097Z",
+        "states": {
+          "signaling": "stable",
+          "iceGathering": "complete",
+          "ice": "checking",
+          "connection": "connecting"
+        },
+        "stateHistory": [
+          {
+            "at": "2026-09-22T00:42:54.195Z",
+            "elapsedMs": 6613,
+            "pcIndex": 1,
+            "state": "ice",
+            "value": "checking"
+          },
+          {
+            "at": "2026-09-22T00:42:54.197Z",
+            "elapsedMs": 6615,
+            "pcIndex": 1,
+            "state": "signaling",
+            "value": "stable"
+          },
+          {
+            "at": "2026-09-22T00:42:54.198Z",
+            "elapsedMs": 6616,
+            "pcIndex": 1,
+            "state": "connection",
+            "value": "connecting"
+          }
+        ],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [
+          {
+            "id": "IMudcxbF5",
+            "candidateType": "host",
+            "protocol": "udp",
+            "address": "192.168.1.71",
+            "addressFamily": "IPv4",
+            "port": 37264,
+            "foundation": "3825708543",
+            "relayProtocol": null,
+            "relatedAddress": null,
+            "relatedPort": null,
+            "at": "2026-09-22T00:42:55.097Z",
+            "pcIndex": 1,
+            "direction": "remote"
+          },
+          {
+            "id": "Iz9fJNv5X",
+            "candidateType": "srflx",
+            "protocol": "udp",
+            "address": "50.120.51.163",
+            "addressFamily": "IPv4",
+            "port": 37264,
+            "foundation": "878771984",
+            "relayProtocol": null,
+            "relatedAddress": "192.168.1.71",
+            "relatedPort": 37264,
+            "at": "2026-09-22T00:42:55.099Z",
+            "pcIndex": 1,
+            "direction": "remote"
+          }
+        ],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 2,
+        "createdAt": "2026-09-22T00:42:49.098Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 3,
+        "createdAt": "2026-09-22T00:42:49.098Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 4,
+        "createdAt": "2026-09-22T00:42:49.099Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 5,
+        "createdAt": "2026-09-22T00:42:49.099Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 6,
+        "createdAt": "2026-09-22T00:42:49.100Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 7,
+        "createdAt": "2026-09-22T00:42:49.100Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 8,
+        "createdAt": "2026-09-22T00:42:49.101Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 9,
+        "createdAt": "2026-09-22T00:42:49.102Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      },
+      {
+        "index": 10,
+        "createdAt": "2026-09-22T00:42:49.103Z",
+        "states": {
+          "signaling": "have-local-offer",
+          "iceGathering": "complete",
+          "ice": "new",
+          "connection": "new"
+        },
+        "stateHistory": [],
+        "candidateTypes": {},
+        "localCandidates": [],
+        "remoteCandidates": [],
+        "selectedPair": null,
+        "candidatePairHistory": [],
+        "iceCandidateErrors": [],
+        "dataChannels": []
+      }
+    ],
+    "candidatePairRecords": [],
+    "dataChannels": []
+  },
+  "verdict": {
+    "streamIdentityObserved": true,
+    "controlledVariantFound": false,
+    "peerConnected": false,
+    "p2pChunkBytesReceived": false,
+    "p2pSegmentLoaded": false,
+    "p2pSegmentMatchedSelectedVariant": false,
+    "proof": false
+  },
+  "events": [
+    {
+      "at": "2026-09-22T00:42:47.588Z",
+      "elapsedMs": 7,
+      "type": "p2p:runtime-surface",
+      "data": {
+        "engine": {
+          "label": "hlsInstance.p2pEngine",
+          "constructor": "Oa",
+          "ownKeys": [
+            "core",
+            "segmentManager",
+            "hlsInstanceGetter",
+            "currentHlsInstance",
+            "debug",
+            "updateMediaElementEventHandlers",
+            "handleManifestLoaded",
+            "handleLevelSwitching",
+            "handleLevelUpdated",
+            "handleMediaAttached",
+            "handleMediaDetached",
+            "handlePlaybackUpdate",
+            "destroyCore",
+            "destroy"
+          ],
+          "functionKeys": [
+            "hlsInstanceGetter",
+            "debug",
+            "updateMediaElementEventHandlers",
+            "handleManifestLoaded",
+            "handleLevelSwitching",
+            "handleLevelUpdated",
+            "handleMediaAttached",
+            "handleMediaDetached",
+            "handlePlaybackUpdate",
+            "destroyCore",
+            "destroy"
+          ]
+        },
+        "core": {
+          "label": "hlsInstance.p2pEngine.core",
+          "constructor": "e",
+          "ownKeys": [
+            "eventTarget",
+            "manifestResponseUrl",
+            "streams",
+            "mainStreamConfig",
+            "secondaryStreamConfig",
+            "commonCoreConfig",
+            "bandwidthCalculators",
+            "segmentStorage",
+            "webTorrentSocketPool",
+            "logger",
+            "socketPoolLogger",
+            "peerId",
+            "mainStreamLoader",
+            "secondaryStreamLoader",
+            "streamDetails",
+            "storageInitPromise"
+          ],
+          "functionKeys": [
+            "logger",
+            "socketPoolLogger"
+          ]
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.589Z",
+      "elapsedMs": 7,
+      "type": "scheduler:core-config-observed",
+      "data": {
+        "mainStream": {
+          "isP2PUploadDisabled": false,
+          "isP2PDisabled": false,
+          "simultaneousHttpDownloads": 0,
+          "simultaneousP2PDownloads": 3,
+          "highDemandTimeWindow": 15,
+          "httpDownloadInitialTimeoutMs": 5000,
+          "httpDownloadTimeWindow": 3000,
+          "p2pDownloadTimeWindow": 6000,
+          "webRtcMaxMessageSize": 65535,
+          "p2pNotReceivingBytesTimeoutMs": 2000,
+          "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+          "httpNotReceivingBytesTimeoutMs": 3000,
+          "httpErrorRetries": 3,
+          "p2pErrorRetries": 3,
+          "announceTrackers": [
+            "wss://tracker.novage.com.ua",
+            "wss://tracker.webtorrent.dev",
+            "wss://tracker.openwebtorrent.com"
+          ],
+          "rtcConfig": {
+            "iceServers": [
+              {
+                "urls": "stun:stun.l.google.com:19302"
+              },
+              {
+                "urls": "stun:global.stun.twilio.com:3478"
+              }
+            ]
+          },
+          "p2pMaxPeers": 50,
+          "p2pChurnMaxPeersMultiplier": 1.5,
+          "p2pChurnCleanupIntervalMs": 30000,
+          "p2pChurnGracePeriodMs": 15000,
+          "webRtcOffersCount": 5,
+          "webRtcOfferTimeoutMs": 50000,
+          "webRtcIceGatheringTimeoutMs": 5000,
+          "webRtcConnectionTimeoutMs": 15000
+        },
+        "secondaryStream": {
+          "isP2PUploadDisabled": false,
+          "isP2PDisabled": false,
+          "simultaneousHttpDownloads": 0,
+          "simultaneousP2PDownloads": 3,
+          "highDemandTimeWindow": 15,
+          "httpDownloadInitialTimeoutMs": 5000,
+          "httpDownloadTimeWindow": 3000,
+          "p2pDownloadTimeWindow": 6000,
+          "webRtcMaxMessageSize": 65535,
+          "p2pNotReceivingBytesTimeoutMs": 2000,
+          "p2pInactiveLoaderDestroyTimeoutMs": 30000,
+          "httpNotReceivingBytesTimeoutMs": 3000,
+          "httpErrorRetries": 3,
+          "p2pErrorRetries": 3,
+          "announceTrackers": [
+            "wss://tracker.novage.com.ua",
+            "wss://tracker.webtorrent.dev",
+            "wss://tracker.openwebtorrent.com"
+          ],
+          "rtcConfig": {
+            "iceServers": [
+              {
+                "urls": "stun:stun.l.google.com:19302"
+              },
+              {
+                "urls": "stun:global.stun.twilio.com:3478"
+              }
+            ]
+          },
+          "p2pMaxPeers": 50,
+          "p2pChurnMaxPeersMultiplier": 1.5,
+          "p2pChurnCleanupIntervalMs": 30000,
+          "p2pChurnGracePeriodMs": 15000,
+          "webRtcOffersCount": 5,
+          "webRtcOfferTimeoutMs": 50000,
+          "webRtcIceGatheringTimeoutMs": 5000,
+          "webRtcConnectionTimeoutMs": 15000
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.589Z",
+      "elapsedMs": 8,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.592Z",
+      "elapsedMs": 10,
+      "type": "hls:manifest-loading",
+      "data": {
+        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.592Z",
+      "elapsedMs": 10,
+      "type": "hls:manifest-loading",
+      "data": {
+        "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.593Z",
+      "elapsedMs": 12,
+      "type": "player:created",
+      "data": {
+        "loaderGlobal": "window.p2pml.hlsjs.HlsJsP2PEngine",
+        "swarmMode": "natural",
+        "transportMode": "p2ponly",
+        "stallRescueEnabled": true,
+        "stallRescueTimeoutMs": 90000,
+        "swarmIdPropertyPresent": false,
+        "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.614Z",
+      "elapsedMs": 32,
+      "type": "hls:manifest-loaded",
+      "data": {
+        "levels": 5,
+        "selectedVariant": {
+          "found": true,
+          "levelIndex": 3,
+          "properties": {
+            "index": 3,
+            "width": 848,
+            "height": 480,
+            "bitrate": 836280,
+            "codecs": null,
+            "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+          },
+          "reason": "Exact controlled rendition matched manifest."
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.614Z",
+      "elapsedMs": 33,
+      "type": "hls:manifest-loaded",
+      "data": {
+        "levels": 5,
+        "selectedVariant": {
+          "found": true,
+          "levelIndex": 3,
+          "properties": {
+            "index": 3,
+            "width": 848,
+            "height": 480,
+            "bitrate": 836280,
+            "codecs": null,
+            "url": "https://test-streams.mux.dev/x36xhzz/url_6/193039199_mp4_h264_aac_hq_7.m3u8"
+          },
+          "reason": "Exact controlled rendition matched manifest."
+        }
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.615Z",
+      "elapsedMs": 34,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 1,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.616Z",
+      "elapsedMs": 34,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.617Z",
+      "elapsedMs": 35,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 2,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.617Z",
+      "elapsedMs": 35,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.617Z",
+      "elapsedMs": 36,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 3,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.618Z",
+      "elapsedMs": 36,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.618Z",
+      "elapsedMs": 36,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 4,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.618Z",
+      "elapsedMs": 37,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.619Z",
+      "elapsedMs": 37,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onStreamAdded",
+        "count": 5,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "stream"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:47.620Z",
+      "elapsedMs": 38,
+      "type": "stream:added",
+      "data": {
+        "streamSwarmId": null,
+        "swarmId": null,
+        "identityHash": null,
+        "infoHash": null,
+        "properties": null
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.095Z",
+      "elapsedMs": 1514,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.096Z",
+      "elapsedMs": 1515,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 0,
+        "signaling": "closed",
+        "iceGathering": "new",
+        "ice": "closed",
+        "connection": "closed"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.097Z",
+      "elapsedMs": 1515,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 1,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.098Z",
+      "elapsedMs": 1516,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 2,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.098Z",
+      "elapsedMs": 1516,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 3,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.099Z",
+      "elapsedMs": 1517,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 4,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.099Z",
+      "elapsedMs": 1517,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 5,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.100Z",
+      "elapsedMs": 1518,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 6,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.100Z",
+      "elapsedMs": 1519,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 7,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.101Z",
+      "elapsedMs": 1520,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 8,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.102Z",
+      "elapsedMs": 1520,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 9,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:49.103Z",
+      "elapsedMs": 1521,
+      "type": "webrtc:pc-created",
+      "data": {
+        "pcIndex": 10,
+        "signaling": "have-local-offer",
+        "iceGathering": "complete",
+        "ice": "new",
+        "connection": "new"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:50.599Z",
+      "elapsedMs": 3018,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:52.095Z",
+      "elapsedMs": 4513,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:53.596Z",
+      "elapsedMs": 6014,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:54.195Z",
+      "elapsedMs": 6613,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:42:54.195Z",
+        "elapsedMs": 6613,
+        "pcIndex": 1,
+        "state": "ice",
+        "value": "checking"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:54.197Z",
+      "elapsedMs": 6615,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:42:54.197Z",
+        "elapsedMs": 6615,
+        "pcIndex": 1,
+        "state": "signaling",
+        "value": "stable"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:54.198Z",
+      "elapsedMs": 6616,
+      "type": "webrtc:state",
+      "data": {
+        "at": "2026-09-22T00:42:54.198Z",
+        "elapsedMs": 6616,
+        "pcIndex": 1,
+        "state": "connection",
+        "value": "connecting"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:55.095Z",
+      "elapsedMs": 7513,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:55.097Z",
+      "elapsedMs": 7516,
+      "type": "webrtc:remote-candidate-observed",
+      "data": {
+        "pcIndex": 1,
+        "type": "host",
+        "addressFamily": "IPv4",
+        "protocol": "udp"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:55.099Z",
+      "elapsedMs": 7517,
+      "type": "webrtc:remote-candidate-observed",
+      "data": {
+        "pcIndex": 1,
+        "type": "srflx",
+        "addressFamily": "IPv4",
+        "protocol": "udp"
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:56.596Z",
+      "elapsedMs": 9014,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:58.094Z",
+      "elapsedMs": 10513,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:42:59.596Z",
+      "elapsedMs": 12014,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:01.100Z",
+      "elapsedMs": 13518,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:02.602Z",
+      "elapsedMs": 15020,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:04.098Z",
+      "elapsedMs": 16516,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:05.596Z",
+      "elapsedMs": 18014,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:07.096Z",
+      "elapsedMs": 19514,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:08.624Z",
+      "elapsedMs": 21042,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:09.201Z",
+      "elapsedMs": 21619,
+      "type": "p2p:event-received",
+      "data": {
+        "event": "onPeerConnectError",
+        "count": 1,
+        "arguments": [
+          {
+            "index": 0,
+            "type": "object",
+            "constructor": "Object",
+            "keys": [
+              "peerId",
+              "infoHash",
+              "streamType",
+              "trackerUrl",
+              "error"
+            ]
+          },
+          {
+            "index": 1,
+            "type": "undefined"
+          },
+          {
+            "index": 2,
+            "type": "undefined"
+          },
+          {
+            "index": 3,
+            "type": "undefined"
+          },
+          {
+            "index": 4,
+            "type": "undefined"
+          }
+        ]
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:09.203Z",
+      "elapsedMs": 21622,
+      "type": "peer:connect-error",
+      "data": {
+        "peerId": "-PM0400-Tv4d89LU0svY",
+        "isNewPeer": true,
+        "trackerUrl": "wss://tracker.openwebtorrent.com",
+        "infoHash": "Dd+yrwrnofWI3vWhfz1l",
+        "elapsedSinceFirstSeenMs": 0,
+        "detail": "PeerConnectError: Data channel open timeout"
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:10.095Z",
+      "elapsedMs": 22513,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:11.596Z",
+      "elapsedMs": 24015,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:13.095Z",
+      "elapsedMs": 25513,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:14.604Z",
+      "elapsedMs": 27022,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:16.098Z",
+      "elapsedMs": 28516,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:17.595Z",
+      "elapsedMs": 30014,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:19.097Z",
+      "elapsedMs": 31516,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:20.600Z",
+      "elapsedMs": 33019,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:22.101Z",
+      "elapsedMs": 34520,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:23.595Z",
+      "elapsedMs": 36014,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:25.102Z",
+      "elapsedMs": 37520,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:26.598Z",
+      "elapsedMs": 39017,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:28.097Z",
+      "elapsedMs": 40515,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:29.599Z",
+      "elapsedMs": 42017,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:31.100Z",
+      "elapsedMs": 43518,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:32.596Z",
+      "elapsedMs": 45014,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:34.094Z",
+      "elapsedMs": 46512,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    },
+    {
+      "at": "2026-09-22T00:43:35.598Z",
+      "elapsedMs": 48016,
+      "type": "identity:actual-p2p-peer-id-observed",
+      "data": {
+        "peerId": "-PM0400-8LDdZdA4cChU",
+        "source": "hlsInstance.p2pEngine.core.peerId (direct property read)",
+        "verified": true
+      }
+    }
+  ]
+}

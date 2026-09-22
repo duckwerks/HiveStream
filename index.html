@@ -1,15 +1,15 @@
 <!doctype html>
 <!--
-HiveStream Phase 1B — Natural Swarm Diagnostic v12.2
+HiveStream Phase 1B — Natural Swarm Diagnostic v12.3
 Author: Elwood Edwards (Project Owner / HiveStream Developer)
 Technical implementation and diagnostic revision: GPT-5.6 Luna (OpenAI)
-Fresh v12.2 source; historical revisions remain in Git history.
+Fresh v12.3 source; historical revisions remain in Git history.
 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.2</title>
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.3</title>
 
 
 
@@ -465,10 +465,12 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.2</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.3</h1>
   <div class="small">
-    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.2 diagnostic implementation
+    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.3 diagnostic implementation
   </div>
+  <div id="bootStatus" class="small" style="margin-top:6px">BOOT: page script not started</div>
+
 
   <section class="card" style="margin-top:12px">
     <div class="controls">
@@ -563,6 +565,13 @@ video {
 <script>
 (function () {
   "use strict";
+
+  var bootStatus = document.getElementById("bootStatus");
+  function bootText(text) {
+    window.__HS_BOOT_STATUS = text;
+    if (bootStatus) bootStatus.textContent = "BOOT: " + text;
+  }
+  bootText("main script entered");
 
   var HLS_VERSION = "1.7.0";
   var P2PML_VERSION = "4.0.0";
@@ -780,11 +789,11 @@ video {
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-      version: "12.2",
+      version: "12.3",
       startedAt: null,
       elapsedMs: 0,
-      authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (Anthropic, v11 and v12) " +
-        "+ GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
+      authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (OpenAI) " +
+        "+ GPT-5.6 Luna (OpenAI)"
     },
 
     identity: {
@@ -2211,11 +2220,11 @@ video {
     R = {
       test: {
         name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-        version: "12.2",
+        version: "12.3",
         startedAt: now(),
         elapsedMs: 0,
-        authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (Anthropic, v11 and v12) " +
-          "+ GPT-5.6 Luna (Research & Technical Analysis Assistant, authored v3-v9.1)"
+        authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (OpenAI) " +
+          "+ GPT-5.6 Luna (OpenAI)"
       },
       identity: {
         browserInstanceId: keepId,
@@ -2312,6 +2321,12 @@ video {
         segments: []
       },
       webrtc: {
+        browserProtocol: {
+          currentRunOnly: true,
+          totalCaptured: 0,
+          currentRunCaptured: 0,
+          records: []
+        },
         peerConnections: [],
         ice: { host: 0, srflx: 0, relay: 0, prflx: 0, other: 0 },
         candidateRecords: [],
@@ -2684,7 +2699,7 @@ video {
       export: {
         savedAt: now(),
         format: "HiveStream Phase 1B diagnostic JSON",
-        exporterVersion: "12.2",
+        exporterVersion: "12.3",
         privacy: "Diagnostic export may include WebRTC ICE candidate addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
       },
       dependencies: R.dependencies,
@@ -2760,9 +2775,11 @@ video {
   }
 
   startBtn.addEventListener("click", function () {
-    resetRun();
-    started = true;
-    createPlayer();
+    bootText("start clicked");
+    try {
+      resetRun();
+      started = true;
+      createPlayer();
 
     if (renderTimer) clearInterval(renderTimer);
     if (statsTimer) clearInterval(statsTimer);
@@ -2772,7 +2789,14 @@ video {
     statsTimer = setInterval(pollStats, 1500);
     stallRescueTimer = setInterval(checkStallRescue, STALL_RESCUE_CHECK_INTERVAL_MS);
 
-    draw();
+      draw();
+      bootText("player startup completed");
+    } catch (error) {
+      started = false;
+      log("fatal:start-handler", {name: error && error.name || "Error", message: safeString(error), stack: error && error.stack ? String(error.stack) : null});
+      bootText("START FAILED — see Event Log / console");
+      try { draw(); } catch (drawError) {}
+    }
   });
 
   stopBtn.addEventListener("click", function () {
@@ -2788,7 +2812,16 @@ video {
     draw();
   });
 
-  saveBtn.addEventListener("click", saveJsonToFile);
+  saveBtn.addEventListener("click", function () {
+    bootText("save clicked");
+    try {
+      saveJsonToFile();
+      bootText("JSON save requested");
+    } catch (error) {
+      try { log("fatal:save-handler", {name: error && error.name || "Error", message: safeString(error), stack: error && error.stack ? String(error.stack) : null}); } catch (logError) {}
+      bootText("SAVE FAILED — see console");
+    }
+  });
 
   copyBtn.addEventListener("click", function () {
     var textValue = JSON.stringify(publicReport(), null, 2);
@@ -2818,7 +2851,7 @@ video {
       .slice(0, 40) || "browser";
     var transportTag = report.transport && report.transport.mode ? report.transport.mode : "unknown";
 
-    var filename = "HiveStream-Phase1B-v12.2-" + transportTag + "-" + label + "-" + stamp + ".json";
+    var filename = "HiveStream-Phase1B-v12.3-" + transportTag + "-" + label + "-" + stamp + ".json";
 
     try {
       var blob = new Blob([jsonText], {
@@ -2868,9 +2901,9 @@ video {
   R._monoStart = mono();
   R.test.startedAt = null;
   R.test.elapsedMs = 0;
-
-  
+  bootText("initializing diagnostic state");
   draw();
+  bootText("READY — buttons wired");
 })();
 </script>
 </body>

@@ -42,6 +42,10 @@ Fresh v12.3 source; historical revisions remain in Git history.
     try { return fn(); } catch (e) { return fallback; }
   }
 
+  function safeString(v) {
+    try { return String(v); } catch (e) { return "[unprintable]"; }
+  }
+
   function sdpSummary(desc) {
     if (!desc) return null;
     var sdp = desc.sdp || "";
@@ -981,7 +985,16 @@ video {
     };
     R.events.push(entry);
     if (R.events.length > 1500) R.events.shift();
-    draw();
+    try {
+      draw();
+    } catch (renderError) {
+      window.__HS_RENDER_ERROR = {
+        name: renderError && renderError.name || "Error",
+        message: safeString(renderError),
+        stack: renderError && renderError.stack ? String(renderError.stack) : null
+      };
+      if (bootStatus) bootStatus.textContent = "BOOT: RENDER FAILED — see console";
+    }
   }
 
   function modeValue() {

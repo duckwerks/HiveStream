@@ -3,7 +3,7 @@
 HiveStream Phase 1B — Natural Swarm Diagnostic v12.4
 Author: Elwood Edwards (Project Owner / HiveStream Developer)
 Technical implementation and diagnostic revision: GPT-5.6 Luna (OpenAI)
-Fresh v12.3 source; historical revisions remain in Git history.
+Fresh v12.4 source; historical revisions remain in Git history.
 -->
 <html lang="en">
 <head>
@@ -269,6 +269,7 @@ Fresh v12.3 source; historical revisions remain in Git history.
     pc.addEventListener("icecandidate", function(e) {
       if (e.candidate) {
         var c = candidateSummary(e.candidate);
+        c.at = now();
         r.ice.candidates.push(c);
         event("icecandidate", c);
       } else {
@@ -480,7 +481,7 @@ video {
 <main>
   <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.4</h1>
   <div class="small">
-    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.3 diagnostic implementation
+    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.4 diagnostic implementation
   </div>
   <div id="bootStatus" class="small" style="margin-top:6px">BOOT: page script not started</div>
 
@@ -855,6 +856,7 @@ video {
     },
 
     instrumentation: {
+      instrumentationVersion: "12.4",
       engineEventBindings: [],
       receivedP2PEvents: {},
       engineSurface: null,
@@ -1324,6 +1326,32 @@ video {
         var selectedPairId = null;
         var transportHit = null;
         var pcStats = null;
+
+        try {
+          var liveStreams = hlsInstance && hlsInstance.p2pEngine &&
+            hlsInstance.p2pEngine.core &&
+            typeof hlsInstance.p2pEngine.core.getStreams === "function"
+              ? hlsInstance.p2pEngine.core.getStreams()
+              : null;
+          if (liveStreams) {
+            R.swarm.coreGetStreams = cloneJson(liveStreams);
+            if (Array.isArray(liveStreams)) {
+              liveStreams.forEach(function (stream) {
+                if (!stream) return;
+                var snapshot = cloneJson(stream);
+                var exists = R.swarm.streams.some(function (x) {
+                  return x && x.streamSwarmId === snapshot.streamSwarmId &&
+                         x.infoHash === snapshot.infoHash;
+                });
+                if (!exists) R.swarm.streams.push(snapshot);
+                if (snapshot.swarmId) R.swarm.resolvedSwarmId = snapshot.swarmId;
+              });
+              if (liveStreams.length) R.verdict.streamIdentityObserved = true;
+            }
+          }
+        } catch (streamError) {
+          log("swarm:core-getStreams-error", {message:safeString(streamError)});
+        }
         var pairSummaries = [];
         var pairStateCounts = {};
 
@@ -1848,20 +1876,6 @@ video {
     on("onStreamRegistrationError", function (d) {
       log("stream:registration-error", cloneJson(d));
     });
-
-    try {
-      var streamsCore = engine.core;
-      if (streamsCore && typeof streamsCore.getStreams === "function") {
-        var observedStreams = streamsCore.getStreams();
-        R.swarm.coreGetStreams = cloneJson(observedStreams);
-        log("swarm:core-getStreams-observed", {
-          count: Array.isArray(observedStreams) ? observedStreams.length : null,
-          streams: cloneJson(observedStreams)
-        });
-      }
-    } catch (e) {
-      log("swarm:core-getStreams-error", {message:safeString(e)});
-    }
 
     on("onPeerConnect", function (d) {
       notePeer(d, "connected");
@@ -2469,12 +2483,27 @@ video {
         dataChannels: []
       },
       connectivity: {
+        offerCreated: false,
+        answerCreated: false,
+        localDescriptionSet: false,
+        remoteDescriptionSet: false,
+        iceGatheringCompleted: false,
+        iceConnectionChecking: false,
+        iceConnectionConnected: false,
+        iceConnectionCompleted: false,
+        iceConnectionFailed: false,
+        iceConnectionDisconnected: false,
+        connectionConnected: false,
+        dtlsConnected: false,
+        dataChannelCreated: false,
+        dataChannelOpened: false,
         trackerPeerDiscovered: false,
         localPeerIdKnown: false,
         remotePeerKnown: false,
         iceCandidatesGathered: false,
-        candidatePairSucceeded: false,
-        dataChannelOpened: false,
+        candidatePairSucceededObserved: false,
+        candidatePairSelectedObserved: false,
+        dataChannelOpenedObserved: false,
         p2pPeerConnected: false,
         p2pBytesReceived: 0
       },
@@ -2647,6 +2676,22 @@ video {
     });
 
     Object.keys(m).forEach(function(k){ R.connectivity[k] = m[k]; });
+
+    records.forEach(function(p){
+      (p.ice.connectionStateHistory || []).forEach(function(s){
+        if (s.value === "failed") R.connectivity.iceConnectionFailed = true;
+        if (s.value === "disconnected") R.connectivity.iceConnectionDisconnected = true;
+      });
+      (p.connection.stateHistory || []).forEach(function(s){
+        if (s.value === "connected") R.connectivity.connectionConnected = true;
+      });
+      if (p.stats && p.stats.transport && p.stats.transport.dtlsState === "connected") {
+        R.connectivity.dtlsConnected = true;
+      }
+      if ((p.dataChannels || []).some(function(d){ return !!d.openAt; })) {
+        R.connectivity.dataChannelOpenedObserved = true;
+      }
+    });
   }
 
   
@@ -2745,11 +2790,15 @@ video {
           createdAt: p.createdAt,
           states: p.states,
           stateHistory: p.stateHistory,
+          iceGatheringStateHistory: p.ice.gatheringStateHistory || [],
+          iceConnectionStateHistory: p.ice.connectionStateHistory || [],
+          connectionStateHistory: p.connection.stateHistory || [],
           candidateTypes: p.candidateTypes,
           localCandidates: p.localCandidates,
           remoteCandidates: p.remoteCandidates,
           selectedPair: p.selectedPair,
           candidatePairHistory: p.candidatePairHistory.slice(-20),
+          stats: p.stats,
           iceCandidateErrors: p.iceCandidateErrors,
           dataChannels: p.dataChannels
         };

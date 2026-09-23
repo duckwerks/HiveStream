@@ -61,6 +61,46 @@ Fresh v12.4 source; historical revisions remain in Git history.
     };
   }
 
+  function parseSdpCandidateInventory(desc) {
+    var sdp = desc && desc.sdp ? String(desc.sdp) : "";
+    var lines = sdp.split(/\\r?\\n/).filter(function(line) {
+      return line.indexOf("a=candidate:") === 0;
+    });
+    var counts = {host:0, srflx:0, relay:0, prflx:0, other:0};
+    var candidates = [];
+
+    lines.forEach(function(line) {
+      var tm = /\\btyp\\s+([^ ]+)/i.exec(line);
+      var type = tm ? String(tm[1]).toLowerCase() : "other";
+      if (counts[type] == null) type = "other";
+      counts[type] += 1;
+
+      var parts = line.substring("a=candidate:".length).trim().split(/\\s+/);
+      var protocol = parts.length > 2 ? String(parts[2]).toLowerCase() : null;
+      var address = parts.length > 4 ? parts[4] : null;
+      var port = parts.length > 5 ? Number(parts[5]) : null;
+
+      candidates.push({
+        type:type,
+        protocol:protocol,
+        addressFamily:address && address.indexOf(":") >= 0 ? "IPv6" : "IPv4",
+        address:address || null,
+        port:Number.isFinite(port) ? port : null,
+        line:line
+      });
+    });
+
+    return {
+      candidateLineCount:lines.length,
+      host:counts.host,
+      srflx:counts.srflx,
+      relay:counts.relay,
+      prflx:counts.prflx,
+      other:counts.other,
+      candidates:candidates
+    };
+  }
+
   function candidateSummary(c) {
     if (!c) return null;
     var text = c.candidate || "";
@@ -330,8 +370,10 @@ Fresh v12.4 source; historical revisions remain in Git history.
         return originalSetLocalDescription.call(self, desc);
       }).then(function(result) {
         var actual = safeCall(function(){ return self.localDescription; }, desc);
-        ctx.record.signaling.localDescriptions.push(sdpSummary(actual));
-        ctx.event("signaling:local-description-set", sdpSummary(actual));
+        var localSummary = sdpSummary(actual);
+        localSummary.candidateInventory = parseSdpCandidateInventory(actual);
+        ctx.record.signaling.localDescriptions.push(localSummary);
+        ctx.event("signaling:local-description-set", localSummary);
         return result;
       });
     };
@@ -341,8 +383,10 @@ Fresh v12.4 source; historical revisions remain in Git history.
         return originalSetRemoteDescription.call(self, desc);
       }).then(function(result) {
         var actual = safeCall(function(){ return self.remoteDescription; }, desc);
-        ctx.record.signaling.remoteDescriptions.push(sdpSummary(actual));
-        ctx.event("signaling:remote-description-set", sdpSummary(actual));
+        var remoteSummary = sdpSummary(actual);
+        remoteSummary.candidateInventory = parseSdpCandidateInventory(actual);
+        ctx.record.signaling.remoteDescriptions.push(remoteSummary);
+        ctx.event("signaling:remote-description-set", remoteSummary);
         return result;
       });
     };
@@ -2390,8 +2434,20 @@ video {
       },
       environment: currentEnvironment(),
       dependencies: {
-        hlsJs: HLS_VERSION,
-        p2pMediaLoaderHlsJs: P2PML_VERSION
+        hlsJs: {
+          package: "hls.js",
+          declaredVersion: HLS_VERSION,
+          sourceUrl: "https://cdn.jsdelivr.net/npm/hls.js@1.7.0/dist/hls.min.js",
+          runtimeVersion: null,
+          runtimeVerified: false
+        },
+        p2pMediaLoaderHlsJs: {
+          package: "p2p-media-loader-hlsjs",
+          declaredVersion: P2PML_VERSION,
+          sourceUrl: "https://cdn.jsdelivr.net/npm/p2p-media-loader-hlsjs@4.0.0/dist/p2p-media-loader-hlsjs.iife.min.js",
+          runtimeGlobal: "window.p2pml.hlsjs",
+          runtimeVerified: null
+        }
       },
       configuration: {
         streamUrl: streamUrlInput.value.trim() || DEFAULT_STREAM,
@@ -2793,6 +2849,12 @@ video {
           iceGatheringStateHistory: p.ice.gatheringStateHistory || [],
           iceConnectionStateHistory: p.ice.connectionStateHistory || [],
           connectionStateHistory: p.connection.stateHistory || [],
+          localSdpCandidateInventory: (p.signaling.localDescriptions || []).map(function(d){
+            return d.candidateInventory || null;
+          }),
+          remoteSdpCandidateInventory: (p.signaling.remoteDescriptions || []).map(function(d){
+            return d.candidateInventory || null;
+          }),
           candidateTypes: p.candidateTypes,
           localCandidates: p.localCandidates,
           remoteCandidates: p.remoteCandidates,

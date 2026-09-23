@@ -607,7 +607,6 @@ video {
   <section class="card" style="margin-top:12px">
     <h2>Full JSON</h2>
     <div class="controls" style="margin-bottom:8px">
-      <button id="copyBtn">Copy JSON</button>
       <button id="saveBtn">Save JSON to File</button>
     </div>
     <div class="small">
@@ -701,7 +700,6 @@ video {
   var stallRescueSecondsInput = document.getElementById("stallRescueSeconds");
   var startBtn = document.getElementById("startBtn");
   var stopBtn = document.getElementById("stopBtn");
-  var copyBtn = document.getElementById("copyBtn");
   var saveBtn = document.getElementById("saveBtn");
   var deviceLabelInput = document.getElementById("deviceLabel");
 
@@ -2956,7 +2954,7 @@ video {
       export: {
         savedAt: now(),
         format: "HiveStream Phase 1B diagnostic JSON",
-        exporterVersion: "12.4",
+        exporterVersion: "12.4.1",
         privacy: "Diagnostic export may include WebRTC ICE candidate addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
       },
       dependencies: R.dependencies,
@@ -3080,79 +3078,126 @@ video {
     }
   });
 
-  copyBtn.addEventListener("click", function () {
-    var textValue = JSON.stringify(publicReport(), null, 2);
+  function recordExportRuntimeEvent(type, data) {
+    var entry = {
+      at: now(),
+      elapsedMs: Math.round(mono() - (R._monoStart || mono())),
+      type: type,
+      data: data || null
+    };
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(textValue).then(function () {
-        log("json:copied");
-      }).catch(function () {
-        fallbackCopy(textValue);
-      });
-    } else {
-      fallbackCopy(textValue);
-    }
-  });
+    // Do not call log() here. log() immediately calls draw(), and draw()
+    // serializes the complete diagnostic report. During an export failure that
+    // can re-enter the same expensive path and hide the original error.
+    R.events.push(entry);
+    if (R.events.length > 1500) R.events.shift();
 
-  
+    window.__HS_LAST_EXPORT = {
+      at: entry.at,
+      type: type,
+      data: data || null
+    };
+  }
+
   function saveJsonToFile() {
-    var report = publicReport();
-    var jsonText = JSON.stringify(report, null, 2);
-    var started = report.test.startedAt || now();
-    var stamp = started.replace(/[:.]/g, "").replace(/Z$/, "Z");
-    var label = (report.identity.deviceLabel ||
-      (report.environment.browserFamily + "-" + report.environment.deviceClass) ||
-      "browser")
-      .replace(/[^a-z0-9_-]+/gi, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 40) || "browser";
-    var transportTag = report.transport && report.transport.mode ? report.transport.mode : "unknown";
-
-    var filename = "HiveStream-Phase1B-v12.4-" + transportTag + "-" + label + "-" + stamp + ".json";
+    var phase = "report-build";
+    var report = null;
+    var jsonText = null;
+    var blob = null;
+    var url = null;
+    var filename = null;
+    var startedMono = mono();
 
     try {
-      var blob = new Blob([jsonText], {
+      // Build the report and stringify it inside the same error boundary.
+      // v12.4 previously performed both operations before entering its try
+      // block, so failures here escaped the save-specific diagnostics.
+      report = publicReport();
+
+      phase = "json-stringify";
+      // Exactly one JSON.stringify() for the file being downloaded.
+      jsonText = JSON.stringify(report, null, 2);
+
+      phase = "filename";
+      var started = report.test.startedAt || now();
+      var stamp = started.replace(/[:.]/g, "").replace(/Z$/, "Z");
+      var label = (report.identity.deviceLabel ||
+        (report.environment.browserFamily + "-" + report.environment.deviceClass) ||
+        "browser")
+        .replace(/[^a-z0-9_-]+/gi, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 40) || "browser");
+      var transportTag = report.transport && report.transport.mode
+        ? report.transport.mode
+        : "unknown";
+
+      filename = "HiveStream-Phase1B-v12.4.1-" + transportTag + "-" +
+        label + "-" + stamp + ".json";
+
+      phase = "blob-create";
+      blob = new Blob([jsonText], {
         type: "application/json;charset=utf-8"
       });
-      var url = URL.createObjectURL(blob);
+
+      phase = "object-url-create";
+      url = URL.createObjectURL(blob);
+
+      phase = "download-click";
       var a = document.createElement("a");
       a.href = url;
       a.download = filename;
       a.rel = "noopener";
       document.body.appendChild(a);
-      a.click();
-      a.remove();
 
-      setTimeout(function () {
-        URL.revokeObjectURL(url);
-      }, 1000);
+      var clickThrew = false;
+      try {
+        a.click();
+      } catch (clickError) {
+        clickThrew = true;
+        throw clickError;
+      } finally {
+        a.remove();
+      }
 
-      log("json:saved", {
+      phase = "download-requested";
+
+      var result = {
+        ok: true,
         filename: filename,
-        bytes: jsonText.length
-      });
-    } catch (e) {
-      log("json:save-failed", {
-        filename: filename,
-        message: safeString(e)
-      });
-    }
-  }
+        jsonCharacters: jsonText.length,
+        blobBytes: blob.size,
+        clickThrew: clickThrew,
+        elapsedMs: Math.round(mono() - startedMono)
+      };
 
-  function fallbackCopy(value) {
-    var ta = document.createElement("textarea");
-    ta.value = value;
-    ta.style.position = "fixed";
-    ta.style.left = "-10000px";
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand("copy");
-      log("json:copied-fallback");
+      recordExportRuntimeEvent("json:saved", result);
+      bootText("JSON save requested — " + result.blobBytes + " bytes");
+      return result;
     } catch (e) {
-      log("json:copy-failed", { message: safeString(e) });
+      var failure = {
+        ok: false,
+        phase: phase,
+        filename: filename,
+        jsonCharacters: jsonText == null ? null : jsonText.length,
+        blobBytes: blob == null ? null : blob.size,
+        clickThrew: phase === "download-click",
+        name: e && e.name ? e.name : "Error",
+        message: safeString(e),
+        elapsedMs: Math.round(mono() - startedMono)
+      };
+
+      recordExportRuntimeEvent("json:save-failed", failure);
+      bootText("SAVE FAILED at " + phase + " — see Event Log / console");
+      throw e;
+    } finally {
+      if (url) {
+        try {
+          setTimeout(function () {
+            try { URL.revokeObjectURL(url); } catch (e) {}
+          }, 1000);
+        } catch (e) {}
+      }
     }
-    document.body.removeChild(ta);
   }
 
   R._monoStart = mono();

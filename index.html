@@ -63,19 +63,19 @@ Fresh v12.4.1.1 source; historical revisions remain in Git history.
 
   function parseSdpCandidateInventory(desc) {
     var sdp = desc && desc.sdp ? String(desc.sdp) : "";
-    var lines = sdp.split(/\\r?\\n/).filter(function(line) {
+    var lines = sdp.split(/\r?\n/).filter(function(line) {
       return line.indexOf("a=candidate:") === 0;
     });
     var counts = {host:0, srflx:0, relay:0, prflx:0, other:0};
     var candidates = [];
 
     lines.forEach(function(line) {
-      var tm = /\\btyp\\s+([^ ]+)/i.exec(line);
+      var tm = /\btyp\s+([^ ]+)/i.exec(line);
       var type = tm ? String(tm[1]).toLowerCase() : "other";
       if (counts[type] == null) type = "other";
       counts[type] += 1;
 
-      var parts = line.substring("a=candidate:".length).trim().split(/\\s+/);
+      var parts = line.substring("a=candidate:".length).trim().split(/\s+/);
       var protocol = parts.length > 2 ? String(parts[2]).toLowerCase() : null;
       var address = parts.length > 4 ? parts[4] : null;
       var port = parts.length > 5 ? Number(parts[5]) : null;
@@ -289,6 +289,7 @@ Fresh v12.4.1.1 source; historical revisions remain in Git history.
 
       if (kind === "iceGathering") r.ice.gatheringStateHistory.push(item);
       if (kind === "iceConnection") r.ice.connectionStateHistory.push(item);
+      if (kind === "iceGathering" || kind === "iceConnection") r.ice.stateHistory.push(item);
       if (kind === "connection") r.connection.stateHistory.push(item);
       if (kind === "signaling") r.signaling.stateHistory = r.signaling.stateHistory || [];
       if (kind === "signaling") r.signaling.stateHistory.push(item);
@@ -397,8 +398,7 @@ Fresh v12.4.1.1 source; historical revisions remain in Git history.
       ctx.event("signaling:addIceCandidate", summary);
       var result;
       try {
-        result = originalAddIceCandidate.call(self, candidate);
-      } catch (error) {
+        result = originalAddIceCandidate.call(self, candidate);      } catch (error) {
         ctx.event("signaling:addIceCandidate-throw", {
           summary: summary,
           message: safeString(error)
@@ -523,9 +523,9 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.4.1</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.4.1.1</h1>
   <div class="small">
-    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.4.1 diagnostic implementation
+    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.4.1.1 diagnostic implementation
   </div>
   <div id="bootStatus" class="small" style="margin-top:6px">BOOT: page script not started</div>
 
@@ -612,7 +612,7 @@ video {
     <div class="small">
       Save JSON downloads the complete diagnostic report with browser, device,
       run, P2P identity, transport-mode, and network-capability identifiers.
-      It does not export public IP, cookies, local storage contents, browsing
+      It may export IP addresses from WebRTC ICE candidates for network-path diagnosis; it does not export cookies, local storage contents, browsing
       history, or precise location.
     </div>
     <pre id="json" style="margin-top:8px"></pre>
@@ -797,8 +797,7 @@ video {
       screen: {
         width: window.screen && Number(window.screen.width) || null,
         height: window.screen && Number(window.screen.height) || null,
-        availWidth: window.screen && Number(window.screen.availWidth) || null,
-        availHeight: window.screen && Number(window.screen.availHeight) || null,
+        availWidth: window.screen && Number(window.screen.availWidth) || null,        availHeight: window.screen && Number(window.screen.availHeight) || null,
         colorDepth: window.screen && Number(window.screen.colorDepth) || null,
         pixelDepth: window.screen && Number(window.screen.pixelDepth) || null
       },
@@ -845,7 +844,7 @@ video {
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-      version: "12.4",
+      version: "12.4.1.1",
       startedAt: null,
       elapsedMs: 0,
       authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (OpenAI) " +
@@ -898,7 +897,7 @@ video {
     },
 
     instrumentation: {
-      instrumentationVersion: "12.4",
+      instrumentationVersion: "12.4.1.1",
       engineEventBindings: [],
       receivedP2PEvents: {},
       engineSurface: null,
@@ -1048,6 +1047,17 @@ video {
     return item;
   }
 
+  function renderEventLogOnly() {
+    var el = document.getElementById("log");
+    if (!el) return;
+    try {
+      el.textContent = R.events.slice(-250).map(function (e) {
+        return "[" + e.at + "] " + e.type + " " +
+          (e.data ? JSON.stringify(e.data) : "");
+      }).join("\n");
+    } catch (e) {}
+  }
+
   function log(type, data) {
     var entry = {
       at: now(),
@@ -1057,16 +1067,7 @@ video {
     };
     R.events.push(entry);
     if (R.events.length > 1500) R.events.shift();
-    try {
-      draw();
-    } catch (renderError) {
-      window.__HS_RENDER_ERROR = {
-        name: renderError && renderError.name || "Error",
-        message: safeString(renderError),
-        stack: renderError && renderError.stack ? String(renderError.stack) : null
-      };
-      if (bootStatus) bootStatus.textContent = "BOOT: RENDER FAILED — see console";
-    }
+    renderEventLogOnly();
   }
 
   function modeValue() {
@@ -1197,8 +1198,7 @@ video {
       pcIndex: rec.index,
       label: channel.label || null,
       id: channel.id != null ? channel.id : null,
-      ordered: channel.ordered != null ? channel.ordered : null,
-      protocol: channel.protocol || null,
+      ordered: channel.ordered != null ? channel.ordered : null,      protocol: channel.protocol || null,
       state: channel.readyState || null,
       createdAt: now(),
       openedAt: null,
@@ -1597,8 +1597,7 @@ video {
         if (/^-PM\d{4}-[A-Za-z0-9]{8,}$/.test(value)) {
           found = { peerId: value, source: path, verified: true };
         }
-        return;
-      }
+        return;      }
 
       if (kind !== "object" && kind !== "function") return;
       if (already(value)) return;
@@ -1997,8 +1996,7 @@ video {
       log("scheduler:segment-abort", item);
     });
 
-    on("onSegmentError", function (d) {
-      var item = {
+    on("onSegmentError", function (d) {      var item = {
         at: now(),
         source: d && d.downloadSource ? d.downloadSource : null,
         peerId: d && d.peerId ? d.peerId : null,
@@ -2397,8 +2395,7 @@ video {
     hlsDestroying = false;
 
     try {
-      video.pause();
-      video.removeAttribute("src");
+      video.pause();      video.removeAttribute("src");
       video.load();
     } catch (e) {}
   }
@@ -2410,7 +2407,7 @@ video {
     R = {
       test: {
         name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-        version: "12.4",
+        version: "12.4.1.1",
         startedAt: now(),
         elapsedMs: 0,
         authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (OpenAI) " +
@@ -2797,8 +2794,7 @@ video {
       R.verdict.p2pChunkBytesReceived &&
       R.verdict.p2pSegmentMatchedSelectedVariant;
 
-    R.test.elapsedMs = Math.round(mono() - (R._monoStart || mono()));
-  }
+    R.test.elapsedMs = Math.round(mono() - (R._monoStart || mono()));  }
 
   function compactPeerView() {
     var peers = Object.keys(R.peers).map(function (id) {
@@ -2954,8 +2950,8 @@ video {
       export: {
         savedAt: now(),
         format: "HiveStream Phase 1B diagnostic JSON",
-        exporterVersion: "12.4.1",
-        privacy: "Diagnostic export may include WebRTC ICE candidate addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
+        exporterVersion: "12.4.1.1",
+        privacy: "Diagnostic export may include WebRTC ICE candidate IP addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
       },
       dependencies: R.dependencies,
       configuration: R.configuration,
@@ -3198,15 +3194,3 @@ video {
         } catch (e) {}
       }
     }
-  }
-
-  R._monoStart = mono();
-  R.test.startedAt = null;
-  R.test.elapsedMs = 0;
-  bootText("initializing diagnostic state");
-  draw();
-  bootText("READY — buttons wired");
-})();
-</script>
-</body>
-  </html>

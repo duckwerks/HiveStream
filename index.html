@@ -3209,37 +3209,57 @@ video {
 
   function compactWebRTC() {
     syncV11BrowserProtocol();
+
+    // R.webrtc.peerConnections is the current flattened v11 projection.
+    // The full nested protocol records remain in browserProtocol.records.
+    // Use the nested record only for fields that are no longer present on
+    // the flattened projection, rather than reading stale p.ice/p.connection/
+    // p.signaling properties from R.webrtc.peerConnections.
+    var nestedRecords = R.webrtc.browserProtocol.records || [];
+    var nestedByPcId = {};
+    nestedRecords.forEach(function (record) {
+      if (record && record.pcId) nestedByPcId[record.pcId] = record;
+    });
+
     return {
       connectivity: R.connectivity,
       browserProtocol: R.webrtc.browserProtocol,
       iceCandidateCounts: R.webrtc.ice,
-      peerConnections: R.webrtc.peerConnections.map(function (p) {
+      peerConnections: (R.webrtc.peerConnections || []).map(function (p) {
+        var nested = p && p.pcId ? nestedByPcId[p.pcId] : null;
+        var signaling = nested && nested.signaling ? nested.signaling : {};
+        var ice = nested && nested.ice ? nested.ice : {};
+        var connection = nested && nested.connection ? nested.connection : {};
+        var stats = nested && nested.stats ? nested.stats : (p.stats || null);
+
         return {
           index: p.index,
-          createdAt: p.createdAt,
-          states: p.states,
-          stateHistory: p.stateHistory,
-          iceGatheringStateHistory: p.ice.gatheringStateHistory || [],
-          iceConnectionStateHistory: p.ice.connectionStateHistory || [],
-          connectionStateHistory: p.connection.stateHistory || [],
-          localSdpCandidateInventory: (p.signaling.localDescriptions || []).map(function(d){
-            return d.candidateInventory || null;
+          pcId: p.pcId || (nested && nested.pcId) || null,
+          peerId: p.peerId || (nested && (nested.peerId || nested.remotePeerId)) || null,
+          createdAt: p.createdAt || (nested && nested.createdAt) || null,
+          states: p.states || null,
+          stateHistory: p.stateHistory || [],
+          iceGatheringStateHistory: ice.gatheringStateHistory || [],
+          iceConnectionStateHistory: ice.connectionStateHistory || [],
+          connectionStateHistory: connection.stateHistory || [],
+          localSdpCandidateInventory: (signaling.localDescriptions || []).map(function(d){
+            return d && d.candidateInventory ? d.candidateInventory : null;
           }),
-          remoteSdpCandidateInventory: (p.signaling.remoteDescriptions || []).map(function(d){
-            return d.candidateInventory || null;
+          remoteSdpCandidateInventory: (signaling.remoteDescriptions || []).map(function(d){
+            return d && d.candidateInventory ? d.candidateInventory : null;
           }),
-          candidateTypes: p.candidateTypes,
-          localCandidates: p.localCandidates,
-          remoteCandidates: p.remoteCandidates,
-          selectedPair: p.selectedPair,
-          candidatePairHistory: p.candidatePairHistory.slice(-20),
-          stats: p.stats,
-          iceCandidateErrors: p.iceCandidateErrors,
-          dataChannels: p.dataChannels
+          candidateTypes: p.candidateTypes || {},
+          localCandidates: p.localCandidates || [],
+          remoteCandidates: p.remoteCandidates || [],
+          selectedPair: p.selectedPair || (stats && stats.selectedCandidatePair) || null,
+          candidatePairHistory: (p.candidatePairHistory || (stats && stats.candidatePairs) || []).slice(-20),
+          stats: stats,
+          iceCandidateErrors: p.iceCandidateErrors || (ice.candidateErrors || []),
+          dataChannels: p.dataChannels || []
         };
       }),
-      candidatePairRecords: R.webrtc.candidatePairRecords.slice(-50),
-      dataChannels: R.webrtc.dataChannels
+      candidatePairRecords: (R.webrtc.candidatePairRecords || []).slice(-50),
+      dataChannels: R.webrtc.dataChannels || []
     };
   }
 

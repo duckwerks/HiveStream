@@ -602,6 +602,7 @@ video {
     <div class="card"><h2>P2P Scheduler / Decision Evidence</h2><pre id="scheduler"></pre></div>
     <div class="card"><h2>Transport Mode / Stall-Rescue / Recovery</h2><pre id="transport"></pre></div>
     <div class="card"><h2>Transfer / Proof</h2><pre id="transfer"></pre></div>
+    <div class="card"><h2>Segment Storage</h2><pre id="storage"></pre></div>
     <div class="card"><h2>Event Log</h2><pre id="log"></pre></div>
   </section>
 
@@ -841,6 +842,37 @@ video {
     return trackers;
   }
 
+  function initialStorageState() {
+    return {
+      available: false,
+      attached: false,
+      constructor: null,
+      runtimeAccessPath: null,
+      instrumentationError: null,
+      methodSurface: [],
+      counters: {
+        onSegmentRequested: 0,
+        storeSegment: 0,
+        storeSegmentSucceeded: 0,
+        storeSegmentFailed: 0,
+        hasSegment: 0,
+        hasSegmentHit: 0,
+        hasSegmentMiss: 0,
+        getSegmentData: 0,
+        getSegmentDataHit: 0,
+        getSegmentDataMiss: 0,
+        getStoredSegmentIds: 0,
+        getUsage: 0,
+        onPlaybackUpdated: 0
+      },
+      lastUsage: null,
+      lastRequested: null,
+      records: [],
+      storedSegments: [],
+      storageHits: []
+    };
+  }
+
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
@@ -978,6 +1010,8 @@ video {
       },
       segments: []
     },
+
+    storage: initialStorageState(),
 
     webrtc: {
       browserProtocol: {
@@ -1345,6 +1379,7 @@ video {
 
   function pollStats() {
     var runIdAtStart = R.identity && R.identity.runId;
+    installSegmentStorageInstrumentation();
     syncV11BrowserProtocol();
     R.instrumentation.peerIdDiscoveryAttempts += 1;
     discoverActualPeerId();
@@ -1789,6 +1824,291 @@ video {
     });
   }
 
+  function installSegmentStorageInstrumentation() {
+    var core = hlsInstance && hlsInstance.p2pEngine && hlsInstance.p2pEngine.core;
+    var storage = core && core.segmentStorage;
+
+    if (!storage) return false;
+    if (storage.__hsStorageInstrumentationRunId === R.identity.runId) {
+      return true;
+    }
+
+    try {
+      R.storage.available = true;
+      R.storage.attached = true;
+      R.storage.runtimeAccessPath = "hlsInstance.p2pEngine.core.segmentStorage";
+      R.storage.constructor = storage.constructor && storage.constructor.name
+        ? storage.constructor.name
+        : null;
+      R.storage.methodSurface = [
+        "initialize", "onPlaybackUpdated", "onSegmentRequested",
+        "storeSegment", "getSegmentData", "getUsage", "hasSegment",
+        "getStoredSegmentIds", "setSegmentChangeCallback", "destroy"
+      ].filter(function (name) {
+        return typeof storage[name] === "function";
+      });
+
+      function pushRecord(type, detail) {
+        boundedPush(R.storage.records, {
+          at: now(),
+          elapsedMs: Math.round(mono() - (R._monoStart || mono())),
+          type: type,
+          detail: detail || null
+        });
+      }
+
+      function storageInfo(streamSwarmId, segmentId) {
+        var stream = (R.swarm.streams || []).filter(function (s) {
+          return s && s.streamSwarmId === streamSwarmId;
+        })[0];
+        return {
+          streamSwarmId: streamSwarmId || null,
+          segmentId: segmentId == null ? null : Number(segmentId),
+          infoHash: stream && stream.infoHash ? stream.infoHash : null,
+          swarmId: stream && stream.swarmId ? stream.swarmId : R.swarm.resolvedSwarmId || null
+        };
+      }
+
+      var originalOnSegmentRequested = storage.onSegmentRequested;
+      var originalStoreSegment = storage.storeSegment;
+      var originalHasSegment = storage.hasSegment;
+      var originalGetSegmentData = storage.getSegmentData;
+      var originalGetStoredSegmentIds = storage.getStoredSegmentIds;
+      var originalGetUsage = storage.getUsage;
+      var originalOnPlaybackUpdated = storage.onPlaybackUpdated;
+
+      if (typeof originalOnSegmentRequested === "function") {
+        storage.onSegmentRequested = function () {
+          var args = Array.prototype.slice.call(arguments);
+          var info = storageInfo(args[1], args[2]);
+          R.storage.counters.onSegmentRequested += 1;
+          R.storage.lastRequested = {
+            at: now(),
+            swarmId: args[0] || null,
+            streamSwarmId: args[1] || null,
+            segmentId: args[2] == null ? null : Number(args[2]),
+            startTime: args[3] == null ? null : Number(args[3]),
+            endTime: args[4] == null ? null : Number(args[4]),
+            streamType: args[5] || null,
+            isLiveStream: !!args[6],
+            infoHash: info.infoHash
+          };
+          pushRecord("onSegmentRequested", R.storage.lastRequested);
+          return originalOnSegmentRequested.apply(this, args);
+        };
+      }
+
+      if (typeof originalHasSegment === "function") {
+        storage.hasSegment = function () {
+          var args = Array.prototype.slice.call(arguments);
+          var result;
+          try {
+            result = originalHasSegment.apply(this, args);
+          } catch (error) {
+            pushRecord("hasSegment:error", {
+              message: safeString(error),
+              streamSwarmId: args[1] || null,
+              segmentId: args[2] == null ? null : Number(args[2])
+            });
+            throw error;
+          }
+
+          var info = storageInfo(args[1], args[2]);
+          R.storage.counters.hasSegment += 1;
+          if (result) {
+            R.storage.counters.hasSegmentHit += 1;
+            boundedPush(R.storage.storageHits, {
+              at: now(),
+              streamSwarmId: info.streamSwarmId,
+              segmentId: info.segmentId,
+              infoHash: info.infoHash,
+              source: "hasSegment"
+            });
+          } else {
+            R.storage.counters.hasSegmentMiss += 1;
+          }
+          return result;
+        };
+      }
+
+      if (typeof originalGetSegmentData === "function") {
+        storage.getSegmentData = function () {
+          var args = Array.prototype.slice.call(arguments);
+          var info = storageInfo(args[1], args[2]);
+          R.storage.counters.getSegmentData += 1;
+          var started = mono();
+          var result;
+          try {
+            result = originalGetSegmentData.apply(this, args);
+          } catch (error) {
+            pushRecord("getSegmentData:error", {
+              streamSwarmId: info.streamSwarmId,
+              segmentId: info.segmentId,
+              message: safeString(error)
+            });
+            throw error;
+          }
+          return Promise.resolve(result).then(function (data) {
+            var bytes = data && data.byteLength != null ? Number(data.byteLength) : 0;
+            var hit = !!data;
+            if (hit) {
+              R.storage.counters.getSegmentDataHit += 1;
+              boundedPush(R.storage.storageHits, {
+                at: now(),
+                streamSwarmId: info.streamSwarmId,
+                segmentId: info.segmentId,
+                infoHash: info.infoHash,
+                bytes: bytes,
+                source: "getSegmentData"
+              });
+            } else {
+              R.storage.counters.getSegmentDataMiss += 1;
+            }
+            pushRecord("getSegmentData:" + (hit ? "hit" : "miss"), {
+              streamSwarmId: info.streamSwarmId,
+              segmentId: info.segmentId,
+              infoHash: info.infoHash,
+              bytes: bytes,
+              elapsedMs: Math.round(mono() - started)
+            });
+            return data;
+          }, function (error) {
+            pushRecord("getSegmentData:rejected", {
+              streamSwarmId: info.streamSwarmId,
+              segmentId: info.segmentId,
+              infoHash: info.infoHash,
+              message: safeString(error),
+              elapsedMs: Math.round(mono() - started)
+            });
+            throw error;
+          });
+        };
+      }
+
+      if (typeof originalStoreSegment === "function") {
+        storage.storeSegment = function () {
+          var args = Array.prototype.slice.call(arguments);
+          var info = storageInfo(args[1], args[2]);
+          var bytes = args[3] && args[3].byteLength != null ? Number(args[3].byteLength) : 0;
+          var detail = {
+            swarmId: args[0] || null,
+            streamSwarmId: info.streamSwarmId,
+            segmentId: info.segmentId,
+            infoHash: info.infoHash,
+            bytes: bytes,
+            startTime: args[4] == null ? null : Number(args[4]),
+            endTime: args[5] == null ? null : Number(args[5]),
+            streamType: args[6] || null,
+            isLiveStream: !!args[7]
+          };
+          R.storage.counters.storeSegment += 1;
+          pushRecord("storeSegment:started", detail);
+          var started = mono();
+          var result;
+          try {
+            result = originalStoreSegment.apply(this, args);
+          } catch (error) {
+            R.storage.counters.storeSegmentFailed += 1;
+            pushRecord("storeSegment:threw", {
+              segment: detail,
+              message: safeString(error),
+              elapsedMs: Math.round(mono() - started)
+            });
+            throw error;
+          }
+          return Promise.resolve(result).then(function (value) {
+            R.storage.counters.storeSegmentSucceeded += 1;
+            boundedPush(R.storage.storedSegments, {
+              at: now(),
+              streamSwarmId: info.streamSwarmId,
+              segmentId: info.segmentId,
+              infoHash: info.infoHash,
+              bytes: bytes
+            });
+            pushRecord("storeSegment:succeeded", {
+              segment: detail,
+              elapsedMs: Math.round(mono() - started)
+            });
+            return value;
+          }, function (error) {
+            R.storage.counters.storeSegmentFailed += 1;
+            pushRecord("storeSegment:rejected", {
+              segment: detail,
+              message: safeString(error),
+              elapsedMs: Math.round(mono() - started)
+            });
+            throw error;
+          });
+        };
+      }
+
+      if (typeof originalGetStoredSegmentIds === "function") {
+        storage.getStoredSegmentIds = function () {
+          var args = Array.prototype.slice.call(arguments);
+          var result;
+          try {
+            result = originalGetStoredSegmentIds.apply(this, args);
+          } catch (error) {
+            pushRecord("getStoredSegmentIds:error", {
+              streamSwarmId: args[1] || null,
+              message: safeString(error)
+            });
+            throw error;
+          }
+          R.storage.counters.getStoredSegmentIds += 1;
+          pushRecord("getStoredSegmentIds", {
+            swarmId: args[0] || null,
+            streamSwarmId: args[1] || null,
+            segmentIds: Array.isArray(result) ? result.slice(-100) : null
+          });
+          return result;
+        };
+      }
+
+      if (typeof originalGetUsage === "function") {
+        storage.getUsage = function () {
+          var result = originalGetUsage.apply(this, arguments);
+          R.storage.counters.getUsage += 1;
+          R.storage.lastUsage = {
+            at: now(),
+            totalCapacityMiB: result && result.totalCapacity != null ? Number(result.totalCapacity) : null,
+            usedCapacityMiB: result && result.usedCapacity != null ? Number(result.usedCapacity) : null
+          };
+          return result;
+        };
+      }
+
+      if (typeof originalOnPlaybackUpdated === "function") {
+        storage.onPlaybackUpdated = function () {
+          var args = Array.prototype.slice.call(arguments);
+          R.storage.counters.onPlaybackUpdated += 1;
+          return originalOnPlaybackUpdated.apply(this, args);
+        };
+      }
+
+      Object.defineProperty(storage, "__hsStorageInstrumentationRunId", {
+        value: R.identity.runId,
+        configurable: true
+      });
+
+      log("storage:instrumented", {
+        constructor: R.storage.constructor,
+        accessPath: R.storage.runtimeAccessPath,
+        methods: R.storage.methodSurface
+      });
+      return true;
+    } catch (error) {
+      R.storage.available = false;
+      R.storage.attached = false;
+      R.storage.instrumentationError = safeString(error);
+      log("storage:instrumentation-error", {
+        accessPath: "hlsInstance.p2pEngine.core.segmentStorage",
+        message: safeString(error)
+      });
+      return false;
+    }
+  }
+
   function wireCoreEvents() {
     if (!hlsInstance || !hlsInstance.p2pEngine) {
       log("fatal:p2p-engine-missing");
@@ -1796,6 +2116,8 @@ video {
     }
 
     var engine = hlsInstance.p2pEngine;
+
+    installSegmentStorageInstrumentation();
 
     R.instrumentation.engineSurface = publicSurface(engine, "hlsInstance.p2pEngine");
     R.instrumentation.coreSurface = publicSurface(engine.core, "hlsInstance.p2pEngine.core");
@@ -2374,8 +2696,8 @@ video {
 
       hlsInstance = new HlsWithP2P(options);
 
-      hlsInstance.loadSource(R.configuration.streamUrl);
       hlsInstance.attachMedia(video);
+      hlsInstance.loadSource(R.configuration.streamUrl);
 
       log("player:created", {
         loaderGlobal: "window.p2pml.hlsjs.HlsJsP2PEngine",
@@ -2531,6 +2853,7 @@ video {
         bytes: { http: 0, p2pDown: 0, p2pUp: 0 },
         segments: []
       },
+      storage: initialStorageState(),
       webrtc: {
         browserProtocol: {
           currentRunOnly: true,
@@ -2979,6 +3302,20 @@ video {
       trackers: compactPeerView().trackers,
       peers: compactPeerView().peers,
       transfer: R.transfer,
+      storage: {
+        available: R.storage.available,
+        attached: R.storage.attached,
+        constructor: R.storage.constructor,
+        runtimeAccessPath: R.storage.runtimeAccessPath,
+        instrumentationError: R.storage.instrumentationError,
+        methodSurface: R.storage.methodSurface,
+        counters: R.storage.counters,
+        lastUsage: R.storage.lastUsage,
+        lastRequested: R.storage.lastRequested,
+        storedSegments: R.storage.storedSegments,
+        storageHits: R.storage.storageHits,
+        records: R.storage.records
+      },
       connectivity: R.connectivity,
       webrtc: compactWebRTC(),
       browserProtocol: R.webrtc.browserProtocol,
@@ -3027,6 +3364,11 @@ video {
         transfer: R.transfer,
         connectivity: R.connectivity,
         verdict: R.verdict
+      }, null, 2);
+
+    document.getElementById("storage").textContent =
+      JSON.stringify({
+        storage: R.storage
       }, null, 2);
 
     document.getElementById("log").textContent =
@@ -3126,6 +3468,11 @@ video {
     var startedMono = mono();
 
     try {
+      recordExportRuntimeEvent("json:save-started", {
+        phase: "report-build",
+        runId: R.identity.runId
+      });
+
       // Build the report and stringify it inside the same error boundary.
       // v12.4.1 previously performed both operations before entering its try
       // block, so failures here escaped the save-specific diagnostics.

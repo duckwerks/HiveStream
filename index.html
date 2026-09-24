@@ -2117,7 +2117,49 @@ video {
 
     var engine = hlsInstance.p2pEngine;
 
-    installSegmentStorageInstrumentation();
+    // Core.initializeSegmentStorage() is an internal TS-private method in the
+    // pinned v4.0.0 source, but it is a normal runtime property in the browser
+    // bundle. Wrapping it lets the diagnostic attach to the storage object
+    // immediately after the library initializes it and before HybridLoader's
+    // first storage operation. This is diagnostic-only and preserves the
+    // library's return value/error semantics.
+    try {
+      var coreForStorageInit = engine.core;
+      var originalInitializeSegmentStorage = coreForStorageInit &&
+        coreForStorageInit.initializeSegmentStorage;
+
+      if (typeof originalInitializeSegmentStorage === "function" &&
+          !coreForStorageInit.__hsStorageInitWrapped) {
+        coreForStorageInit.initializeSegmentStorage = function () {
+          var self = this;
+          var args = Array.prototype.slice.call(arguments);
+          return Promise.resolve(
+            originalInitializeSegmentStorage.apply(self, args)
+          ).then(function (value) {
+            installSegmentStorageInstrumentation();
+            return value;
+          }, function (error) {
+            installSegmentStorageInstrumentation();
+            throw error;
+          });
+        };
+        Object.defineProperty(coreForStorageInit, "__hsStorageInitWrapped", {
+          value: true,
+          configurable: true
+        });
+        R.storage.runtimeAccessPath =
+          "hlsInstance.p2pEngine.core.segmentStorage (attached after initializeSegmentStorage)";
+      } else {
+        installSegmentStorageInstrumentation();
+      }
+    } catch (storageInitWrapError) {
+      R.storage.instrumentationError =
+        "initializeSegmentStorage wrapper: " + safeString(storageInitWrapError);
+      log("storage:initialization-wrapper-error", {
+        message: safeString(storageInitWrapError)
+      });
+      installSegmentStorageInstrumentation();
+    }
 
     R.instrumentation.engineSurface = publicSurface(engine, "hlsInstance.p2pEngine");
     R.instrumentation.coreSurface = publicSurface(engine.core, "hlsInstance.p2pEngine.core");
@@ -3512,6 +3554,12 @@ video {
       a.download = filename;
       a.rel = "noopener";
       document.body.appendChild(a);
+
+      recordExportRuntimeEvent("json:download-invoking", {
+        filename: filename,
+        jsonCharacters: jsonText.length,
+        blobBytes: blob.size
+      });
 
       var clickThrew = false;
       try {

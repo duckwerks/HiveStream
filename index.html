@@ -355,14 +355,16 @@ Fresh v12.4.1.1 source; historical revisions remain in Git history.
 
     pc.createOffer = function() {
       var self = this;
+      var args = Array.prototype.slice.call(arguments);
       return ctx.operation("createOffer", function() {
-        return originalCreateOffer.apply(self, arguments);
+        return originalCreateOffer.apply(self, args);
       });
     };
     pc.createAnswer = function() {
       var self = this;
+      var args = Array.prototype.slice.call(arguments);
       return ctx.operation("createAnswer", function() {
-        return originalCreateAnswer.apply(self, arguments);
+        return originalCreateAnswer.apply(self, args);
       });
     };
     pc.setLocalDescription = function(desc) {
@@ -2463,6 +2465,7 @@ video {
         announceTrackers: TRACKER_HINTS.slice()
       },
       instrumentation: {
+        instrumentationVersion: "12.4.1.1",
         engineEventBindings: [],
         receivedP2PEvents: {},
         engineSurface: null,
@@ -3040,8 +3043,15 @@ video {
     bootText("start clicked");
     try {
       resetRun();
+      started = false;
+      var playerCreated = createPlayer();
+      if (!playerCreated) {
+        started = false;
+        bootText("START FAILED — player creation failed; see Event Log / console");
+        try { draw(); } catch (drawError) {}
+        return;
+      }
       started = true;
-      createPlayer();
 
     if (renderTimer) clearInterval(renderTimer);
     if (statsTimer) clearInterval(statsTimer);

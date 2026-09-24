@@ -397,8 +397,7 @@ Fresh v12.4.1.1 source; historical revisions remain in Git history.
       ctx.record.signaling.addIceCandidateCalls++;
       ctx.event("signaling:addIceCandidate", summary);
       var result;
-      try {
-        result = originalAddIceCandidate.call(self, candidate);      } catch (error) {
+      try {        result = originalAddIceCandidate.call(self, candidate);      } catch (error) {
         ctx.event("signaling:addIceCandidate-throw", {
           summary: summary,
           message: safeString(error)
@@ -797,8 +796,7 @@ video {
       screen: {
         width: window.screen && Number(window.screen.width) || null,
         height: window.screen && Number(window.screen.height) || null,
-        availWidth: window.screen && Number(window.screen.availWidth) || null,        availHeight: window.screen && Number(window.screen.availHeight) || null,
-        colorDepth: window.screen && Number(window.screen.colorDepth) || null,
+        availWidth: window.screen && Number(window.screen.availWidth) || null,        availHeight: window.screen && Number(window.screen.availHeight) || null,        colorDepth: window.screen && Number(window.screen.colorDepth) || null,
         pixelDepth: window.screen && Number(window.screen.pixelDepth) || null
       },
       devicePixelRatio: Number(window.devicePixelRatio) || null,
@@ -1197,8 +1195,7 @@ video {
     var d = {
       pcIndex: rec.index,
       label: channel.label || null,
-      id: channel.id != null ? channel.id : null,
-      ordered: channel.ordered != null ? channel.ordered : null,      protocol: channel.protocol || null,
+      id: channel.id != null ? channel.id : null,      ordered: channel.ordered != null ? channel.ordered : null,      protocol: channel.protocol || null,
       state: channel.readyState || null,
       createdAt: now(),
       openedAt: null,
@@ -1598,7 +1595,6 @@ video {
           found = { peerId: value, source: path, verified: true };
         }
         return;      }
-
       if (kind !== "object" && kind !== "function") return;
       if (already(value)) return;
       seen.push(value);
@@ -1830,9 +1826,15 @@ video {
       log("scheduler:core-config-error", { message: safeString(e) });
     }
 
+    var wiredRunId = R.identity.runId;
+
     function on(name, fn) {
       try {
         engine.addEventListener(name, function () {
+          // The engine may finish an asynchronous operation after this run has
+          // been destroyed and a new run has already replaced global R.
+          // Never let stale callbacks contaminate the new run's report.
+          if (!R.identity || R.identity.runId !== wiredRunId) return;
           var args = Array.prototype.slice.call(arguments);
           recordReceivedP2PEvent(name, args);
           return fn.apply(this, args);
@@ -1997,8 +1999,7 @@ video {
     });
 
     on("onSegmentError", function (d) {      var item = {
-        at: now(),
-        source: d && d.downloadSource ? d.downloadSource : null,
+        at: now(),        source: d && d.downloadSource ? d.downloadSource : null,
         peerId: d && d.peerId ? d.peerId : null,
         infoHash: d && d.infoHash ? d.infoHash : null,
         streamType: d && d.streamType ? d.streamType : null,
@@ -2176,11 +2177,18 @@ video {
   function attachHlsEvents() {
     if (!hlsInstance || !hlsInstance.on || !window.Hls) return;
 
+    var wiredRunId = R.identity.runId;
+    function isCurrentRun() {
+      return !!R.identity && R.identity.runId === wiredRunId;
+    }
+
     hlsInstance.on(Hls.Events.MANIFEST_LOADING, function (e, d) {
+      if (!isCurrentRun()) return;
       log("hls:manifest-loading", { url: d && d.url ? d.url : null });
     });
 
     hlsInstance.on(Hls.Events.MANIFEST_LOADED, function (e, d) {
+      if (!isCurrentRun()) return;
       R.manifest.loaded = true;
       R.manifest.url = d && d.url ? d.url : R.configuration.streamUrl;
       R.manifest.renditions = (d && d.levels ? d.levels : []).map(function (l, i) {
@@ -2225,6 +2233,7 @@ video {
     });
 
     hlsInstance.on(Hls.Events.LEVEL_SWITCHED, function (e, d) {
+      if (!isCurrentRun()) return;
       R.manifest.activeLevelIndex = d && d.level != null ? d.level : null;
       log("hls:level-switched", { level: R.manifest.activeLevelIndex });
 
@@ -2252,6 +2261,7 @@ video {
     });
 
     hlsInstance.on(Hls.Events.ERROR, function (e, d) {
+      if (!isCurrentRun()) return;
       log("hls:error", {
         type: d && d.type ? d.type : null,
         details: d && d.details ? d.details : null,
@@ -2397,8 +2407,7 @@ video {
     try {
       video.pause();      video.removeAttribute("src");
       video.load();
-    } catch (e) {}
-  }
+    } catch (e) {}  }
 
   function resetRun() {
     stopPlayer();
@@ -2640,6 +2649,9 @@ video {
 
     selected.forEach(function(pc, index){
       var p = pc.__hsV11;
+      if ((p.ice.candidates || []).length) {
+        R.connectivity.iceCandidatesGathered = true;
+      }
       (p.ice.candidates || []).forEach(function(c){
         var t = normalizeCandidateType(c.candidateType || "other");
         R.webrtc.ice[t] = (R.webrtc.ice[t] || 0) + 1;
@@ -2797,8 +2809,7 @@ video {
     R.test.elapsedMs = Math.round(mono() - (R._monoStart || mono()));  }
 
   function compactPeerView() {
-    var peers = Object.keys(R.peers).map(function (id) {
-      var p = R.peers[id];
+    var peers = Object.keys(R.peers).map(function (id) {      var p = R.peers[id];
       return {
         peerId: id,
         connected: p.connected,

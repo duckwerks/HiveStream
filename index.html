@@ -3532,7 +3532,7 @@ video {
         "browser")
         .replace(/[^a-z0-9_-]+/gi, "-")
         .replace(/^-+|-+$/g, "")
-        .slice(0, 40) || "browser");
+        .slice(0, 40) || "browser";
       var transportTag = report.transport && report.transport.mode
         ? report.transport.mode
         : "unknown";

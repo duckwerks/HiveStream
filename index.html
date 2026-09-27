@@ -1,15 +1,15 @@
 <!doctype html>
 <!--
-HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.0
+HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.1
 Author: Elwood Edwards (Project Owner / HiveStream Developer)
 Technical implementation and diagnostic revision: GPT-5.6 Luna (OpenAI)
-Fresh v12.5.0 source; historical revisions remain in Git history.
+Fresh v12.5.1 source; historical revisions remain in Git history.
 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.0</title>
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.1</title>
 
 
 
@@ -534,9 +534,9 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.0</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.1</h1>
   <div class="small">
-    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.5.0 diagnostic implementation
+    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.5.1 diagnostic implementation
   </div>
   <div id="bootStatus" class="small" style="margin-top:6px">BOOT: page script not started</div>
 
@@ -886,7 +886,7 @@ video {
   var R = {
     test: {
       name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-      version: "12.5.0",
+      version: "12.5.1",
       startedAt: null,
       elapsedMs: 0,
       authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (OpenAI) " +
@@ -939,7 +939,7 @@ video {
     },
 
     instrumentation: {
-      instrumentationVersion: "12.5.0",
+      instrumentationVersion: "12.5.1",
       engineEventBindings: [],
       receivedP2PEvents: {},
       engineSurface: null,
@@ -2662,10 +2662,24 @@ video {
 
     hlsInstance.on(Hls.Events.ERROR, function (e, d) {
       if (!isCurrentRun()) return;
+      var internalError = d && d.details === "internalException" ? {
+        event: d.event || null,
+        message: d.err && d.err.message ? String(d.err.message) : null,
+        name: d.err && d.err.name ? String(d.err.name) : null,
+        stack: d.err && d.err.stack ? String(d.err.stack) : null
+      } : null;
+
       log("hls:error", {
         type: d && d.type ? d.type : null,
         details: d && d.details ? d.details : null,
-        fatal: !!(d && d.fatal)
+        fatal: !!(d && d.fatal),
+        event: d && d.event ? safeString(d.event) : null,
+        error: d && d.err ? {
+          name: d.err.name ? String(d.err.name) : null,
+          message: d.err.message ? String(d.err.message) : safeString(d.err),
+          stack: d.err.stack ? String(d.err.stack) : null
+        } : null,
+        internalError: internalError
       });
 
       if (!d || !d.fatal) return;
@@ -2829,7 +2843,7 @@ video {
     R = {
       test: {
         name: "HiveStream Phase 1B — Natural Swarm Diagnostic",
-        version: "12.5.0",
+        version: "12.5.1",
         startedAt: now(),
         elapsedMs: 0,
         authorship: "Elwood Edwards (Project Owner) + GPT-5.6 Luna (OpenAI) " +
@@ -2876,7 +2890,7 @@ video {
         announceTrackers: TRACKER_HINTS.slice()
       },
       instrumentation: {
-        instrumentationVersion: "12.5.0",
+        instrumentationVersion: "12.5.1",
         engineEventBindings: [],
         receivedP2PEvents: {},
         engineSurface: null,
@@ -3401,8 +3415,8 @@ video {
       export: {
         savedAt: now(),
         format:"HiveStream Phase 1B diagnostic JSON",
-        schemaVersion:"12.5.0",
-        exporterVersion: "12.5.0",
+        schemaVersion:"12.5.1",
+        exporterVersion: "12.5.1",
         privacy: "Diagnostic export may include WebRTC ICE candidate IP addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
       },
       dependencies: R.dependencies,
@@ -3610,7 +3624,7 @@ video {
       });
 
       // Build the report and stringify it inside the same error boundary.
-      // v12.5.0 previously performed both operations before entering its try
+      // v12.5.1 previously performed both operations before entering its try
       // block, so failures here escaped the save-specific diagnostics.
       report = publicReport();
 
@@ -3631,7 +3645,7 @@ video {
         ? report.transport.mode
         : "unknown";
 
-      filename = "HiveStream-Phase1B-v12.5.0-" + transportTag + "-" +
+      filename = "HiveStream-Phase1B-v12.5.1-" + transportTag + "-" +
         label + "-" + stamp + ".json";
 
       phase = "blob-create";

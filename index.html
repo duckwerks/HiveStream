@@ -1,15 +1,15 @@
 <!doctype html>
 <!--
-HiveStream Phase 1B — Natural Swarm Diagnostic v12.4.1
+HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.0
 Author: Elwood Edwards (Project Owner / HiveStream Developer)
 Technical implementation and diagnostic revision: GPT-5.6 Luna (OpenAI)
-Fresh v12.4.1 source; historical revisions remain in Git history.
+Fresh v12.5.0 source; historical revisions remain in Git history.
 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.4.1</title>
+<title>HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.0</title>
 
 
 
@@ -23,8 +23,8 @@ Fresh v12.4.1 source; historical revisions remain in Git history.
   var Native = window.RTCPeerConnection;
   var pcs = [];
   var seq = 0;
-  window.__HS_V11_PEER_CONNECTIONS = pcs;
-  window.__HS_V11_ACTIVE_RUN_ID = null;
+  window.__HS_V12_PEER_CONNECTIONS = pcs;
+  window.__HS_V12_ACTIVE_RUN_ID = null;
 
   if (!Native) return;
 
@@ -35,7 +35,7 @@ Fresh v12.4.1 source; historical revisions remain in Git history.
   }
 
   function activeRunId() {
-    return window.__HS_V11_ACTIVE_RUN_ID || null;
+    return window.__HS_V12_ACTIVE_RUN_ID || null;
   }
 
   function safeCall(fn, fallback) {
@@ -83,7 +83,13 @@ Fresh v12.4.1 source; historical revisions remain in Git history.
       candidates.push({
         type:type,
         protocol:protocol,
-        addressFamily:address && address.indexOf(":") >= 0 ? "IPv6" : "IPv4",
+        addressFamily:(function(address){
+        if (!address) return "unknown";
+        var s=String(address);
+        if (/^\d+(?:\.\d+){3}$/.test(s)) return "IPv4";
+        if (s.indexOf(":")>=0) return "IPv6";
+        return "hostname";
+      })(address),
         address:address || null,
         port:Number.isFinite(port) ? port : null,
         line:line
@@ -112,10 +118,12 @@ Fresh v12.4.1 source; historical revisions remain in Git history.
     var typIndex = parts.indexOf("typ");
     if (typIndex >= 0 && parts[typIndex + 1]) type = parts[typIndex + 1];
 
-    var family = null;
+    var family = "unknown";
     if (address) {
-      if (String(address).indexOf(":") >= 0) family = "IPv6";
-      else if (/^\d+\.\d+\.\d+\.\d+$/.test(String(address))) family = "IPv4";
+      var addressString = String(address);
+      if (/^\d+(?:\.\d+){3}$/.test(addressString)) family = "IPv4";
+      else if (addressString.indexOf(":") >= 0) family = "IPv6";
+      else family = "hostname";
     }
 
     return {
@@ -310,7 +318,7 @@ Fresh v12.4.1 source; historical revisions remain in Git history.
     pc.addEventListener("icecandidate", function(e) {
       if (e.candidate) {
         var c = candidateSummary(e.candidate);
-        c.at = now();
+        c.at = new Date().toISOString();
         r.ice.candidates.push(c);
         event("icecandidate", c);
       } else {
@@ -346,6 +354,8 @@ Fresh v12.4.1 source; historical revisions remain in Git history.
   var originalAddIceCandidate = Native.prototype.addIceCandidate;
   var originalCreateDataChannel = Native.prototype.createDataChannel;
   var originalClose = Native.prototype.close;
+
+  window.__HS_V12_PRUNE_FOR_RUN=function(keepRunId){pcs=pcs.filter(function(pc){var rec=pc&&pc.__hsV12;return !!rec&&rec.runId===keepRunId;});};
 
   function WrappedRTCPeerConnection() {
     var args = Array.prototype.slice.call(arguments);
@@ -524,9 +534,9 @@ video {
 
 <body>
 <main>
-  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.4.1</h1>
+  <h1>HiveStream Phase 1B — Natural Swarm Diagnostic v12.5.0</h1>
   <div class="small">
-    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.4.1 diagnostic implementation
+    Elwood Edwards + GPT-5.6 Luna (OpenAI) — v12.5.0 diagnostic implementation
   </div>
   <div id="bootStatus" class="small" style="margin-top:6px">BOOT: page script not started</div>
 
@@ -914,7 +924,7 @@ video {
         declaredVersion: P2PML_VERSION,
         sourceUrl: "https://cdn.jsdelivr.net/npm/p2p-media-loader-hlsjs@4.0.0/dist/p2p-media-loader-hlsjs.iife.min.js",
         runtimeGlobal: "window.p2pml.hlsjs",
-        runtimeVerified: null
+        runtimePresent: null
       }
     },
 
@@ -1074,7 +1084,7 @@ video {
   };
 
   
-  var V12_ARRAY_CAP = 2000;
+  var V12_ARRAY_CAP = 600
   function boundedPush(arr, item) {
     arr.push(item);
     if (arr.length > V12_ARRAY_CAP) arr.shift();
@@ -1166,9 +1176,12 @@ video {
     }
 
     var family = "unknown";
-    var a = address || "";
-    if (a.indexOf(":") >= 0) family = "IPv6";
-    else if (/^\d+(?:\.\d+){3}$/.test(a)) family = "IPv4";
+    if (address) {
+      var addressString = String(address);
+      if (/^\d+(?:\.\d+){3}$/.test(addressString)) family = "IPv4";
+      else if (addressString.indexOf(":") >= 0) family = "IPv6";
+      else family = "hostname";
+    }
 
     return {
       raw: raw || null,
@@ -1225,132 +1238,6 @@ video {
     log("webrtc:state", item);
   }
 
-  function attachDataChannel(rec, channel) {
-    if (!channel) return;
-
-    var d = {
-      pcIndex: rec.index,
-      label: channel.label || null,
-      id: channel.id != null ? channel.id : null,      ordered: channel.ordered != null ? channel.ordered : null,      protocol: channel.protocol || null,
-      state: channel.readyState || null,
-      createdAt: now(),
-      openedAt: null,
-      closedAt: null,
-      messages: 0
-    };
-
-    R.webrtc.dataChannels.push(d);
-    rec.dataChannels.push(d);
-
-    function syncState(eventName) {
-      d.state = channel.readyState || null;
-      if (eventName === "open") {
-        d.openedAt = now();
-        R.connectivity.dataChannelOpened = true;
-      }
-      if (eventName === "close") d.closedAt = now();
-      recordState(rec, "datachannel:" + eventName, d.state);
-      log("webrtc:datachannel", {
-        pcIndex: rec.index,
-        event: eventName,
-        label: d.label,
-        state: d.state
-      });
-    }
-
-    try {
-      channel.addEventListener("open", function () { syncState("open"); });
-      channel.addEventListener("close", function () { syncState("close"); });
-      channel.addEventListener("error", function () { syncState("error"); });
-      channel.addEventListener("message", function () {
-        d.messages += 1;
-        log("webrtc:datachannel-message", {
-          pcIndex: rec.index,
-          label: d.label,
-          count: d.messages
-        });
-      });
-    } catch (e) {
-      log("webrtc:datachannel-listener-error", { message: safeString(e) });
-    }
-  }
-
-  function attachPC(pc, index) {
-    if (!pc || !pc.addEventListener) return null;
-
-    var rec = {
-      index: index,
-      createdAt: now(),
-      states: {
-        signaling: pc.signalingState,
-        iceGathering: pc.iceGatheringState,
-        ice: pc.iceConnectionState,
-        connection: pc.connectionState
-      },
-      candidateTypes: {},
-      localCandidates: [],
-      remoteCandidates: [],
-      selectedPair: null,
-      candidatePairHistory: [],
-      stateHistory: [],
-      dataChannels: [],
-      iceCandidateErrors: []
-    };
-
-    R.webrtc.peerConnections.push(rec);
-
-    ["signalingstatechange", "icegatheringstatechange", "iceconnectionstatechange", "connectionstatechange"].forEach(function (eventName) {
-      pc.addEventListener(eventName, function () {
-        var field =
-          eventName === "signalingstatechange" ? "signaling" :
-          eventName === "icegatheringstatechange" ? "iceGathering" :
-          eventName === "iceconnectionstatechange" ? "ice" :
-          "connection";
-
-        recordState(rec, field, pc[
-          field === "signaling" ? "signalingState" :
-          field === "iceGathering" ? "iceGatheringState" :
-          field === "ice" ? "iceConnectionState" :
-          "connectionState"
-        ]);
-      });
-    });
-
-    pc.addEventListener("icecandidate", function (e) {
-      if (!e || !e.candidate) return;
-      addCandidateRecord(index, e.candidate, "local");
-      rec.localCandidates.push(parseCandidate(e.candidate));
-    });
-
-    pc.addEventListener("icecandidateerror", function (e) {
-      var err = {
-        at: now(),
-        pcIndex: index,
-        address: e && e.address ? e.address : null,
-        port: e && e.port ? e.port : null,
-        url: e && e.url ? e.url : null,
-        errorCode: e && e.errorCode ? e.errorCode : null,
-        errorText: e && e.errorText ? e.errorText : null
-      };
-      rec.iceCandidateErrors.push(err);
-      log("webrtc:icecandidateerror", err);
-    });
-
-    pc.addEventListener("datachannel", function (e) {
-      attachDataChannel(rec, e.channel);
-    });
-
-    log("webrtc:pc-created", {
-      pcIndex: index,
-      signaling: pc.signalingState,
-      iceGathering: pc.iceGatheringState,
-      ice: pc.iceConnectionState,
-      connection: pc.connectionState
-    });
-
-    return rec;
-  }
-
   function statObject(report, id) {
     if (!id || !report) return null;
     return report.get(id) || null;
@@ -1377,14 +1264,95 @@ video {
     };
   }
 
-  function pollStats() {
+  function pollStats() {  function ensureV125State(){
+    if(!R._v125){
+      R._v125={
+        transportChains:[],
+        hls:{levelState:{currentLevel:null,loadLevel:null,nextLevel:null},fragmentLoading:[],fragmentLoaded:[],fragmentChanged:[],actualControlledFragment:null,controlledFragmentUrls:[]},
+        localCandidateStats:[],
+        remoteCandidateStats:[],
+        selectedPairHistory:[],
+        notes:[]
+      };
+    }
+    return R._v125;
+  }
+
+  function compactFragmentEvidence(frag){
+    if(!frag)return null;
+    return {
+      level:frag.level==null?null:Number(frag.level),
+      sn:frag.sn==null?null:Number(frag.sn),
+      url:frag.url||null,
+      type:frag.type||null,
+      start:Number.isFinite(Number(frag.start))?Number(frag.start):null,
+      duration:Number.isFinite(Number(frag.duration))?Number(frag.duration):null
+    };
+  }
+
+  function updateTransportEvidence(pc,browserRec){
+    var d=ensureV125State();
+    if(!pc||!browserRec)return null;
+    var sctp=null,dtls=null,ice=null,selected=null;
+    try{sctp=pc.sctp||null;}catch(e){}
+    try{dtls=sctp&&sctp.transport?sctp.transport:null;}catch(e){}
+    try{ice=dtls&&dtls.iceTransport?dtls.iceTransport:null;}catch(e){}
+    try{if(ice&&typeof ice.getSelectedCandidatePair==="function")selected=ice.getSelectedCandidatePair()||null;}catch(e){}
+    var chain={
+      at:now(),
+      pcId:browserRec.pcId,
+      sctp:{present:!!sctp,state:sctp?sctp.state||null:null,maxMessageSize:sctp&&sctp.maxMessageSize!=null?Number(sctp.maxMessageSize):null},
+      dtls:{present:!!dtls,state:dtls?dtls.state||null:null,role:dtls?dtls.role||null:null},
+      ice:{present:!!ice,state:ice?ice.state||null:null,selectedCandidatePairId:selected&&selected.id?selected.id:null}
+    };
+    var signature=JSON.stringify({sctp:chain.sctp.state,dtls:chain.dtls.state,ice:chain.ice.state,pair:chain.ice.selectedCandidatePairId});
+    var prev=browserRec._v125TransportSignature||null;
+    browserRec._v125Transport=chain;
+    if(prev!==signature){
+      browserRec._v125TransportSignature=signature;
+      if(d.transportChains.length>=120)d.transportChains.shift();
+      d.transportChains.push(chain);
+    }
+    if(chain.ice.state==="checking")R.connectivity.iceConnectionChecking=true;
+    if(chain.ice.state==="connected"||chain.ice.state==="completed")R.connectivity.iceConnectionConnected=true;
+    if(chain.ice.state==="failed")R.connectivity.iceConnectionFailed=true;
+    if(chain.ice.state==="disconnected")R.connectivity.iceConnectionDisconnected=true;
+    if(chain.dtls.state==="connected")R.connectivity.dtlsConnected=true;
+    if(chain.sctp.state==="connected")R.connectivity.sctpConnected=true;
+    if(chain.ice.selectedCandidatePairId)R.connectivity.candidatePairSelectedObserved=true;
+    return chain;
+  }
+
+  function rememberControlledFragment(frag){
+    var d=ensureV125State();
+    var f=compactFragmentEvidence(frag);
+    if(!f||R.selectedVariant.levelIndex==null||f.level!==R.selectedVariant.levelIndex)return false;
+    if(f.url&&d.hls.controlledFragmentUrls.indexOf(f.url)<0){
+      d.hls.controlledFragmentUrls.push(f.url);
+      if(d.hls.controlledFragmentUrls.length>100)d.hls.controlledFragmentUrls.shift();
+    }
+    return true;
+  }
+
+  function matchControlledFragment(segment){
+    var d=ensureV125State(),seg=segment||null,url=seg&&(seg.url||seg.segmentUrl)||null;
+    if(!url||R.selectedVariant.levelIndex==null)return null;
+    var lists=[d.hls.fragmentChanged,d.hls.fragmentLoaded,d.hls.fragmentLoading];
+    for(var li=0;li<lists.length;li++)for(var i=lists[li].length-1;i>=0;i--){
+      var f=lists[li][i];
+      if(f&&f.level===R.selectedVariant.levelIndex&&f.url===url)return f;
+    }
+    return null;
+  }
+
+
     var runIdAtStart = R.identity && R.identity.runId;
     installSegmentStorageInstrumentation();
-    syncV11BrowserProtocol();
+    syncV12BrowserProtocol();
     R.instrumentation.peerIdDiscoveryAttempts += 1;
     discoverActualPeerId();
 
-    var pcs = (window.__HS_V11_PEER_CONNECTIONS || []).filter(function(p){
+    var pcs = (window.__HS_V12_PEER_CONNECTIONS || []).filter(function(p){
       return p && p.__hsV11 && p.__hsV11.runId === runIdAtStart;
     });
 
@@ -1430,6 +1398,7 @@ video {
         }
         var pairSummaries = [];
         var pairStateCounts = {};
+        var v125 = ensureV125State();
 
         report.forEach(function (s) {
           if (s.type === "transport" && s.selectedCandidatePairId) {
@@ -1440,6 +1409,20 @@ video {
         });
 
         report.forEach(function (s) {
+          if (s.type === "local-candidate" || s.type === "remote-candidate") {
+            var candidate = summarizeCandidateStat(s);
+            candidate.at = now();
+            candidate.pcIndex = i;
+            candidate.direction = s.type === "local-candidate" ? "local" : "remote";
+            if (candidate.direction === "local") {
+              boundedPush(v125.localCandidateStats, candidate);
+              R.connectivity.iceCandidatesGathered = true;
+            } else {
+              boundedPush(v125.remoteCandidateStats, candidate);
+            }
+            return;
+          }
+
           if (s.type !== "candidate-pair") return;
 
           var state = s.state || "unknown";
@@ -1473,8 +1456,6 @@ video {
           };
 
           pairSummaries.push(summary);
-          boundedPush(browserRec.stats.candidatePairs, summary);
-          boundedPush(R.webrtc.candidatePairRecords, summary);
 
           if (summary.selected) {
             browserRec.stats.selectedCandidatePairId = s.id || null;
@@ -1525,6 +1506,8 @@ video {
         } : null;
         browserRec.stats.peerConnection = pcSummary;
         browserRec.stats.pairStateCounts = pairStateCounts;
+        updateTransportEvidence(pc,browserRec);
+
         boundedPush(browserRec.stats.snapshots, {
           at: now(),
           selectedCandidatePairId: selectedPairId,
@@ -2394,6 +2377,7 @@ video {
 
       if (peerId) {
         R.connectivity.remotePeerKnown = true;
+        correlatePeerIdToBrowserPc(peerId);
       }
 
       log("transfer:chunk-downloaded", {
@@ -2451,8 +2435,19 @@ video {
         R.verdict.p2pSegmentLoaded = true;
         if (R.swarm.controlledInfoHash &&
             seg.infoHash === R.swarm.controlledInfoHash) {
-          R.verdict.p2pSegmentMatchedSelectedVariant = true;
+          var matchedFragment=matchControlledFragment(seg.segment);
+          if(matchedFragment){
+            R.verdict.p2pSegmentMatchedSelectedVariant=true;
+            R.verdict.p2pSegmentCorrelatedToControlledFragment=true;
+            R.verdict.controlledFragmentCorrelation={
+              at:now(),
+              method:"exact-fragment-url",
+              fragment:matchedFragment,
+              segment:cloneJson(seg.segment)
+            };
+          }
         }
+        if(peerId)correlatePeerIdToBrowserPc(peerId);
       }
 
       log("transfer:segment-loaded", {
@@ -2490,6 +2485,8 @@ video {
         });
         R.scheduler.stallRescue.action =
           "applyDynamicConfig({ core: { simultaneousHttpDownloads: 1 } })";
+        R.scheduler.effectiveMode="hybrid-rescue";
+        R.scheduler.rescued=true;
         log("scheduler:stall-rescue-triggered", {
           reason: R.scheduler.stallRescue.reason,
           elapsedMs: elapsedMs,
@@ -2555,6 +2552,12 @@ video {
 
     hlsInstance.on(Hls.Events.MANIFEST_LOADED, function (e, d) {
       if (!isCurrentRun()) return;
+      var v125=ensureV125State();
+      v125.hls.levelState={
+        currentLevel:hlsInstance.currentLevel,
+        loadLevel:hlsInstance.loadLevel,
+        nextLevel:hlsInstance.nextLevel
+      };
       R.manifest.loaded = true;
       R.manifest.url = d && d.url ? d.url : R.configuration.streamUrl;
       R.manifest.renditions = (d && d.levels ? d.levels : []).map(function (l, i) {
@@ -2577,10 +2580,11 @@ video {
           R.selectedVariant.found = true;
           R.selectedVariant.levelIndex = found.index;
           R.selectedVariant.properties = cloneJson(found);
-          R.selectedVariant.reason = "Exact controlled rendition matched manifest.";
+          R.selectedVariant.selectionMechanism = "hls.nextLevel";
+          R.selectedVariant.reason = "Exact controlled rendition matched manifest; hls.nextLevel used so the target level is scheduled without forcing an immediate buffer-flush switch.";
 
           try {
-            hlsInstance.currentLevel = found.index;
+            hlsInstance.nextLevel = found.index;
           } catch (err) {
             log("hls:current-level-error", { message: safeString(err) });
           }
@@ -2619,11 +2623,41 @@ video {
         R.playerRecovery.levelDriftCorrections.push(correction);
         log("hls:level-drift-corrected", correction);
         try {
-          hlsInstance.currentLevel = R.selectedVariant.levelIndex;
+          hlsInstance.nextLevel = R.selectedVariant.levelIndex;
         } catch (err) {
           log("hls:level-relock-error", { message: safeString(err) });
         }
       }
+    });
+
+    hlsInstance.on(Hls.Events.FRAG_LOADING,function(e,d){
+      if(!isCurrentRun())return;
+      var v125=ensureV125State(),f=compactFragmentEvidence(d&&d.frag);
+      if(f){boundedPush(v125.hls.fragmentLoading,f);rememberControlledFragment(d&&d.frag);}
+      if(hlsInstance){
+        v125.hls.levelState={currentLevel:hlsInstance.currentLevel,loadLevel:hlsInstance.loadLevel,nextLevel:hlsInstance.nextLevel};
+      }
+      log("hls:fragment-loading",{fragment:f,levelState:v125.hls.levelState,controlled:!!(f&&f.level===R.selectedVariant.levelIndex)});
+    });
+
+    hlsInstance.on(Hls.Events.FRAG_LOADED,function(e,d){
+      if(!isCurrentRun())return;
+      var v125=ensureV125State(),f=compactFragmentEvidence(d&&d.frag);
+      if(f){boundedPush(v125.hls.fragmentLoaded,f);rememberControlledFragment(d&&d.frag);}
+      log("hls:fragment-loaded",{fragment:f,controlled:!!(f&&f.level===R.selectedVariant.levelIndex),payloadBytes:d&&d.payload&&d.payload.byteLength!=null?Number(d.payload.byteLength):null});
+    });
+
+    hlsInstance.on(Hls.Events.FRAG_CHANGED,function(e,d){
+      if(!isCurrentRun())return;
+      var v125=ensureV125State(),f=compactFragmentEvidence(d&&d.frag);
+      if(f)boundedPush(v125.hls.fragmentChanged,f);
+      var controlled=rememberControlledFragment(d&&d.frag);
+      if(controlled){
+        v125.hls.actualControlledFragment=f;
+        R.verdict.actualControlledPlaybackFragmentObserved=true;
+        R.verdict.controlledFragmentCorrelation={at:now(),method:"hls.FRAG_CHANGED.level",fragment:f};
+      }
+      log("hls:fragment-changed",{fragment:f,controlled:controlled,levelState:v125.hls.levelState});
     });
 
     hlsInstance.on(Hls.Events.ERROR, function (e, d) {
@@ -2678,6 +2712,9 @@ video {
     R.configuration.transportMode = cfg.transport;
 
     R.scheduler.transportMode = cfg.transport;
+    R.scheduler.requestedMode = cfg.transport;
+    R.scheduler.effectiveMode = cfg.transport;
+    R.scheduler.rescued = false;
     R.scheduler.requestedStreamConfig = cloneJson(STREAM_TRANSPORT[cfg.transport]);
     R.scheduler.stallRescue.enabled = cfg.transport === "p2ponly" && stallRescueSecondsValue() > 0;
     R.scheduler.stallRescue.timeoutMs = stallRescueSecondsValue() * 1000;
@@ -2687,7 +2724,7 @@ video {
       window.Hls && typeof window.Hls.version === "string" ? window.Hls.version : null;
     R.dependencies.hlsJs.runtimeVerified =
       R.dependencies.hlsJs.runtimeVersion === HLS_VERSION;
-    R.dependencies.p2pMediaLoaderHlsJs.runtimeVerified =
+    R.dependencies.p2pMediaLoaderHlsJs.runtimePresent =
       !!(window.p2pml && window.p2pml.hlsjs &&
           typeof window.p2pml.hlsjs.HlsJsP2PEngine === "function");
 
@@ -2696,7 +2733,7 @@ video {
       hlsRuntime: R.dependencies.hlsJs.runtimeVersion,
       hlsVerified: R.dependencies.hlsJs.runtimeVerified,
       p2pmlDeclared: P2PML_VERSION,
-      p2pmlGlobalPresent: R.dependencies.p2pMediaLoaderHlsJs.runtimeVerified
+      p2pmlGlobalPresent: R.dependencies.p2pMediaLoaderHlsJs.runtimePresent
     });
 
     var options = {
@@ -2816,7 +2853,7 @@ video {
           declaredVersion: P2PML_VERSION,
           sourceUrl: "https://cdn.jsdelivr.net/npm/p2p-media-loader-hlsjs@4.0.0/dist/p2p-media-loader-hlsjs.iife.min.js",
           runtimeGlobal: "window.p2pml.hlsjs",
-          runtimeVerified: null
+          runtimePresent: null
         }
       },
       configuration: {
@@ -2951,13 +2988,13 @@ video {
     R._seenRemoteCandidateStats = {};
 
     
-    window.__HS_V11_ACTIVE_RUN_ID = R.identity.runId;
+    window.__HS_V12_ACTIVE_RUN_ID = R.identity.runId;
   }
 
 
   
-  function syncV11BrowserProtocol() {
-    var all = window.__HS_V11_PEER_CONNECTIONS || [];
+  function syncV12BrowserProtocol() {
+    var all = window.__HS_V12_PEER_CONNECTIONS || [];
     var runId = R.identity && R.identity.runId;
     var selected = all.filter(function(pc){
       return pc && pc.__hsV11 && pc.__hsV11.runId === runId;
@@ -2979,6 +3016,7 @@ video {
       return {
         index: index,
         pcId: p.pcId,
+
         peerId: p.peerId || p.remotePeerId || null,
         createdAt: p.createdAt,
         states: {
@@ -2993,6 +3031,10 @@ video {
         peerCorrelationConfidence: p.peerCorrelationConfidence || null,
         peerCorrelationCandidatePoolSize: p.peerCorrelationCandidatePoolSize || null,
         selectedPair: p.stats.selectedCandidatePair,
+        selectedPairHistory: (p.stats.selectedPairHistory || []).slice(-20),
+        transportEvidence: p._v125Transport || null,
+        localCandidateStats: (p.stats.localCandidateStats || []).slice(-120),
+        remoteCandidateStats: (p.stats.remoteCandidateStats || []).slice(-120),
         candidatePairHistory: p.stats.candidatePairs || [],
         stateHistory: p.ice.stateHistory || [],
         dataChannels: p.dataChannels.map(function(d){
@@ -3066,8 +3108,8 @@ video {
     });
   }
 
-  function updateV11ProtocolMilestones() {
-    syncV11BrowserProtocol();
+  function updateV12ProtocolMilestones() {
+    syncV12BrowserProtocol();
 
     var records = R.webrtc.browserProtocol.records || [];
     var m = {
@@ -3127,52 +3169,52 @@ video {
 
   
   function correlatePeerIdToBrowserPc(peerId) {
-    if(!peerId) return;
-    var all = window.__HS_V11_PEER_CONNECTIONS || [];
-    var runId = R.identity && R.identity.runId;
-    var open = all.filter(function(p){ return p && p.runId === runId && !p.closed; });
-    var unclaimed = open.filter(function(p){ return !p.peerId; });
-    var pool = unclaimed.length ? unclaimed : open;
-    var confidence;
-    if (!unclaimed.length && open.length) {
-      confidence = "reattribution-fallback";
-    } else if (pool.length > 1) {
-      confidence = "ambiguous";
-      log("webrtc:peer-correlation-ambiguous", {
-        peerId: peerId,
-        candidateCount: pool.length,
-        candidatePcIds: pool.map(function(p){ return p.pcId || p.id || null; }),
-        note: "More than one open, unclaimed RTCPeerConnection existed for " +
-          "this run when peerId " + peerId + " arrived. Attributing to the " +
-          "most recently created candidate as a best guess; this may be wrong."
+    if(!peerId)return;
+    var all=window.__HS_V12_PEER_CONNECTIONS||[];
+    var runId=R.identity&&R.identity.runId;
+    var open=all.filter(function(pc){
+      var rec=pc&&pc.__hsV12;
+      return rec&&rec.runId===runId&&!rec.closed;
+    });
+    var unclaimed=open.filter(function(pc){
+      var rec=pc&&pc.__hsV12;
+      return rec&&!rec.peerId&&!rec.remotePeerId;
+    });
+    if(unclaimed.length!==1){
+      log("webrtc:peer-correlation-not-assigned",{
+        peerId:peerId,
+        openCount:open.length,
+        unclaimedCount:unclaimed.length,
+        candidatePcIds:unclaimed.map(function(pc){return pc&&pc.__hsV12?pc.__hsV12.pcId:null;}),
+        reason:unclaimed.length===0?"no-unclaimed-pc":"ambiguous-unclaimed-pcs"
       });
-    } else {
-      confidence = "unambiguous";
+      return;
     }
-    pool.sort(function(a,b){ return (b.createdMono||0) - (a.createdMono||0); });
-    if(pool[0]){
-      pool[0].peerId = peerId;
-      pool[0].remotePeerId = peerId;
-      pool[0].peerCorrelationConfidence = confidence;
-      pool[0].peerCorrelationCandidatePoolSize = pool.length;
-      pool[0].events.push({
-        at:now(),
-        elapsedMs:Math.round(mono()-(pool[0].createdMono||mono())),
-        type:"p2pml:peer-id-correlated",
-        data:{peerId:peerId, confidence:confidence, candidatePoolSize:pool.length}
-      });
-    }
+    var rec=unclaimed[0].__hsV12;
+    rec.peerId=peerId;
+    rec.remotePeerId=peerId;
+    rec.peerCorrelationConfidence="unambiguous";
+    rec.peerCorrelationCandidatePoolSize=1;
+    rec.events.push({
+      at:now(),
+      elapsedMs:Math.round(mono()-(rec.createdMono||mono())),
+      type:"p2pml:peer-id-correlated",
+      data:{peerId:peerId,confidence:"unambiguous",candidatePoolSize:1}
+    });
+    R.connectivity.remotePeerKnown=true;
+    log("webrtc:peer-correlation-assigned",{peerId:peerId,pcId:rec.pcId,confidence:"unambiguous"});
   }
 
   function updateVerdict() {
-    updateV11ProtocolMilestones();
+    updateV12ProtocolMilestones();
 
     
     R.verdict.proof =
       !!R.selectedVariant.found &&
       !!R.swarm.controlledInfoHash &&
-      R.verdict.p2pChunkBytesReceived &&
-      R.verdict.p2pSegmentMatchedSelectedVariant;
+      !!R.verdict.actualControlledPlaybackFragmentObserved &&
+      !!R.verdict.p2pChunkBytesReceived &&
+      !!R.verdict.p2pSegmentCorrelatedToControlledFragment;
 
     R.test.elapsedMs = Math.round(mono() - (R._monoStart || mono()));  }
 
@@ -3208,7 +3250,7 @@ video {
   }
 
   function compactWebRTC() {
-    syncV11BrowserProtocol();
+    syncV12BrowserProtocol();
 
     // R.webrtc.peerConnections is the current flattened v11 projection.
     // The full nested protocol records remain in browserProtocol.records.
@@ -3348,7 +3390,8 @@ video {
       network: networkSummary(),
       export: {
         savedAt: now(),
-        format: "HiveStream Phase 1B diagnostic JSON",
+        format:"HiveStream Phase 1B diagnostic JSON",
+        schemaVersion:"12.5.0",
         exporterVersion: "12.4.1.1",
         privacy: "Diagnostic export may include WebRTC ICE candidate IP addresses, ports, protocols, foundations, and related network metadata because network-path diagnosis is an explicit purpose of this experiment. Cookies, browsing history, precise device location, and unrelated local-storage contents are not exported."
       },
@@ -3382,6 +3425,14 @@ video {
       webrtc: compactWebRTC(),
       browserProtocol: R.webrtc.browserProtocol,
       verdict: R.verdict,
+      v125: R._v125 || null,
+      proofChain:{
+        peerConnected:!!R.verdict.peerConnected,
+        p2pChunkBytesReceived:!!R.verdict.p2pChunkBytesReceived,
+        actualControlledPlaybackFragmentObserved:!!R.verdict.actualControlledPlaybackFragmentObserved,
+        p2pSegmentCorrelatedToControlledFragment:!!R.verdict.p2pSegmentCorrelatedToControlledFragment,
+        finalProof:!!R.verdict.proof
+      },
       events: R.events
     };
   }
@@ -3440,12 +3491,27 @@ video {
       }).join("\n");
 
     document.getElementById("json").textContent =
-      JSON.stringify(publicReport(), null, 2);
+      JSON.stringify({
+        note:"Full diagnostic report is serialized only when Save JSON to File is pressed.",
+        runId:R.identity.runId,
+        transportMode:R.scheduler.transportMode,
+        effectiveMode:R.scheduler.effectiveMode,
+        currentRunPeerConnections:R.webrtc.browserProtocol.currentRunCaptured,
+        p2pBytesReceived:R.transfer.bytes.p2pDown,
+        proof:R.verdict.proof
+      },null,2);
   }
 
   startBtn.addEventListener("click", function () {
     bootText("start clicked");
     try {
+
+      if (renderTimer) clearInterval(renderTimer);
+      if (statsTimer) clearInterval(statsTimer);
+      if (stallRescueTimer) clearInterval(stallRescueTimer);
+      renderTimer=null;statsTimer=null;stallRescueTimer=null;
+      resetRun();
+      if(window.__HS_V12_PRUNE_FOR_RUN&&R.identity&&R.identity.runId){try{window.__HS_V12_PRUNE_FOR_RUN(R.identity.runId);}catch(e){}}
       resetRun();
       started = false;
       var playerCreated = createPlayer();
@@ -3536,7 +3602,7 @@ video {
       });
 
       // Build the report and stringify it inside the same error boundary.
-      // v12.4.1 previously performed both operations before entering its try
+      // v12.5.0 previously performed both operations before entering its try
       // block, so failures here escaped the save-specific diagnostics.
       report = publicReport();
 
@@ -3557,7 +3623,7 @@ video {
         ? report.transport.mode
         : "unknown";
 
-      filename = "HiveStream-Phase1B-v12.4.1-" + transportTag + "-" +
+      filename = "HiveStream-Phase1B-v12.5.0-" + transportTag + "-" +
         label + "-" + stamp + ".json";
 
       phase = "blob-create";

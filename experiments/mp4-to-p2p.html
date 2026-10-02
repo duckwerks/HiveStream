@@ -32,7 +32,19 @@ $("load").onclick=async()=>{
     const r=await fetch(backend+"/api/ingest",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({sourceUrl:source})});
     const bootstrap=await r.json();
     if(!r.ok||bootstrap.ok===false) throw new Error(bootstrap.error||"Ingestion failed");
-    player=new HiveStreamPlayer($("video"),{onEvent:(_e,state)=>$("stats").textContent=JSON.stringify(state,null,2)});
+    player=new HiveStreamPlayer($("video"),{
+      onP2PEngine:(p2p)=>{
+        p2p.addEventListener("onChunkDownloaded",(bytesLength,downloadSource,peerId)=>{
+          const state=player.snapshot();
+          state.chunkSource=downloadSource;
+          state.lastPeerId=peerId||null;
+          if(String(downloadSource).toLowerCase().includes("p2p")) state.p2pBytes+=bytesLength;
+          else state.httpBytes+=bytesLength;
+          $("stats").textContent=JSON.stringify(state,null,2);
+        });
+      },
+      onEvent:(_e,state)=>$("stats").textContent=JSON.stringify(state,null,2)
+    });
     await player.load(bootstrap);
   }catch(e){$("stats").textContent=e.stack||String(e);}
   finally{$("load").disabled=false;}

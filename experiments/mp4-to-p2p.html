@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HiveStream Phase 1 — MP4 to P2P</title>
+<style>
+body{font:16px system-ui,sans-serif;max-width:1000px;margin:24px auto;padding:0 16px}
+input{width:70%;padding:8px}button{padding:8px 14px}
+video{width:100%;background:#000;margin-top:16px}
+pre{white-space:pre-wrap;background:#f4f4f4;padding:12px}
+</style>
+</head>
+<body>
+<h1>HiveStream Phase 1 — MP4 → HLS → P2P</h1>
+<p>This page is a real media-plane test, not a diagnostic-only mock.</p>
+<input id="backend" placeholder="https://your-hivestream-server.example">
+<input id="source" value="https://u.pone.rs/sahrrklr.mp4">
+<button id="load">Ingest and play</button>
+<video id="video" controls playsinline></video>
+<pre id="stats">Waiting.</pre>
+<script type="module">
+import { HiveStreamPlayer } from "../src/hivestream-client.js";
+
+const $=id=>document.getElementById(id);
+let player=null;
+$("load").onclick=async()=>{
+  const backend=$("backend").value.replace(/\/$/,"");
+  const source=$("source").value.trim();
+  $("load").disabled=true;
+  try{
+    const r=await fetch(backend+"/api/ingest",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({sourceUrl:source})});
+    const bootstrap=await r.json();
+    if(!r.ok||bootstrap.ok===false) throw new Error(bootstrap.error||"Ingestion failed");
+    player=new HiveStreamPlayer($("video"),{
+      onP2PEngine:(p2p)=>{
+        p2p.addEventListener("onChunkDownloaded",(bytesLength,downloadSource,peerId)=>{
+          const state=player.snapshot();
+          state.chunkSource=downloadSource;
+          state.lastPeerId=peerId||null;
+          if(String(downloadSource).toLowerCase().includes("p2p")) state.p2pBytes+=bytesLength;
+          else state.httpBytes+=bytesLength;
+          $("stats").textContent=JSON.stringify(state,null,2);
+        });
+      },
+      onEvent:(_e,state)=>$("stats").textContent=JSON.stringify(state,null,2)
+    });
+    await player.load(bootstrap);
+  }catch(e){$("stats").textContent=e.stack||String(e);}
+  finally{$("load").disabled=false;}
+};
+</script>
+</body>
+</html>
